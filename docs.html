@@ -81,6 +81,15 @@
             <a href="docs.html#browser-api" class="docs-nav-link">Browser API</a>
           </div>
         </div>
+        <div class="docs-nav-group collapsed">
+          <button type="button" class="docs-nav-group-title" aria-expanded="false" aria-controls="docs-group-guides" id="docs-group-guides-btn">
+            <span>Guides</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-guides">
+            <a href="docs.html#actions" class="docs-nav-link">Actions</a>
+          </div>
+        </div>
       </nav>
     </aside>
 
@@ -294,12 +303,127 @@ describe('My site', () => {
   });
 });</code></pre>
 
-        <h2>What's next</h2>
-        <ul>
-          <li>Write tests using assertions and hooks</li>
-          <li>Run tests with browser automation</li>
-          <li><a href="https://github.com/lokesh771988/EasyTesting" target="_blank" rel="noopener noreferrer">View on GitHub</a></li>
-        </ul>
+        <h2 id="actions">Actions</h2>
+        <h3>Introduction</h3>
+        <p>Playwright can interact with HTML Input elements such as text inputs, checkboxes, radio buttons, select options, mouse clicks, type characters, keys and shortcuts as well as upload files and focus elements.</p>
+
+        <h3>Text input – ways to handle</h3>
+        <p><strong>CSTesting supports 5 ways to handle text input</strong> (typing into inputs):</p>
+        <hr />
+
+        <h4>1. Config file (no code)</h4>
+        <p>In a <code>.conf</code> file, one line per field. Format: <strong><code>&lt;label&gt;:&lt;locator&gt;=value:&lt;text&gt;</code></strong></p>
+        <pre><code># Login Page
+username:[name="userName"]=value:mercury
+password:[name="password"]=value:secret</code></pre>
+        <p>Run: <code>npx cstesting run login.conf</code></p>
+        <hr />
+
+        <h4>2. browser.type(selector, text)</h4>
+        <p>Direct API: pass a CSS selector (or shorthand) and the text.</p>
+        <pre><code>const { createBrowser } = require('cstesting');
+const browser = await createBrowser({ headless: true });
+await browser.goto('https://example.com/login');
+await browser.type('[name="userName"]', 'mercury');
+await browser.type('[name="password"]', 'secret');
+await browser.close();</code></pre>
+        <p><strong>Locator shorthand:</strong> <code>name="userName"</code> → <code>[name="userName"]</code>, <code>id="email"</code> → <code>[id="email"]</code>, etc.</p>
+        <hr />
+
+        <h4>3. browser.locator(selector).type(text)</h4>
+        <p>Use a locator when you need to chain (e.g. type then press key) or target one of multiple elements.</p>
+        <pre><code>await browser.goto('https://www.google.com');
+const searchBox = browser.locator('[name="q"]');
+await searchBox.type('CSTesting');
+await searchBox.pressKey('Enter');</code></pre>
+        <p><strong>When multiple elements match:</strong> use <code>.first()</code>, <code>.last()</code>, or <code>.nth(index)</code>:</p>
+        <pre><code>await browser.locator('input').first().type('hello');
+await browser.locator('input').nth(1).type('world');</code></pre>
+        <hr />
+
+        <h4>4. browser.getByAttribute(attr, value).type(text)</h4>
+        <p>Type into an element found by attribute (same locator API).</p>
+        <pre><code>const input = browser.getByAttribute('name', 'userName');
+await input.type('mercury');</code></pre>
+        <hr />
+
+        <h4>5. Page Object (wrap in a class)</h4>
+        <p>Centralize selectors and typing in a page class; use it in tests.</p>
+        <p><strong>pages/LoginPage.js:</strong></p>
+        <pre><code>class LoginPage {
+  constructor(browser) {
+    this.browser = browser;
+  }
+  async typeUsername(value) {
+    await this.browser.type('[name="userName"]', value);
+  }
+  async typePassword(value) {
+    await this.browser.type('[name="password"]', value);
+  }
+  async submit() {
+    await this.browser.click('[name="submit"]');
+  }
+}
+module.exports = LoginPage;</code></pre>
+        <p><strong>Test:</strong></p>
+        <pre><code>const { createBrowser, describe, it, beforeAll, afterAll } = require('cstesting');
+const LoginPage = require('./pages/LoginPage');
+
+describe('Login', () => {
+  let browser, page;
+  beforeAll(async () => {
+    browser = await createBrowser({ headless: true });
+    page = new LoginPage(browser);
+  });
+  afterAll(async () => await browser.close());
+
+  it('logs in', async () => {
+    await browser.goto('https://example.com/login');
+    await page.typeUsername('mercury');
+    await page.typePassword('secret');
+    await page.submit();
+  });
+});</code></pre>
+        <hr />
+
+        <p><strong>Summary</strong></p>
+        <table class="docs-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Way</th>
+              <th>Use when</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Config file <code>label:locator=value:text</code></td>
+              <td>No code; run flows from .conf</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><code>browser.type(selector, text)</code></td>
+              <td>Simple one-off typing</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><code>browser.locator(selector).type(text)</code></td>
+              <td>Chain with pressKey; use .first()/.nth()</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td><code>browser.getByAttribute(attr, value).type(text)</code></td>
+              <td>Find by attribute, then type</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Page Object method</td>
+              <td>Reuse and maintain selectors in one place</td>
+            </tr>
+          </tbody>
+        </table>
+
         </div>
       </div>
     </main>
@@ -352,6 +476,39 @@ describe('My site', () => {
           group.classList.toggle('collapsed', expanded);
         });
       });
+
+      function syncSidebarToHash() {
+        var hash = window.location.hash.slice(1);
+        var groups = document.querySelectorAll('.docs-nav-group');
+        var activeGroup = null;
+        groups.forEach(function(group) {
+          var links = group.querySelectorAll('a.docs-nav-link');
+          for (var i = 0; i < links.length; i++) {
+            var href = links[i].getAttribute('href') || '';
+            var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+            if (hash && linkHash === hash) {
+              activeGroup = group;
+              break;
+            }
+          }
+        });
+        if (!hash) activeGroup = document.querySelector('.docs-nav-group');
+        groups.forEach(function(group) {
+          var btn = group.querySelector('.docs-nav-group-title');
+          if (btn) {
+            var isOpen = group === activeGroup;
+            group.classList.toggle('collapsed', !isOpen);
+            btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          }
+        });
+        document.querySelectorAll('.docs-nav-link').forEach(function(a) {
+          var href = a.getAttribute('href') || '';
+          var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+          a.classList.toggle('docs-nav-link--active', hash && linkHash === hash);
+        });
+      }
+      syncSidebarToHash();
+      window.addEventListener('hashchange', syncSidebarToHash);
 
       var logoText = document.getElementById('logo-text');
       var platformBadge = document.getElementById('docs-platform-badge');
