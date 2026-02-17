@@ -26,22 +26,37 @@
 }
 
 .docs-content-footer.is-visible {
-  max-height: 180px;
+  max-height: 115px;
   min-height: 0;
   opacity: 1;
   pointer-events: auto;
-  padding: 16px 24px 12px;
+  padding: 8px 20px 8px;
   border-top: 1px solid var(--border, #262626);
 }
 
 .docs-content-footer .footer-grid {
-  gap: 16px;
-  margin-bottom: 12px;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.docs-content-footer .footer-col h4 {
+  font-size: 0.75rem;
+  margin: 0 0 4px;
+}
+
+.docs-content-footer .footer-col ul {
+  margin: 0;
+  padding-left: 0;
+}
+
+.docs-content-footer .footer-col li {
+  margin-bottom: 2px;
+  font-size: 0.8125rem;
 }
 
 .docs-content-footer .footer-copy {
-  padding-top: 12px;
-  font-size: 0.8125rem;
+  padding-top: 6px;
+  font-size: 0.75rem;
 }
 
 .docs-layout {
