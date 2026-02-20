@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Annotations | CSTesting for Java</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="docs.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="docs-page">
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <header class="header">
+    <div class="header-inner">
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="index.html" class="logo">
+        <span class="logo-icon" aria-hidden="true">◆</span>
+        <span id="logo-text">CSTesting</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="index.html#features">Features</a>
+        <a href="docs-java.html" class="nav-active" id="docs-link">Docs</a>
+        <a href="index.html#community">Community</a>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="youtube-menu" id="youtube-trigger">YouTube</button>
+          <div class="nav-dropdown-menu" id="youtube-menu" role="menu" aria-labelledby="youtube-trigger">
+            <a href="https://www.youtube.com/@testingtutorialspoint" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">testingtutorialspoint</a>
+            <a href="https://www.youtube.com/@cstechnologiestelugu1988" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">cstechnologiestelugu</a>
+          </div>
+        </div>
+      </nav>
+      <div class="header-actions">
+        <button class="search-btn" aria-label="Search (Command+K)">Search</button>
+        <a href="index.html#get-started" class="btn btn-primary">Get started</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <button type="button" class="docs-sidebar-toggle" aria-label="Toggle docs menu" aria-expanded="false">Docs menu</button>
+    <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation navigation">
+      <nav class="docs-nav">
+        <div class="docs-nav-group">
+          <button type="button" class="docs-nav-group-title" aria-expanded="false" aria-controls="docs-group-getting-started" id="docs-group-getting-started-btn">
+            <span>Getting Started</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-getting-started">
+            <a href="docs-java.html#installation" class="docs-nav-link">Installation</a>
+            <a href="docs-java-writing-tests.html" class="docs-nav-link">Writing tests</a>
+            <a href="docs-java-running-debugging.html" class="docs-nav-link">Running and debugging tests</a>
+            <a href="docs-java-test-runners.html" class="docs-nav-link">Test runners</a>
+          </div>
+        </div>
+        <div class="docs-nav-group">
+          <button type="button" class="docs-nav-group-title" aria-expanded="true" aria-controls="docs-group-guides" id="docs-group-guides-btn">
+            <span>Guides</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-guides">
+            <a href="docs-java-actions.html" class="docs-nav-link">Actions</a>
+            <a href="docs-java-waits.html" class="docs-nav-link">Waits</a>
+            <a href="docs-java-assertions.html" class="docs-nav-link">Assertions</a>
+            <a href="docs-java-dialogs.html" class="docs-nav-link">Dialogs</a>
+            <a href="docs-java-frames.html" class="docs-nav-link">Frames</a>
+            <a href="docs-java-locators.html" class="docs-nav-link">Locators</a>
+            <a href="docs-java-navigations.html" class="docs-nav-link">Navigations</a>
+            <a href="docs-java-annotations.html" class="docs-nav-link docs-nav-link--active">Annotations</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main id="main" class="docs-content">
+      <div class="docs-content-inner">
+        <div class="docs-main-content" id="docs-main-content">
+        <h1 class="docs-section-heading">Annotations</h1>
+
+        <h2 id="introduction">Introduction</h2>
+        <p>CSTesting provides <strong>TestNG-style annotations</strong> and a <strong>runner</strong> so you can structure tests with suite/class/method lifecycle. You mark test methods with <strong><code>@CSTest</code></strong> and use <strong><code>@BeforeSuite</code></strong>, <strong><code>@AfterSuite</code></strong>, <strong><code>@BeforeClass</code></strong>, <strong><code>@AfterClass</code></strong>, <strong><code>@BeforeMethod</code></strong>, and <strong><code>@AfterMethod</code></strong> for setup and teardown. Extend <strong><code>CSTestingTestBase</code></strong> to get a <strong><code>browser</code></strong> field that the runner injects before each test method. The runner creates a <strong>new browser for each test</strong>, runs the lifecycle methods in order, and closes the browser after <strong><code>@AfterMethod</code></strong>.</p>
+
+        <h2 id="list-of-annotations">List of annotations</h2>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Annotation</th><th>When it runs</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong><code>@BeforeSuite</code></strong></td><td>Once before the entire run (before any <code>@BeforeClass</code> or test). No browser is created yet.</td></tr>
+            <tr><td><strong><code>@AfterSuite</code></strong></td><td>Once after the entire run (after all tests and <code>@AfterClass</code>). Browser is already closed.</td></tr>
+            <tr><td><strong><code>@BeforeClass</code></strong></td><td>Once before any test method in the class. No browser yet.</td></tr>
+            <tr><td><strong><code>@AfterClass</code></strong></td><td>Once after all test methods in the class. Browser already closed.</td></tr>
+            <tr><td><strong><code>@BeforeMethod</code></strong></td><td>Before each <code>@CSTest</code> method. <strong>Browser is created and injected</strong> before this runs.</td></tr>
+            <tr><td><strong><code>@AfterMethod</code></strong></td><td>After each <code>@CSTest</code> method. Browser is still open; the runner closes it after this.</td></tr>
+            <tr><td><strong><code>@CSTest</code></strong></td><td>The test method. Runs with <code>browser</code> set.</td></tr>
+          </tbody>
+        </table>
+        <p>All lifecycle and test methods must be <strong>public</strong>, <strong>no-argument</strong> instance methods. Multiple methods can share the same annotation (e.g. several <code>@BeforeMethod</code> methods); they are all invoked in declaration order.</p>
+
+        <h2 id="execution-order">Execution order</h2>
+        <p>The runner runs in this order:</p>
+        <ol>
+          <li><strong><code>@BeforeSuite</code></strong> (all methods)</li>
+          <li><strong><code>@BeforeClass</code></strong> (all methods)</li>
+          <li>For <strong>each</strong> <code>@CSTest</code> method:
+            <ul>
+              <li>Create a new browser and inject it into the test instance</li>
+              <li><strong><code>@BeforeMethod</code></strong> (all methods)</li>
+              <li><strong><code>@CSTest</code></strong> (the test method)</li>
+              <li><strong><code>@AfterMethod</code></strong> (all methods)</li>
+              <li>Close the browser</li>
+            </ul>
+          </li>
+          <li><strong><code>@AfterClass</code></strong> (all methods)</li>
+          <li><strong><code>@AfterSuite</code></strong> (all methods)</li>
+        </ol>
+        <p>So each test method gets a <strong>fresh browser</strong>; nothing is shared between tests except the same test class instance for suite/class hooks.</p>
+
+        <h2 id="base-class">Base class: CSTestingTestBase</h2>
+        <p>Your test class should <strong>extend <code>CSTestingTestBase</code></strong>. The base class provides:</p>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Member</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong><code>protected CSTestingBrowser browser</code></strong></td><td>Set by the runner before each test. Use it in <code>@BeforeMethod</code>, <code>@CSTest</code>, and <code>@AfterMethod</code>.</td></tr>
+            <tr><td><strong><code>protected CSTestingOptions getBrowserOptions()</code></strong></td><td>Override to customize browser options (e.g. headless vs headed). Default: headless.</td></tr>
+            <tr><td><strong><code>public void setBrowser(CSTestingBrowser browser)</code></strong></td><td>Called by the runner to inject the browser. You normally don't call this yourself.</td></tr>
+          </tbody>
+        </table>
+        <p><strong>Example – run with a visible browser:</strong></p>
+        <pre><code>@Override
+protected CSTestingOptions getBrowserOptions() {
+    return CSTestingOptions.builder().headless(false).build();
+}</code></pre>
+
+        <h2 id="cstest">@CSTest</h2>
+        <p>Mark a method as a test with <strong><code>@CSTest</code></strong>. You can optionally set a <strong>description</strong> (e.g. for reports or logs):</p>
+        <pre><code>@CSTest
+public void testLogin() {
+    browser.gotoUrl("https://example.com/login");
+    browser.locator("name=user").type("alice");
+    browser.locator("button[type=submit]").click();
+    browser.assertThat().hasURL("**/welcome");
+}
+
+@CSTest(description = "Check example.com title")
+public void testTitle() {
+    browser.gotoUrl("https://example.com");
+    browser.assertThat().hasTitle("Example");
+}</code></pre>
+
+        <h2 id="runner">Runner: CSTestingRunner</h2>
+        <p><strong><code>CSTestingRunner</code></strong> discovers and runs all <code>@CSTest</code> methods in a class and runs the lifecycle annotations.</p>
+        <p><strong>From code:</strong></p>
+        <pre><code>// Default options (headless)
+CSTestingRunner.run(MyTestClass.class);
+
+// Custom options (e.g. headed)
+CSTestingRunner.run(MyTestClass.class, CSTestingOptions.builder().headless(false).build());</code></pre>
+        <p><strong>From command line (no <code>main()</code> in the test class):</strong></p>
+        <pre><code>mvn exec:java -Dexec.mainClass="com.cstesting.runner.CSTestingRunner" -Dexec.args="com.example.MyTest"</code></pre>
+        <p>Or with the <strong>annotation-tests</strong> profile (if configured to run a specific class):</p>
+        <pre><code>mvn exec:java -Pannotation-tests</code></pre>
+        <p><strong>Entry point with class name as argument:</strong></p>
+        <pre><code>java -cp ... com.cstesting.runner.CSTestingRunner com.example.MyTest</code></pre>
+        <p>The first argument must be the <strong>fully qualified class name</strong> of the test class.</p>
+
+        <h2 id="full-example">Full example</h2>
+        <pre><code>import com.cstesting.annotations.*;
+import com.cstesting.runner.CSTestingRunner;
+import com.cstesting.runner.CSTestingTestBase;
+
+public class MyTest extends CSTestingTestBase {
+
+    @BeforeSuite
+    public void beforeSuite() {
+        System.out.println("Before suite");
+    }
+
+    @AfterSuite
+    public void afterSuite() {
+        System.out.println("After suite");
+    }
+
+    @BeforeClass
+    public void beforeClass() {
+        System.out.println("Before class");
+    }
+
+    @AfterClass
+    public void afterClass() {
+        System.out.println("After class");
+    }
+
+    @BeforeMethod
+    public void setUp() {
+        // browser is already created and set by the runner
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        // runs before the runner closes the browser
+    }
+
+    @CSTest(description = "Check example.com title")
+    public void testTitle() {
+        browser.gotoUrl("https://example.com");
+        browser.assertThat().hasTitle("Example");
+    }
+
+    @CSTest
+    public void testHeading() {
+        browser.gotoUrl("https://example.com");
+        browser.assertThat(browser.locator("h1")).isVisible();
+    }
+
+    public static void main(String[] args) {
+        CSTestingRunner.run(MyTest.class);
+    }
+}</code></pre>
+        <p><strong>Run:</strong></p>
+        <ul>
+          <li>From IDE: run <code>main</code>, or run the class with JUnit/TestNG if you integrate the runner there.</li>
+          <li>From Maven: <code>mvn exec:java -Dexec.mainClass="com.cstesting.runner.CSTestingRunner" -Dexec.args="com.example.MyTest"</code></li>
+        </ul>
+
+        <h2 id="without-base-class">Running without extending CSTestingTestBase</h2>
+        <p>The runner can inject the browser into a class that does <strong>not</strong> extend <code>CSTestingTestBase</code> if the class has either:</p>
+        <ul>
+          <li>A <strong><code>setBrowser(CSTestingBrowser browser)</code></strong> method, or</li>
+          <li>A <strong>field named <code>browser</code></strong> (any visibility) of type <code>CSTestingBrowser</code>.</li>
+        </ul>
+        <p>The runner will use reflection to set the browser before each test. Prefer extending <strong><code>CSTestingTestBase</code></strong> for a clear contract and <code>getBrowserOptions()</code> support.</p>
+
+        <h2 id="summary">Summary</h2>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Topic</th><th>CSTesting</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Test method</strong></td><td><code>@CSTest</code> or <code>@CSTest(description = "...")</code></td></tr>
+            <tr><td><strong>Suite</strong></td><td><code>@BeforeSuite</code>, <code>@AfterSuite</code> — once per run</td></tr>
+            <tr><td><strong>Class</strong></td><td><code>@BeforeClass</code>, <code>@AfterClass</code> — once per class</td></tr>
+            <tr><td><strong>Method</strong></td><td><code>@BeforeMethod</code>, <code>@AfterMethod</code> — per test; browser is set before <code>@BeforeMethod</code></td></tr>
+            <tr><td><strong>Base class</strong></td><td>Extend <code>CSTestingTestBase</code> for <code>browser</code> and <code>getBrowserOptions()</code></td></tr>
+            <tr><td><strong>Run from code</strong></td><td><code>CSTestingRunner.run(MyTest.class)</code> or <code>run(MyTest.class, options)</code></td></tr>
+            <tr><td><strong>Run from CLI</strong></td><td><code>CSTestingRunner</code> with fully qualified class name as first argument</td></tr>
+            <tr><td><strong>Browser</strong></td><td>One new browser per test; closed after <code>@AfterMethod</code></td></tr>
+          </tbody>
+        </table>
+        <div class="docs-prev-next docs-prev-next--prev-only">
+          <a href="docs-java-navigations.html" class="docs-prev">
+            <span class="docs-prev-next-label">Previous</span>
+            <span class="docs-prev-next-title">« Navigations</span>
+          </a>
+        </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer docs-content-footer" id="docs-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Learn</h4>
+          <ul>
+            <li><a href="docs-java.html">Getting started</a></li>
+            <li><a href="docs-java-writing-tests.html">Writing tests</a></li>
+            <li><a href="docs-java-running-debugging.html">Running and debugging tests</a></li>
+            <li><a href="docs-java-test-runners.html">Test runners</a></li>
+            <li><a href="docs-java-actions.html">Actions</a></li>
+            <li><a href="docs-java-waits.html">Waits</a></li>
+            <li><a href="docs-java-assertions.html">Assertions</a></li>
+            <li><a href="docs-java-dialogs.html">Dialogs</a></li>
+            <li><a href="docs-java-frames.html">Frames</a></li>
+            <li><a href="docs-java-locators.html">Locators</a></li>
+            <li><a href="docs-java-navigations.html">Navigations</a></li>
+            <li><a href="docs-java-annotations.html">Annotations</a></li>
+            <li><a href="docs.html">Node.js docs</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="https://github.com/lokesh771988/EasyTesting" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-copy">&copy; 2025 CSTesting. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    (function() {
+      try {
+        sessionStorage.setItem('cstesting-platform', 'Java');
+      } catch (e) {}
+      var logoText = document.getElementById('logo-text');
+      if (logoText) {
+        logoText.textContent = 'CSTesting for Java';
+      }
+
+      var logoLink = document.querySelector('header .logo');
+      if (logoLink) {
+        logoLink.setAttribute('href', 'index.html');
+        logoLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = 'index.html';
+        });
+      }
+
+      var toggle = document.querySelector('.docs-sidebar-toggle');
+      var sidebar = document.getElementById('docs-sidebar');
+      if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+          var open = sidebar.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', open);
+        });
+      }
+      document.querySelectorAll('.docs-nav-group-title').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var group = btn.closest('.docs-nav-group');
+          var expanded = btn.getAttribute('aria-expanded') === 'true';
+          document.querySelectorAll('.docs-nav-group').forEach(function(other) {
+            if (other !== group) {
+              other.classList.add('collapsed');
+              var otherBtn = other.querySelector('.docs-nav-group-title');
+              if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+            }
+          });
+          btn.setAttribute('aria-expanded', !expanded);
+          group.classList.toggle('collapsed', expanded);
+        });
+      });
+
+      function syncSidebarToHash() {
+        var hash = window.location.hash.slice(1);
+        var groups = document.querySelectorAll('.docs-nav-group');
+        var activeGroup = null;
+        groups.forEach(function(group) {
+          var links = group.querySelectorAll('a.docs-nav-link');
+          for (var i = 0; i < links.length; i++) {
+            var href = links[i].getAttribute('href') || '';
+            var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+            if (hash && linkHash === hash) {
+              activeGroup = group;
+              break;
+            }
+          }
+          if (!hash && links.length && group.querySelector('a[href="docs-java-annotations.html"]')) {
+            activeGroup = group;
+          }
+        });
+        if (!hash) activeGroup = activeGroup || document.querySelector('.docs-nav-group');
+        groups.forEach(function(group) {
+          var btn = group.querySelector('.docs-nav-group-title');
+          if (btn) {
+            var isOpen = group === activeGroup;
+            group.classList.toggle('collapsed', !isOpen);
+            btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          }
+        });
+        document.querySelectorAll('.docs-nav-link').forEach(function(a) {
+          var href = a.getAttribute('href') || '';
+          var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+          var isAnnotationsPage = href.indexOf('docs-java-annotations.html') !== -1 && !linkHash;
+          a.classList.toggle('docs-nav-link--active', isAnnotationsPage || (hash && linkHash === hash));
+        });
+      }
+      syncSidebarToHash();
+      window.addEventListener('hashchange', syncSidebarToHash);
+    })();
+  </script>
+</body>
+</html>

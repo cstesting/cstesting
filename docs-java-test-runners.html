@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test runners | CSTesting for Java</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="docs.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="docs-page">
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <header class="header">
+    <div class="header-inner">
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="index.html" class="logo">
+        <span class="logo-icon" aria-hidden="true">◆</span>
+        <span id="logo-text">CSTesting</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="index.html#features">Features</a>
+        <a href="docs-java.html" class="nav-active" id="docs-link">Docs</a>
+        <a href="index.html#community">Community</a>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="youtube-menu" id="youtube-trigger">YouTube</button>
+          <div class="nav-dropdown-menu" id="youtube-menu" role="menu" aria-labelledby="youtube-trigger">
+            <a href="https://www.youtube.com/@testingtutorialspoint" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">testingtutorialspoint</a>
+            <a href="https://www.youtube.com/@cstechnologiestelugu1988" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">cstechnologiestelugu</a>
+          </div>
+        </div>
+      </nav>
+      <div class="header-actions">
+        <button class="search-btn" aria-label="Search (Command+K)">Search</button>
+        <a href="index.html#get-started" class="btn btn-primary">Get started</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <button type="button" class="docs-sidebar-toggle" aria-label="Toggle docs menu" aria-expanded="false">Docs menu</button>
+    <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation navigation">
+      <nav class="docs-nav">
+        <div class="docs-nav-group">
+          <button type="button" class="docs-nav-group-title" aria-expanded="true" aria-controls="docs-group-getting-started" id="docs-group-getting-started-btn">
+            <span>Getting Started</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-getting-started">
+            <a href="docs-java.html#installation" class="docs-nav-link">Installation</a>
+            <a href="docs-java-writing-tests.html" class="docs-nav-link">Writing tests</a>
+            <a href="docs-java-running-debugging.html" class="docs-nav-link">Running and debugging tests</a>
+            <a href="docs-java-test-runners.html" class="docs-nav-link docs-nav-link--active">Test runners</a>
+          </div>
+        </div>
+        <div class="docs-nav-group collapsed">
+          <button type="button" class="docs-nav-group-title" aria-expanded="false" aria-controls="docs-group-guides" id="docs-group-guides-btn">
+            <span>Guides</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-guides">
+            <a href="docs-java-actions.html" class="docs-nav-link">Actions</a>
+            <a href="docs-java-waits.html" class="docs-nav-link">Waits</a>
+            <a href="docs-java-assertions.html" class="docs-nav-link">Assertions</a>
+            <a href="docs-java-dialogs.html" class="docs-nav-link">Dialogs</a>
+            <a href="docs-java-frames.html" class="docs-nav-link">Frames</a>
+            <a href="docs-java-locators.html" class="docs-nav-link">Locators</a>
+            <a href="docs-java-navigations.html" class="docs-nav-link">Navigations</a>
+            <a href="docs-java-annotations.html" class="docs-nav-link">Annotations</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main id="main" class="docs-content">
+      <div class="docs-content-inner">
+        <div class="docs-main-content" id="docs-main-content">
+        <h1 class="docs-section-heading">Getting Started</h1>
+
+        <h2 id="introduction">Test runners</h2>
+
+        <h3 id="intro">Introduction</h3>
+        <p>CSTesting does <strong>not</strong> integrate with JUnit or TestNG. It provides its <strong>own test runner</strong> (<strong>CSTestingRunner</strong>) and <strong>annotations</strong> (<code>@CSTest</code>, <code>@BeforeMethod</code>, <code>@AfterMethod</code>, <code>@BeforeClass</code>, <code>@AfterClass</code>, <code>@BeforeSuite</code>, <code>@AfterSuite</code>). You run tests by passing your test class to the runner from code or from the command line (Maven or Gradle). Each test method runs in a <strong>new browser</strong> for isolation; the runner creates and closes the browser for you.</p>
+
+        <h3 id="supported-runner">Supported: CSTestingRunner (built-in)</h3>
+        <p>CSTesting's <strong>only</strong> supported way to run annotated tests is <strong>CSTestingRunner</strong>.</p>
+        <ul>
+          <li>Your test class extends <strong>CSTestingTestBase</strong> and uses <strong><code>@CSTest</code></strong>, <strong><code>@BeforeMethod</code></strong>, <strong><code>@AfterMethod</code></strong>, etc.</li>
+          <li>The runner creates one <strong>CSTestingBrowser</strong> per test method, injects it, runs the test, then closes the browser.</li>
+          <li>There is no <strong>BrowserContext</strong> or <strong>Page</strong> abstraction; <strong>CSTestingBrowser</strong> is the single object you use (like a "page" that can navigate and interact).</li>
+        </ul>
+        <p><strong>From code:</strong></p>
+        <pre><code>public static void main(String[] args) {
+    CSTestingRunner.run(MyTest.class);
+}</code></pre>
+        <p><strong>From command line (Maven):</strong></p>
+        <pre><code>mvn exec:java -Dexec.mainClass="com.cstesting.runner.CSTestingRunner" -Dexec.args="com.example.MyTest"</code></pre>
+        <p>See <a href="docs-java-annotations.html">Annotations</a> and <a href="docs-java-running-debugging.html">Running and debugging tests</a> for details.</p>
+
+        <h3 id="not-junit">Not supported: JUnit</h3>
+        <p>CSTesting <strong>does not</strong> integrate with JUnit. There is no JUnit dependency, no JUnit-specific APIs, and no "run with JUnit" setup.</p>
+        <p>Use <strong>CSTestingRunner</strong> and CSTesting annotations instead. The annotation names (<code>@BeforeMethod</code>, <code>@AfterMethod</code>, <code>@BeforeClass</code>, <code>@AfterClass</code>) are similar to TestNG; the lifecycle is implemented by <strong>CSTestingRunner</strong>, not by JUnit or TestNG.</p>
+
+        <h3 id="not-testng">Not supported: TestNG</h3>
+        <p>CSTesting <strong>does not</strong> integrate with TestNG. There is no TestNG dependency and no TestNG-specific setup.</p>
+        <p>CSTesting's annotations are <strong>inspired by</strong> TestNG (e.g. <code>@BeforeMethod</code>, <code>@AfterMethod</code>, <code>@BeforeClass</code>, <code>@AfterClass</code>), but tests are run by <strong>CSTestingRunner</strong>, not by the TestNG engine. You cannot run CSTesting tests with <code>@Test</code> from TestNG; use <strong><code>@CSTest</code></strong> and <strong>CSTestingRunner.run(MyTest.class)</strong>.</p>
+
+        <h3 id="supported-maven">Supported: Maven</h3>
+        <p>You can run CSTesting tests with <strong>Maven</strong> using the <strong>exec-maven-plugin</strong>:</p>
+        <pre><code>mvn exec:java -Dexec.mainClass="com.cstesting.runner.CSTestingRunner" -Dexec.args="com.example.MyTest"</code></pre>
+        <p>Or add a profile in your <strong>pom.xml</strong> and run:</p>
+        <pre><code>mvn exec:java -Pannotation-tests</code></pre>
+        <p><strong>Dependency:</strong></p>
+        <pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;io.github.cstesttool&lt;/groupId&gt;
+  &lt;artifactId&gt;cstesting-java&lt;/artifactId&gt;
+  &lt;version&gt;0.1.5&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+
+        <h3 id="supported-gradle">Supported: Gradle</h3>
+        <p>CSTesting works with <strong>Gradle</strong> as the build tool. Add the dependency and run the runner with a <strong>JavaExec</strong> task.</p>
+        <p><strong>build.gradle (Kotlin):</strong></p>
+        <pre><code>plugins {
+    java
+    application
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("io.github.cstesttool:cstesting-java:0.1.5")
+}
+
+application {
+    mainClass.set("com.cstesting.runner.CSTestingRunner")
+}
+
+// Run one test class: ./gradlew run --args="com.example.MyTest"
+tasks.named&lt;JavaExec&gt;("run") {
+    if (project.hasProperty("testClass")) {
+        args(project.property("testClass"))
+    }
+}</code></pre>
+        <p><strong>Run:</strong></p>
+        <pre><code>./gradlew run --args="com.example.MyTest"</code></pre>
+        <p>Or define a dedicated task:</p>
+        <pre><code>tasks.register&lt;JavaExec&gt;("cstesting") {
+    group = "verification"
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.cstesting.runner.CSTestingRunner")
+    if (project.hasProperty("testClass")) {
+        args(project.property("testClass"))
+    }
+}</code></pre>
+        <pre><code>./gradlew cstesting -PtestClass=com.example.MyTest</code></pre>
+        <p><strong>build.gradle (Groovy):</strong></p>
+        <pre><code>plugins {
+    id 'java'
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.github.cstesttool:cstesting-java:0.1.5'
+}
+
+application {
+    mainClass = 'com.cstesting.runner.CSTestingRunner'
+}
+
+run {
+    if (project.hasProperty('testClass')) {
+        args project.testClass
+    }
+}</code></pre>
+
+        <h3 id="parallel">Parallel execution</h3>
+        <p>CSTestingRunner runs all <strong><code>@CSTest</code></strong> methods in a class <strong>sequentially</strong> on a single thread. There is <strong>no built-in parallel execution</strong> (no parallel test methods or parallel classes within the same JVM).</p>
+        <p>If you need parallelism, you can run <strong>multiple test classes in separate processes</strong> (e.g. multiple Maven/Gradle invocations with different class names), each using CSTestingRunner. That is not an official integration; it is a usage pattern you can implement in your build or scripts.</p>
+
+        <h3 id="summary">Summary</h3>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Runner / build</th><th>Supported?</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>CSTestingRunner</strong></td><td>Yes</td><td>Built-in; only supported way to run <code>@CSTest</code> methods.</td></tr>
+            <tr><td><strong>JUnit</strong></td><td>No</td><td>Not integrated; use CSTestingRunner.</td></tr>
+            <tr><td><strong>TestNG</strong></td><td>No</td><td>Not integrated; use CSTestingRunner (annotations are TestNG-style only).</td></tr>
+            <tr><td><strong>Maven</strong></td><td>Yes</td><td>Use <code>exec:java</code> with <code>CSTestingRunner</code> and test class name.</td></tr>
+            <tr><td><strong>Gradle</strong></td><td>Yes</td><td>Use JavaExec with main class <code>CSTestingRunner</code> and args = test class name.</td></tr>
+            <tr><td><strong>Parallel (in-process)</strong></td><td>No</td><td>Runner is single-threaded; tests run one after another.</td></tr>
+          </tbody>
+        </table>
+        <div class="docs-prev-next">
+          <a href="docs-java-running-debugging.html" class="docs-prev">
+            <span class="docs-prev-next-label">Previous</span>
+            <span class="docs-prev-next-title">« Running and debugging tests</span>
+          </a>
+          <a href="docs-java-actions.html" class="docs-next-block">
+            <span class="docs-prev-next-label">Next</span>
+            <span class="docs-prev-next-title">Actions »</span>
+          </a>
+        </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer docs-content-footer" id="docs-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Learn</h4>
+          <ul>
+            <li><a href="docs-java.html">Getting started</a></li>
+            <li><a href="docs-java-writing-tests.html">Writing tests</a></li>
+            <li><a href="docs-java-running-debugging.html">Running and debugging tests</a></li>
+            <li><a href="docs-java-test-runners.html">Test runners</a></li>
+            <li><a href="docs-java-actions.html">Actions</a></li>
+            <li><a href="docs-java-waits.html">Waits</a></li>
+            <li><a href="docs-java-assertions.html">Assertions</a></li>
+            <li><a href="docs-java-dialogs.html">Dialogs</a></li>
+            <li><a href="docs-java-frames.html">Frames</a></li>
+            <li><a href="docs-java-locators.html">Locators</a></li>
+            <li><a href="docs-java-navigations.html">Navigations</a></li>
+            <li><a href="docs-java-annotations.html">Annotations</a></li>
+            <li><a href="docs.html">Node.js docs</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="https://github.com/lokesh771988/EasyTesting" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-copy">&copy; 2025 CSTesting. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    (function() {
+      try {
+        sessionStorage.setItem('cstesting-platform', 'Java');
+      } catch (e) {}
+      var logoText = document.getElementById('logo-text');
+      if (logoText) {
+        logoText.textContent = 'CSTesting for Java';
+      }
+
+      var logoLink = document.querySelector('header .logo');
+      if (logoLink) {
+        logoLink.setAttribute('href', 'index.html');
+        logoLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = 'index.html';
+        });
+      }
+
+      var toggle = document.querySelector('.docs-sidebar-toggle');
+      var sidebar = document.getElementById('docs-sidebar');
+      if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+          var open = sidebar.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', open);
+        });
+      }
+      document.querySelectorAll('.docs-nav-group-title').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var group = btn.closest('.docs-nav-group');
+          var expanded = btn.getAttribute('aria-expanded') === 'true';
+          document.querySelectorAll('.docs-nav-group').forEach(function(other) {
+            if (other !== group) {
+              other.classList.add('collapsed');
+              var otherBtn = other.querySelector('.docs-nav-group-title');
+              if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+            }
+          });
+          btn.setAttribute('aria-expanded', !expanded);
+          group.classList.toggle('collapsed', expanded);
+        });
+      });
+
+      function syncSidebarToHash() {
+        var hash = window.location.hash.slice(1);
+        var groups = document.querySelectorAll('.docs-nav-group');
+        var activeGroup = null;
+        groups.forEach(function(group) {
+          var links = group.querySelectorAll('a.docs-nav-link');
+          for (var i = 0; i < links.length; i++) {
+            var href = links[i].getAttribute('href') || '';
+            var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+            if (hash && linkHash === hash) {
+              activeGroup = group;
+              break;
+            }
+          }
+          if (!hash && links.length && group.querySelector('a[href="docs-java-test-runners.html"]')) {
+            activeGroup = group;
+          }
+        });
+        if (!hash) activeGroup = activeGroup || document.querySelector('.docs-nav-group');
+        groups.forEach(function(group) {
+          var btn = group.querySelector('.docs-nav-group-title');
+          if (btn) {
+            var isOpen = group === activeGroup;
+            group.classList.toggle('collapsed', !isOpen);
+            btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          }
+        });
+        document.querySelectorAll('.docs-nav-link').forEach(function(a) {
+          var href = a.getAttribute('href') || '';
+          var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+          var isTestRunnersPage = href.indexOf('docs-java-test-runners.html') !== -1 && !linkHash;
+          a.classList.toggle('docs-nav-link--active', isTestRunnersPage || (hash && linkHash === hash));
+        });
+      }
+      syncSidebarToHash();
+      window.addEventListener('hashchange', syncSidebarToHash);
+    })();
+  </script>
+</body>
+</html>

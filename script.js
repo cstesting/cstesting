@@ -7,6 +7,36 @@
   var featuresMenu = document.getElementById('features-menu');
   var youtubeTrigger = document.getElementById('youtube-trigger');
   var youtubeMenu = document.getElementById('youtube-menu');
+  var logoText = document.getElementById('logo-text');
+  var docsLink = document.getElementById('docs-link');
+
+  function getStoredPlatform() {
+    try {
+      return sessionStorage.getItem('cstesting-platform') || '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function applyPlatformToUI(platform) {
+    if (logoText) {
+      logoText.textContent = platform ? 'CSTesting for ' + platform : 'CSTesting';
+    }
+    if (docsLink) {
+      docsLink.href = platform === 'Java' ? 'docs-java.html' : 'docs.html';
+    }
+  }
+
+  var storedPlatform = getStoredPlatform();
+  var isMainPage = !document.body.classList.contains('docs-page');
+  if (storedPlatform) {
+    if (docsLink) {
+      docsLink.href = storedPlatform === 'Java' ? 'docs-java.html' : 'docs.html';
+    }
+    if (!isMainPage && logoText) {
+      logoText.textContent = 'CSTesting for ' + storedPlatform;
+    }
+  }
 
   function closeAllDropdowns() {
     if (featuresMenu) featuresMenu.classList.remove('is-open');
@@ -41,16 +71,14 @@
       featuresMenu.classList.toggle('is-open', !expanded);
     });
 
-    var logoText = document.getElementById('logo-text');
     featuresMenu.addEventListener('click', function (e) {
       var item = e.target.closest('[data-platform]');
-      if (item && logoText) {
-        var platform = item.getAttribute('data-platform');
-        var displayText = platform ? 'CSTesting for ' + platform : 'CSTesting';
-        logoText.textContent = displayText;
+      if (item) {
+        var platform = item.getAttribute('data-platform') || '';
         try {
-          sessionStorage.setItem('cstesting-platform', platform || '');
+          sessionStorage.setItem('cstesting-platform', platform);
         } catch (err) {}
+        applyPlatformToUI(platform);
         featuresTrigger.setAttribute('aria-expanded', 'false');
         featuresMenu.classList.remove('is-open');
       }

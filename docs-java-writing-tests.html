@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Writing tests | CSTesting for Java</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="docs.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="docs-page">
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <header class="header">
+    <div class="header-inner">
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="index.html" class="logo">
+        <span class="logo-icon" aria-hidden="true">◆</span>
+        <span id="logo-text">CSTesting</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="index.html#features">Features</a>
+        <a href="docs-java.html" class="nav-active" id="docs-link">Docs</a>
+        <a href="index.html#community">Community</a>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="youtube-menu" id="youtube-trigger">YouTube</button>
+          <div class="nav-dropdown-menu" id="youtube-menu" role="menu" aria-labelledby="youtube-trigger">
+            <a href="https://www.youtube.com/@testingtutorialspoint" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">testingtutorialspoint</a>
+            <a href="https://www.youtube.com/@cstechnologiestelugu1988" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">cstechnologiestelugu</a>
+          </div>
+        </div>
+      </nav>
+      <div class="header-actions">
+        <button class="search-btn" aria-label="Search (Command+K)">Search</button>
+        <a href="index.html#get-started" class="btn btn-primary">Get started</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <button type="button" class="docs-sidebar-toggle" aria-label="Toggle docs menu" aria-expanded="false">Docs menu</button>
+    <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation navigation">
+      <nav class="docs-nav">
+        <div class="docs-nav-group">
+          <button type="button" class="docs-nav-group-title" aria-expanded="true" aria-controls="docs-group-getting-started" id="docs-group-getting-started-btn">
+            <span>Getting Started</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-getting-started">
+            <a href="docs-java.html#installation" class="docs-nav-link">Installation</a>
+            <a href="docs-java-writing-tests.html" class="docs-nav-link docs-nav-link--active">Writing tests</a>
+            <a href="docs-java-running-debugging.html" class="docs-nav-link">Running and debugging tests</a>
+            <a href="docs-java-test-runners.html" class="docs-nav-link">Test runners</a>
+          </div>
+        </div>
+        <div class="docs-nav-group collapsed">
+          <button type="button" class="docs-nav-group-title" aria-expanded="false" aria-controls="docs-group-guides" id="docs-group-guides-btn">
+            <span>Guides</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-guides">
+            <a href="docs-java-actions.html" class="docs-nav-link">Actions</a>
+            <a href="docs-java-waits.html" class="docs-nav-link">Waits</a>
+            <a href="docs-java-assertions.html" class="docs-nav-link">Assertions</a>
+            <a href="docs-java-dialogs.html" class="docs-nav-link">Dialogs</a>
+            <a href="docs-java-frames.html" class="docs-nav-link">Frames</a>
+            <a href="docs-java-locators.html" class="docs-nav-link">Locators</a>
+            <a href="docs-java-navigations.html" class="docs-nav-link">Navigations</a>
+            <a href="docs-java-annotations.html" class="docs-nav-link">Annotations</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main id="main" class="docs-content">
+      <div class="docs-content-inner">
+        <div class="docs-main-content" id="docs-main-content">
+        <h1 class="docs-section-heading">Writing tests</h1>
+
+        <h2 id="writing-tests-intro">Introduction</h2>
+        <p>CSTesting assertions are designed for the dynamic web. Use <strong><code>assertThat()</code></strong> for page-level checks (title, URL) and <strong><code>assertThat(locator)</code></strong> for element-level checks (visible, attribute, text, value). Assertions throw <strong><code>AssertionError</code></strong> on failure. Use <strong><code>waitForSelector</code></strong>, <strong><code>waitForLoad</code></strong>, or <strong><code>waitForURL</code></strong> when you need to wait for conditions before asserting or acting.</p>
+        <p>The example below shows how to write a test using assertions, locators, and selectors.</p>
+        <pre><code>package org.example;
+
+import com.cstesting.CSTesting;
+import com.cstesting.CSTestingBrowser;
+import com.cstesting.CSTestingOptions;
+
+public class App {
+    public static void main(String[] args) {
+        CSTestingBrowser browser = CSTesting.createBrowser(
+            CSTestingOptions.builder().headless(true).build()
+        );
+        try {
+            browser.gotoUrl("https://example.com");
+
+            // Expect the page title to contain a substring.
+            browser.assertThat().hasTitle("Example");
+
+            // Create a locator and expect an attribute to match.
+            var link = browser.locator("a").first();
+            browser.assertThat(link).hasAttribute("href");
+
+            // Click the link (e.g. "More information...").
+            link.click();
+
+            // Wait for navigation and expect a heading to be visible.
+            browser.waitForLoad(5_000);
+            browser.assertThat(browser.locator("h1")).isVisible();
+        } finally {
+            browser.close();
+        }
+    }
+}</code></pre>
+
+        <h2 id="assertions">Assertions</h2>
+        <p>Use <strong><code>browser.assertThat()</code></strong> for the page and <strong><code>browser.assertThat(locator)</code></strong> for elements. Assertions are fluent and throw <code>AssertionError</code> if the condition is not met.</p>
+        <p><strong>Page assertions:</strong></p>
+        <pre><code>// Title contains or equals the expected string.
+browser.assertThat().hasTitle("Example Domain");
+
+// URL contains the string or matches a pattern (use * as wildcard).
+browser.assertThat().hasURL("https://example.com");
+browser.assertThat().hasURL("**/example*");</code></pre>
+
+        <p><strong>Element assertions:</strong></p>
+        <pre><code>// Visibility and state.
+browser.assertThat(browser.locator("button")).isVisible();
+browser.assertThat(browser.locator("#name")).isEditable();
+browser.assertThat(browser.locator("input")).isEnabled();
+browser.assertThat(browser.locator("[disabled]")).isDisabled();
+
+// Text and value.
+browser.assertThat(browser.locator("h1")).hasText("Example");
+browser.assertThat(browser.locator("h1")).containText("Example");
+browser.assertThat(browser.locator("#search")).hasValue("query");
+browser.assertThat(browser.locator("#search")).containValue("query");
+
+// Attributes.
+browser.assertThat(browser.locator("a").first()).hasAttribute("href");
+browser.assertThat(browser.locator("a").first()).hasAttribute("href", "https://example.com");
+
+// Count of matching elements.
+browser.assertThat(browser.locator("button")).count(3);
+browser.assertThat(browser.locator("li")).hasCount(5);</code></pre>
+
+        <h2 id="locators">Locators</h2>
+        <p>Locators represent a way to find element(s) on the page. Create them with <strong><code>browser.locator(selector)</code></strong> and use them for actions (<code>.click()</code>, <code>.type()</code>, etc.) and assertions. If the selector matches <strong>multiple</strong> elements, use <strong><code>.first()</code></strong>, <strong><code>.last()</code></strong>, or <strong><code>.nth(index)</code></strong> before performing an action.</p>
+        <p><strong>Selector formats:</strong> CSS (default), XPath (<code>//button</code> or <code>xpath=//button</code>), <code>id=value</code>, <code>name=value</code>, or any <code>attr=value</code>.</p>
+        <pre><code>// By text (XPath).
+var getStarted = browser.locator("//a[contains(.,'Get Started')]").first();
+browser.assertThat(getStarted).hasAttribute("href", "/docs/intro");
+getStarted.click();
+
+// By CSS or id/name.
+browser.assertThat(browser.locator("h1")).isVisible();
+browser.assertThat(browser.locator("id=submit")).isEnabled();
+browser.locator("name=email").type("user@example.com");</code></pre>
+
+        <p>See <a href="#locators">Locators</a> for the full list of selector formats and locator methods.</p>
+
+        <h2 id="test-isolation">Test isolation</h2>
+        <p>Create a <strong>new browser</strong> for each test so that tests do not share state (cookies, storage, or tabs). Open the browser at the start of the test and close it in a <code>finally</code> block (or use try-with-resources if you wrap the API).</p>
+        <pre><code>public void testLogin() {
+    CSTestingBrowser browser = CSTesting.createBrowser(
+        CSTestingOptions.builder().headless(true).build()
+    );
+    try {
+        browser.gotoUrl("https://example.com/login");
+        browser.locator("name=user").type("alice");
+        browser.locator("name=pass").type("secret");
+        browser.locator("button[type=submit]").click();
+        browser.assertThat().hasURL("**/welcome");
+    } finally {
+        browser.close();
+    }
+}</code></pre>
+        <div class="docs-prev-next">
+          <a href="docs-java.html#installation" class="docs-prev">
+            <span class="docs-prev-next-label">Previous</span>
+            <span class="docs-prev-next-title">« Installation</span>
+          </a>
+          <a href="docs-java-running-debugging.html" class="docs-next-block">
+            <span class="docs-prev-next-label">Next</span>
+            <span class="docs-prev-next-title">Running and debugging tests »</span>
+          </a>
+        </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer docs-content-footer" id="docs-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Learn</h4>
+          <ul>
+            <li><a href="docs-java.html">Getting started</a></li>
+            <li><a href="docs-java-writing-tests.html">Writing tests</a></li>
+            <li><a href="docs-java-running-debugging.html">Running and debugging tests</a></li>
+            <li><a href="docs-java-test-runners.html">Test runners</a></li>
+            <li><a href="docs-java-actions.html">Actions</a></li>
+            <li><a href="docs-java-waits.html">Waits</a></li>
+            <li><a href="docs-java-assertions.html">Assertions</a></li>
+            <li><a href="docs-java-dialogs.html">Dialogs</a></li>
+            <li><a href="docs-java-frames.html">Frames</a></li>
+            <li><a href="docs-java-locators.html">Locators</a></li>
+            <li><a href="docs-java-navigations.html">Navigations</a></li>
+            <li><a href="docs-java-annotations.html">Annotations</a></li>
+            <li><a href="docs.html">Node.js docs</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="https://github.com/lokesh771988/EasyTesting" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-copy">&copy; 2025 CSTesting. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    (function() {
+      try {
+        sessionStorage.setItem('cstesting-platform', 'Java');
+      } catch (e) {}
+      var logoText = document.getElementById('logo-text');
+      if (logoText) {
+        logoText.textContent = 'CSTesting for Java';
+      }
+
+      var logoLink = document.querySelector('header .logo');
+      if (logoLink) {
+        logoLink.setAttribute('href', 'index.html');
+        logoLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = 'index.html';
+        });
+      }
+
+      var toggle = document.querySelector('.docs-sidebar-toggle');
+      var sidebar = document.getElementById('docs-sidebar');
+      if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+          var open = sidebar.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', open);
+        });
+      }
+      document.querySelectorAll('.docs-nav-group-title').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var group = btn.closest('.docs-nav-group');
+          var expanded = btn.getAttribute('aria-expanded') === 'true';
+          document.querySelectorAll('.docs-nav-group').forEach(function(other) {
+            if (other !== group) {
+              other.classList.add('collapsed');
+              var otherBtn = other.querySelector('.docs-nav-group-title');
+              if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+            }
+          });
+          btn.setAttribute('aria-expanded', !expanded);
+          group.classList.toggle('collapsed', expanded);
+        });
+      });
+
+      function syncSidebarToHash() {
+        var hash = window.location.hash.slice(1);
+        var groups = document.querySelectorAll('.docs-nav-group');
+        var activeGroup = null;
+        groups.forEach(function(group) {
+          var links = group.querySelectorAll('a.docs-nav-link');
+          for (var i = 0; i < links.length; i++) {
+            var href = links[i].getAttribute('href') || '';
+            var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+            if (hash && linkHash === hash) {
+              activeGroup = group;
+              break;
+            }
+          }
+          if (!hash && links.length && group.querySelector('a[href="docs-java-writing-tests.html"]')) {
+            activeGroup = group;
+          }
+        });
+        if (!hash) activeGroup = activeGroup || document.querySelector('.docs-nav-group');
+        groups.forEach(function(group) {
+          var btn = group.querySelector('.docs-nav-group-title');
+          if (btn) {
+            var isOpen = group === activeGroup;
+            group.classList.toggle('collapsed', !isOpen);
+            btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          }
+        });
+        document.querySelectorAll('.docs-nav-link').forEach(function(a) {
+          var href = a.getAttribute('href') || '';
+          var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+          var isWritingTestsPage = href.indexOf('docs-java-writing-tests.html') !== -1 && !linkHash;
+          a.classList.toggle('docs-nav-link--active', isWritingTestsPage || (hash && linkHash === hash));
+        });
+      }
+      syncSidebarToHash();
+      window.addEventListener('hashchange', syncSidebarToHash);
+    })();
+  </script>
+</body>
+</html>

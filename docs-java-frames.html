@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frames | CSTesting for Java</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="docs.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="docs-page">
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <header class="header">
+    <div class="header-inner">
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="index.html" class="logo">
+        <span class="logo-icon" aria-hidden="true">◆</span>
+        <span id="logo-text">CSTesting</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="index.html#features">Features</a>
+        <a href="docs-java.html" class="nav-active" id="docs-link">Docs</a>
+        <a href="index.html#community">Community</a>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="youtube-menu" id="youtube-trigger">YouTube</button>
+          <div class="nav-dropdown-menu" id="youtube-menu" role="menu" aria-labelledby="youtube-trigger">
+            <a href="https://www.youtube.com/@testingtutorialspoint" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">testingtutorialspoint</a>
+            <a href="https://www.youtube.com/@cstechnologiestelugu1988" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">cstechnologiestelugu</a>
+          </div>
+        </div>
+      </nav>
+      <div class="header-actions">
+        <button class="search-btn" aria-label="Search (Command+K)">Search</button>
+        <a href="index.html#get-started" class="btn btn-primary">Get started</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <button type="button" class="docs-sidebar-toggle" aria-label="Toggle docs menu" aria-expanded="false">Docs menu</button>
+    <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation navigation">
+      <nav class="docs-nav">
+        <div class="docs-nav-group">
+          <button type="button" class="docs-nav-group-title" aria-expanded="false" aria-controls="docs-group-getting-started" id="docs-group-getting-started-btn">
+            <span>Getting Started</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-getting-started">
+            <a href="docs-java.html#installation" class="docs-nav-link">Installation</a>
+            <a href="docs-java-writing-tests.html" class="docs-nav-link">Writing tests</a>
+            <a href="docs-java-running-debugging.html" class="docs-nav-link">Running and debugging tests</a>
+            <a href="docs-java-test-runners.html" class="docs-nav-link">Test runners</a>
+          </div>
+        </div>
+        <div class="docs-nav-group">
+          <button type="button" class="docs-nav-group-title" aria-expanded="true" aria-controls="docs-group-guides" id="docs-group-guides-btn">
+            <span>Guides</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-guides">
+            <a href="docs-java-actions.html" class="docs-nav-link">Actions</a>
+            <a href="docs-java-waits.html" class="docs-nav-link">Waits</a>
+            <a href="docs-java-assertions.html" class="docs-nav-link">Assertions</a>
+            <a href="docs-java-dialogs.html" class="docs-nav-link">Dialogs</a>
+            <a href="docs-java-frames.html" class="docs-nav-link docs-nav-link--active">Frames</a>
+            <a href="docs-java-locators.html" class="docs-nav-link">Locators</a>
+            <a href="docs-java-navigations.html" class="docs-nav-link">Navigations</a>
+            <a href="docs-java-annotations.html" class="docs-nav-link">Annotations</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main id="main" class="docs-content">
+      <div class="docs-content-inner">
+        <div class="docs-main-content" id="docs-main-content">
+        <h1 class="docs-section-heading">Frames</h1>
+
+        <h2 id="introduction">Introduction</h2>
+        <p>A page has one <strong>main frame</strong>. Page-level interactions (such as <code>click</code>, <code>type</code>, <code>locator</code>) run in the main frame by default.</p>
+        <p>A page can also have <strong>additional frames</strong> created with the <code>&lt;iframe&gt;</code> element. To interact with elements inside an iframe, you get a <strong>browser scoped to that frame</strong> using <strong><code>frame(iframeSelector)</code></strong>. The returned object has the same API as the page (e.g. <code>locator</code>, <code>click</code>, <code>type</code>), but all actions run inside that frame.</p>
+        <p>To go back to the main page, use the original <strong>browser</strong> reference for main-page actions. You do not need to "switch back"; you keep two references: one for the main page and one for the frame.</p>
+
+        <h2 id="locating-elements">Locating elements inside a frame</h2>
+        <p>Call <strong><code>browser.frame(iframeSelector)</code></strong> to get a <code>CSTestingBrowser</code> scoped to that iframe. Then use <strong><code>locator()</code></strong>, <strong><code>click()</code></strong>, <strong><code>type()</code></strong>, and other methods on that reference — they operate inside the frame.</p>
+        <pre><code>browser.gotoUrl("https://example.com/page-with-iframe");
+browser.waitForSelector("iframe", 10_000);   // ensure iframe is in DOM
+
+CSTestingBrowser frame = browser.frame("iframe");
+frame.locator("#username-input").type("John");
+frame.locator("button[type=submit]").click();
+
+// Main page: use the original browser
+browser.locator("body").click();</code></pre>
+        <p>Selector formats inside the frame are the same as on the main page: CSS, XPath (<code>//input[@name='user']</code>), <code>id=</code>, <code>name=</code>, or any <code>attr=value</code>.</p>
+
+        <h2 id="frame-access">Frame access</h2>
+        <p>CSTesting provides <strong><code>frame(String iframeSelector)</code></strong>: you pass a selector that matches the <strong>iframe element</strong> in the main page (or in the current frame for nested frames). The selector targets the <code>&lt;iframe&gt;</code> DOM node, not the document inside it.</p>
+
+        <table class="docs-table">
+          <thead>
+            <tr>
+              <th>Approach</th>
+              <th>CSTesting</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>By tag</td><td><code>browser.frame("iframe")</code></td></tr>
+            <tr><td>By id</td><td><code>browser.frame("iframe#my-frame")</code> or <code>browser.frame("#my-frame")</code></td></tr>
+            <tr><td>By name attribute</td><td><code>browser.frame("iframe[name='frame-login']")</code></td></tr>
+            <tr><td>By URL (src)</td><td><code>browser.frame("iframe[src*='domain']")</code> or <code>browser.frame("iframe[src^='https://auth.']")</code></td></tr>
+          </tbody>
+        </table>
+
+        <p><strong>Get frame by the iframe's <code>name</code> attribute:</strong></p>
+        <pre><code>CSTestingBrowser frame = browser.frame("iframe[name='frame-login']");
+frame.locator("#username-input").type("John");</code></pre>
+
+        <p><strong>Get frame by the iframe's URL (e.g. contains "domain"):</strong></p>
+        <pre><code>CSTestingBrowser frame = browser.frame("iframe[src*='domain']");
+frame.locator("#username-input").type("John");</code></pre>
+
+        <p>There is no separate <code>frameByName(String)</code> or <code>frameByUrl(Pattern)</code> API; use the same <strong><code>frame(iframeSelector)</code></strong> with an attribute selector (e.g. <code>iframe[name='...']</code>, <code>iframe[src*='...']</code>).</p>
+
+        <h2 id="interacting-with-frame">Interacting with the frame</h2>
+        <p>The object returned by <strong><code>frame(iframeSelector)</code></strong> implements <strong><code>CSTestingBrowser</code></strong>. You can use the same methods as on the page:</p>
+        <ul>
+          <li><strong><code>frame.locator(selector)</code></strong> — create locators inside the frame</li>
+          <li><strong><code>frame.click(selector)</code></strong> / <strong><code>frame.locator(selector).click()</code></strong></li>
+          <li><strong><code>frame.type(selector, text)</code></strong> / <strong><code>frame.locator(selector).type(text)</code></strong></li>
+          <li><strong><code>frame.assertThat(locator)</code></strong> / <strong><code>frame.assertThat()</code></strong> — assertions inside the frame</li>
+          <li><strong><code>frame.gotoUrl(url)</code></strong> — navigate inside the frame (if allowed)</li>
+          <li><strong><code>frame.title()</code></strong>, <strong><code>frame.url()</code></strong> — frame document title/URL</li>
+        </ul>
+        <p>Example:</p>
+        <pre><code>CSTestingBrowser frame = browser.frame("iframe#login");
+frame.locator("name=user").type("John");
+frame.locator("name=pass").type("secret");
+frame.locator("button[type=submit]").click();</code></pre>
+
+        <h2 id="nested-frames">Nested frames</h2>
+        <p>An iframe can contain another iframe. To interact with a <strong>nested frame</strong>, call <strong><code>frame(iframeSelector)</code></strong> on the <strong>parent frame</strong> reference (not on the main browser). That returns a new browser scoped to the inner iframe.</p>
+        <pre><code>// Outer iframe
+CSTestingBrowser outer = browser.frame("iframe#outer");
+
+// Inner iframe (inside the outer one)
+CSTestingBrowser inner = outer.frame("iframe#inner");
+inner.locator("button").click();
+inner.locator("#input").type("hello");
+
+// Still in outer frame
+outer.locator("h1").getTextContent();
+
+// Main page
+browser.locator("body").click();</code></pre>
+        <p>Selector for the inner iframe is evaluated <strong>in the context of the outer frame's document</strong>. So <code>"iframe#inner"</code> means an iframe with <code>id="inner"</code> inside the outer frame.</p>
+
+        <h2 id="summary">Summary</h2>
+        <table class="docs-table">
+          <thead>
+            <tr>
+              <th>Topic</th>
+              <th>CSTesting</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Main frame</strong></td><td>Default. Use the <code>browser</code> reference.</td></tr>
+            <tr><td><strong>Single iframe</strong></td><td><code>CSTestingBrowser frame = browser.frame("iframeSelector");</code> then use <code>frame.locator()</code>, <code>frame.click()</code>, etc.</td></tr>
+            <tr><td><strong>By name</strong></td><td><code>browser.frame("iframe[name='frame-login']")</code></td></tr>
+            <tr><td><strong>By URL</strong></td><td><code>browser.frame("iframe[src*='domain']")</code></td></tr>
+            <tr><td><strong>Nested frame</strong></td><td><code>outer = browser.frame("iframe#outer");</code> then <code>inner = outer.frame("iframe#inner");</code></td></tr>
+            <tr><td><strong>Back to main</strong></td><td>Use the original <code>browser</code> reference; no explicit "switch back".</td></tr>
+          </tbody>
+        </table>
+
+        <p><strong>Note (CDP):</strong> The iframe must have <strong>loaded</strong> before calling <code>frame()</code>, so its execution context exists. Use <strong><code>browser.waitForSelector("iframe", timeoutMs)</code></strong> (and optionally a short <strong><code>waitForLoad()</code></strong> or <strong><code>waitForTime(...)</code></strong> for slow embeds) before <strong><code>frame(...)</code></strong>.</p>
+        <div class="docs-prev-next">
+          <a href="docs-java-dialogs.html" class="docs-prev">
+            <span class="docs-prev-next-label">Previous</span>
+            <span class="docs-prev-next-title">« Dialogs</span>
+          </a>
+          <a href="docs-java-locators.html" class="docs-next-block">
+            <span class="docs-prev-next-label">Next</span>
+            <span class="docs-prev-next-title">Locators »</span>
+          </a>
+        </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer docs-content-footer" id="docs-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Learn</h4>
+          <ul>
+            <li><a href="docs-java.html">Getting started</a></li>
+            <li><a href="docs-java-writing-tests.html">Writing tests</a></li>
+            <li><a href="docs-java-running-debugging.html">Running and debugging tests</a></li>
+            <li><a href="docs-java-test-runners.html">Test runners</a></li>
+            <li><a href="docs-java-actions.html">Actions</a></li>
+            <li><a href="docs-java-waits.html">Waits</a></li>
+            <li><a href="docs-java-assertions.html">Assertions</a></li>
+            <li><a href="docs-java-dialogs.html">Dialogs</a></li>
+            <li><a href="docs-java-frames.html">Frames</a></li>
+            <li><a href="docs-java-locators.html">Locators</a></li>
+            <li><a href="docs-java-navigations.html">Navigations</a></li>
+            <li><a href="docs-java-annotations.html">Annotations</a></li>
+            <li><a href="docs.html">Node.js docs</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="https://github.com/lokesh771988/EasyTesting" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-copy">&copy; 2025 CSTesting. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    (function() {
+      try {
+        sessionStorage.setItem('cstesting-platform', 'Java');
+      } catch (e) {}
+      var logoText = document.getElementById('logo-text');
+      if (logoText) {
+        logoText.textContent = 'CSTesting for Java';
+      }
+
+      var logoLink = document.querySelector('header .logo');
+      if (logoLink) {
+        logoLink.setAttribute('href', 'index.html');
+        logoLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = 'index.html';
+        });
+      }
+
+      var toggle = document.querySelector('.docs-sidebar-toggle');
+      var sidebar = document.getElementById('docs-sidebar');
+      if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+          var open = sidebar.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', open);
+        });
+      }
+      document.querySelectorAll('.docs-nav-group-title').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var group = btn.closest('.docs-nav-group');
+          var expanded = btn.getAttribute('aria-expanded') === 'true';
+          document.querySelectorAll('.docs-nav-group').forEach(function(other) {
+            if (other !== group) {
+              other.classList.add('collapsed');
+              var otherBtn = other.querySelector('.docs-nav-group-title');
+              if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+            }
+          });
+          btn.setAttribute('aria-expanded', !expanded);
+          group.classList.toggle('collapsed', expanded);
+        });
+      });
+
+      function syncSidebarToHash() {
+        var hash = window.location.hash.slice(1);
+        var groups = document.querySelectorAll('.docs-nav-group');
+        var activeGroup = null;
+        groups.forEach(function(group) {
+          var links = group.querySelectorAll('a.docs-nav-link');
+          for (var i = 0; i < links.length; i++) {
+            var href = links[i].getAttribute('href') || '';
+            var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+            if (hash && linkHash === hash) {
+              activeGroup = group;
+              break;
+            }
+          }
+          if (!hash && links.length && group.querySelector('a[href="docs-java-frames.html"]')) {
+            activeGroup = group;
+          }
+        });
+        if (!hash) activeGroup = activeGroup || document.querySelector('.docs-nav-group');
+        groups.forEach(function(group) {
+          var btn = group.querySelector('.docs-nav-group-title');
+          if (btn) {
+            var isOpen = group === activeGroup;
+            group.classList.toggle('collapsed', !isOpen);
+            btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          }
+        });
+        document.querySelectorAll('.docs-nav-link').forEach(function(a) {
+          var href = a.getAttribute('href') || '';
+          var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+          var isFramesPage = href.indexOf('docs-java-frames.html') !== -1 && !linkHash;
+          a.classList.toggle('docs-nav-link--active', isFramesPage || (hash && linkHash === hash));
+        });
+      }
+      syncSidebarToHash();
+      window.addEventListener('hashchange', syncSidebarToHash);
+    })();
+  </script>
+</body>
+</html>

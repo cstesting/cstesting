@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Waits | CSTesting for Java</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="docs.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="docs-page">
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <header class="header">
+    <div class="header-inner">
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="index.html" class="logo">
+        <span class="logo-icon" aria-hidden="true">◆</span>
+        <span id="logo-text">CSTesting</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="index.html#features">Features</a>
+        <a href="docs-java.html" class="nav-active" id="docs-link">Docs</a>
+        <a href="index.html#community">Community</a>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="youtube-menu" id="youtube-trigger">YouTube</button>
+          <div class="nav-dropdown-menu" id="youtube-menu" role="menu" aria-labelledby="youtube-trigger">
+            <a href="https://www.youtube.com/@testingtutorialspoint" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">testingtutorialspoint</a>
+            <a href="https://www.youtube.com/@cstechnologiestelugu1988" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">cstechnologiestelugu</a>
+          </div>
+        </div>
+      </nav>
+      <div class="header-actions">
+        <button class="search-btn" aria-label="Search (Command+K)">Search</button>
+        <a href="index.html#get-started" class="btn btn-primary">Get started</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <button type="button" class="docs-sidebar-toggle" aria-label="Toggle docs menu" aria-expanded="false">Docs menu</button>
+    <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation navigation">
+      <nav class="docs-nav">
+        <div class="docs-nav-group">
+          <button type="button" class="docs-nav-group-title" aria-expanded="false" aria-controls="docs-group-getting-started" id="docs-group-getting-started-btn">
+            <span>Getting Started</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-getting-started">
+            <a href="docs-java.html#installation" class="docs-nav-link">Installation</a>
+            <a href="docs-java-writing-tests.html" class="docs-nav-link">Writing tests</a>
+            <a href="docs-java-running-debugging.html" class="docs-nav-link">Running and debugging tests</a>
+            <a href="docs-java-test-runners.html" class="docs-nav-link">Test runners</a>
+          </div>
+        </div>
+        <div class="docs-nav-group">
+          <button type="button" class="docs-nav-group-title" aria-expanded="true" aria-controls="docs-group-guides" id="docs-group-guides-btn">
+            <span>Guides</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-guides">
+            <a href="docs-java-actions.html" class="docs-nav-link">Actions</a>
+            <a href="docs-java-waits.html" class="docs-nav-link docs-nav-link--active">Waits</a>
+            <a href="docs-java-assertions.html" class="docs-nav-link">Assertions</a>
+            <a href="docs-java-dialogs.html" class="docs-nav-link">Dialogs</a>
+            <a href="docs-java-frames.html" class="docs-nav-link">Frames</a>
+            <a href="docs-java-locators.html" class="docs-nav-link">Locators</a>
+            <a href="docs-java-navigations.html" class="docs-nav-link">Navigations</a>
+            <a href="docs-java-annotations.html" class="docs-nav-link">Annotations</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main id="main" class="docs-content">
+      <div class="docs-content-inner">
+        <div class="docs-main-content" id="docs-main-content">
+        <h1 class="docs-section-heading">Waits</h1>
+
+        <h2 id="introduction">Introduction</h2>
+        <p>CSTesting performs a set of <strong>actionability checks</strong> on elements before performing actions, so that actions run only when the element is ready. It auto-waits for the relevant checks to pass and then runs the requested action. If the checks do not pass within the timeout (default 30 seconds), the action fails with an error.</p>
+        <p>For example, for <strong><code>locator.click()</code></strong>, CSTesting ensures that:</p>
+        <ul>
+          <li>The locator resolves to an element (when using <code>.first()</code>, <code>.last()</code>, or <code>.nth(index)</code> for multiple matches).</li>
+          <li>The element is <strong>Visible</strong>.</li>
+          <li>The element is <strong>Enabled</strong>.</li>
+        </ul>
+        <p>For <strong><code>locator.type(text)</code></strong>, CSTesting ensures the element is visible and <strong>Editable</strong>. Other actions use the checks that apply (see table below).</p>
+        <p>Here is the list of actionability checks performed for each action in CSTesting:</p>
+
+        <table class="docs-table">
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Visible</th>
+              <th>Enabled</th>
+              <th>Editable</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>locator.check()</code></td>
+              <td>Yes</td>
+              <td>Yes</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>locator.click()</code></td>
+              <td>Yes</td>
+              <td>Yes</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>locator.doubleClick()</code></td>
+              <td>Yes</td>
+              <td>Yes</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>locator.rightClick()</code></td>
+              <td>Yes</td>
+              <td>Yes</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>locator.uncheck()</code></td>
+              <td>Yes</td>
+              <td>Yes</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>locator.hover()</code></td>
+              <td>Yes</td>
+              <td>—</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>locator.dragAndDrop(other)</code></td>
+              <td>Yes (both)</td>
+              <td>—</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>locator.type(text)</code></td>
+              <td>Yes</td>
+              <td>—</td>
+              <td>Yes</td>
+            </tr>
+            <tr>
+              <td><code>locator.select(option)</code></td>
+              <td>Yes</td>
+              <td>Yes</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>locator.selectOptions(...)</code></td>
+              <td>Yes</td>
+              <td>Yes</td>
+              <td>—</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>You typically do <strong>not</strong> need to call <code>waitForSelector</code> before an action; CSTesting waits for the element to be actionable first. After navigation, use <strong><code>browser.waitForLoad()</code></strong> for page-level readiness.</p>
+
+        <h2 id="assertions">Assertions</h2>
+        <p>CSTesting provides <strong><code>assertThat(locator)</code></strong> for element assertions and <strong><code>assertThat()</code></strong> for page assertions. These evaluate <strong>once</strong> (no auto-retry). To wait then assert, use <strong><code>waitForSelector</code></strong> first, or rely on auto-wait before a follow-up action.</p>
+
+        <table class="docs-table">
+          <thead>
+            <tr>
+              <th>Assertion</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>assertThat(locator).isVisible()</code></td><td>Element is visible</td></tr>
+            <tr><td><code>assertThat(locator).isEditable()</code></td><td>Element is editable (not disabled, not readonly)</td></tr>
+            <tr><td><code>assertThat(locator).isEmpty()</code></td><td>Element value or text is empty</td></tr>
+            <tr><td><code>assertThat(locator).isEnabled()</code></td><td>Element is enabled</td></tr>
+            <tr><td><code>assertThat(locator).isDisabled()</code></td><td>Element is disabled</td></tr>
+            <tr><td><code>assertThat(locator).contains(expected)</code></td><td>Text or value contains the string</td></tr>
+            <tr><td><code>assertThat(locator).hasText(expected)</code></td><td>Text content matches or contains</td></tr>
+            <tr><td><code>assertThat(locator).containText(expected)</code></td><td>Text content contains the string</td></tr>
+            <tr><td><code>assertThat(locator).hasValue(expected)</code></td><td>Input/select value equals</td></tr>
+            <tr><td><code>assertThat(locator).containValue(expected)</code></td><td>Input/select value contains</td></tr>
+            <tr><td><code>assertThat(locator).hasAttribute(name)</code></td><td>Element has the attribute</td></tr>
+            <tr><td><code>assertThat(locator).hasAttribute(name, value)</code></td><td>Attribute equals the value</td></tr>
+            <tr><td><code>assertThat(locator).count(n)</code></td><td>Number of matching elements equals n</td></tr>
+            <tr><td><code>assertThat(locator).hasCount(n)</code></td><td>Same as <code>count(n)</code></td></tr>
+            <tr><td><code>assertThat().hasTitle(expected)</code></td><td>Page title contains or equals</td></tr>
+            <tr><td><code>assertThat().hasURL(pattern)</code></td><td>Page URL contains or matches pattern (<code>*</code> wildcard)</td></tr>
+          </tbody>
+        </table>
+
+        <h2 id="visible">Visible</h2>
+        <p>An element is considered <strong>visible</strong> when it has a non-zero size and is not <code>visibility: hidden</code> in computed style.</p>
+        <ul>
+          <li>Elements with zero size are not considered visible.</li>
+          <li>Elements with <code>display: none</code> are not considered visible.</li>
+          <li>Elements with <code>opacity: 0</code> are still considered visible by this definition.</li>
+        </ul>
+
+        <h2 id="enabled">Enabled</h2>
+        <p>An element is considered <strong>enabled</strong> when it is not disabled.</p>
+        <p>An element is disabled when:</p>
+        <ul>
+          <li>It is a <code>&lt;button&gt;</code>, <code>&lt;select&gt;</code>, <code>&lt;input&gt;</code>, <code>&lt;textarea&gt;</code>, <code>&lt;option&gt;</code>, or <code>&lt;optgroup&gt;</code> with a <code>[disabled]</code> attribute; or</li>
+          <li>It is one of those elements inside a <code>&lt;fieldset&gt;</code> with <code>[disabled]</code>; or</li>
+          <li>It is inside an element with <code>[aria-disabled="true"]</code>.</li>
+        </ul>
+        <p>CSTesting uses the element's <code>disabled</code> property and DOM structure for this check.</p>
+
+        <h2 id="editable">Editable</h2>
+        <p>An element is considered <strong>editable</strong> when it is enabled and not readonly.</p>
+        <p>An element is readonly when:</p>
+        <ul>
+          <li>It is a <code>&lt;input&gt;</code> or <code>&lt;textarea&gt;</code> with a <code>[readonly]</code> attribute; or</li>
+          <li>It has <code>[aria-readonly="true"]</code> with a role that supports it.</li>
+        </ul>
+        <p><code>&lt;select&gt;</code> elements are treated as editable when enabled (they can be changed). CSTesting checks <code>disabled</code> and <code>readOnly</code> (and tag type) for inputs and textareas.</p>
+
+        <h2 id="example">Example</h2>
+        <p>CSTesting will wait for the <strong>Sign Up</strong> button to become actionable before clicking, even if it appears only after a delay:</p>
+        <ol>
+          <li>The page checks that the user name is unique and shows a disabled Sign Up button.</li>
+          <li>After the server responds, the button is replaced with an enabled one.</li>
+          <li><strong><code>locator.click()</code></strong> waits for the element to exist, be visible, and be enabled, then clicks.</li>
+        </ol>
+        <pre><code>browser.gotoUrl("https://example.com/signup");
+browser.locator("name=username").type("alice");
+// Sign Up may be disabled until username is validated.
+browser.locator("//button[contains(.,'Sign Up')]").first().click();
+browser.assertThat().hasURL("**/welcome");</code></pre>
+        <p>No explicit <code>waitForSelector</code> or sleep is needed; the click auto-waits for the button to be ready (within the default timeout).</p>
+        <div class="docs-prev-next">
+          <a href="docs-java-actions.html" class="docs-prev">
+            <span class="docs-prev-next-label">Previous</span>
+            <span class="docs-prev-next-title">« Actions</span>
+          </a>
+          <a href="docs-java-assertions.html" class="docs-next-block">
+            <span class="docs-prev-next-label">Next</span>
+            <span class="docs-prev-next-title">Assertions »</span>
+          </a>
+        </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer docs-content-footer" id="docs-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Learn</h4>
+          <ul>
+            <li><a href="docs-java.html">Getting started</a></li>
+            <li><a href="docs-java-writing-tests.html">Writing tests</a></li>
+            <li><a href="docs-java-running-debugging.html">Running and debugging tests</a></li>
+            <li><a href="docs-java-test-runners.html">Test runners</a></li>
+            <li><a href="docs-java-actions.html">Actions</a></li>
+            <li><a href="docs-java-waits.html">Waits</a></li>
+            <li><a href="docs-java-assertions.html">Assertions</a></li>
+            <li><a href="docs-java-dialogs.html">Dialogs</a></li>
+            <li><a href="docs-java-frames.html">Frames</a></li>
+            <li><a href="docs-java-locators.html">Locators</a></li>
+            <li><a href="docs-java-navigations.html">Navigations</a></li>
+            <li><a href="docs-java-annotations.html">Annotations</a></li>
+            <li><a href="docs.html">Node.js docs</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="https://github.com/lokesh771988/EasyTesting" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-copy">&copy; 2025 CSTesting. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    (function() {
+      try {
+        sessionStorage.setItem('cstesting-platform', 'Java');
+      } catch (e) {}
+      var logoText = document.getElementById('logo-text');
+      if (logoText) {
+        logoText.textContent = 'CSTesting for Java';
+      }
+
+      var logoLink = document.querySelector('header .logo');
+      if (logoLink) {
+        logoLink.setAttribute('href', 'index.html');
+        logoLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = 'index.html';
+        });
+      }
+
+      var toggle = document.querySelector('.docs-sidebar-toggle');
+      var sidebar = document.getElementById('docs-sidebar');
+      if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+          var open = sidebar.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', open);
+        });
+      }
+      document.querySelectorAll('.docs-nav-group-title').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var group = btn.closest('.docs-nav-group');
+          var expanded = btn.getAttribute('aria-expanded') === 'true';
+          document.querySelectorAll('.docs-nav-group').forEach(function(other) {
+            if (other !== group) {
+              other.classList.add('collapsed');
+              var otherBtn = other.querySelector('.docs-nav-group-title');
+              if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+            }
+          });
+          btn.setAttribute('aria-expanded', !expanded);
+          group.classList.toggle('collapsed', expanded);
+        });
+      });
+
+      function syncSidebarToHash() {
+        var hash = window.location.hash.slice(1);
+        var groups = document.querySelectorAll('.docs-nav-group');
+        var activeGroup = null;
+        groups.forEach(function(group) {
+          var links = group.querySelectorAll('a.docs-nav-link');
+          for (var i = 0; i < links.length; i++) {
+            var href = links[i].getAttribute('href') || '';
+            var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+            if (hash && linkHash === hash) {
+              activeGroup = group;
+              break;
+            }
+          }
+          if (!hash && links.length && group.querySelector('a[href="docs-java-waits.html"]')) {
+            activeGroup = group;
+          }
+        });
+        if (!hash) activeGroup = activeGroup || document.querySelector('.docs-nav-group');
+        groups.forEach(function(group) {
+          var btn = group.querySelector('.docs-nav-group-title');
+          if (btn) {
+            var isOpen = group === activeGroup;
+            group.classList.toggle('collapsed', !isOpen);
+            btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          }
+        });
+        document.querySelectorAll('.docs-nav-link').forEach(function(a) {
+          var href = a.getAttribute('href') || '';
+          var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+          var isWaitsPage = href.indexOf('docs-java-waits.html') !== -1 && !linkHash;
+          a.classList.toggle('docs-nav-link--active', isWaitsPage || (hash && linkHash === hash));
+        });
+      }
+      syncSidebarToHash();
+      window.addEventListener('hashchange', syncSidebarToHash);
+    })();
+  </script>
+</body>
+</html>

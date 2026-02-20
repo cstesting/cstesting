@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Navigations | CSTesting for Java</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="docs.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="docs-page">
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <header class="header">
+    <div class="header-inner">
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="index.html" class="logo">
+        <span class="logo-icon" aria-hidden="true">◆</span>
+        <span id="logo-text">CSTesting</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="index.html#features">Features</a>
+        <a href="docs-java.html" class="nav-active" id="docs-link">Docs</a>
+        <a href="index.html#community">Community</a>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="youtube-menu" id="youtube-trigger">YouTube</button>
+          <div class="nav-dropdown-menu" id="youtube-menu" role="menu" aria-labelledby="youtube-trigger">
+            <a href="https://www.youtube.com/@testingtutorialspoint" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">testingtutorialspoint</a>
+            <a href="https://www.youtube.com/@cstechnologiestelugu1988" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">cstechnologiestelugu</a>
+          </div>
+        </div>
+      </nav>
+      <div class="header-actions">
+        <button class="search-btn" aria-label="Search (Command+K)">Search</button>
+        <a href="index.html#get-started" class="btn btn-primary">Get started</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <button type="button" class="docs-sidebar-toggle" aria-label="Toggle docs menu" aria-expanded="false">Docs menu</button>
+    <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation navigation">
+      <nav class="docs-nav">
+        <div class="docs-nav-group">
+          <button type="button" class="docs-nav-group-title" aria-expanded="false" aria-controls="docs-group-getting-started" id="docs-group-getting-started-btn">
+            <span>Getting Started</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-getting-started">
+            <a href="docs-java.html#installation" class="docs-nav-link">Installation</a>
+            <a href="docs-java-writing-tests.html" class="docs-nav-link">Writing tests</a>
+            <a href="docs-java-running-debugging.html" class="docs-nav-link">Running and debugging tests</a>
+            <a href="docs-java-test-runners.html" class="docs-nav-link">Test runners</a>
+          </div>
+        </div>
+        <div class="docs-nav-group">
+          <button type="button" class="docs-nav-group-title" aria-expanded="true" aria-controls="docs-group-guides" id="docs-group-guides-btn">
+            <span>Guides</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-guides">
+            <a href="docs-java-actions.html" class="docs-nav-link">Actions</a>
+            <a href="docs-java-waits.html" class="docs-nav-link">Waits</a>
+            <a href="docs-java-assertions.html" class="docs-nav-link">Assertions</a>
+            <a href="docs-java-dialogs.html" class="docs-nav-link">Dialogs</a>
+            <a href="docs-java-frames.html" class="docs-nav-link">Frames</a>
+            <a href="docs-java-locators.html" class="docs-nav-link">Locators</a>
+            <a href="docs-java-navigations.html" class="docs-nav-link docs-nav-link--active">Navigations</a>
+            <a href="docs-java-annotations.html" class="docs-nav-link">Annotations</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main id="main" class="docs-content">
+      <div class="docs-content-inner">
+        <div class="docs-main-content" id="docs-main-content">
+        <h1 class="docs-section-heading">Navigations</h1>
+
+        <h2 id="introduction">Introduction</h2>
+        <p>CSTesting can navigate to URLs and work with navigations caused by page interactions (e.g. clicking a link or submitting a form). This page describes basic navigation, when the page is considered loaded, and how to wait for a specific URL after an action.</p>
+
+        <h2 id="basic-navigation">Basic navigation</h2>
+        <p>The main way to open a URL is <strong><code>browser.gotoUrl(url)</code></strong>:</p>
+        <pre><code>browser.gotoUrl("https://example.com");</code></pre>
+        <p>This loads the page. With the CDP implementation, navigation completes when the browser has loaded the document. For more control, you can call <strong><code>waitForLoad()</code></strong> or <strong><code>waitForLoad(timeoutMs)</code></strong> after <strong><code>gotoUrl</code></strong> to wait until <code>document.readyState</code> is <strong>complete</strong> (all resources such as stylesheets, scripts, and images have loaded, and the <code>load</code> event has fired).</p>
+        <pre><code>browser.gotoUrl("https://example.com");
+browser.waitForLoad(10_000);</code></pre>
+        <p>If the page does a <strong>client-side redirect</strong> before load, <strong><code>gotoUrl</code></strong> (and any following <strong><code>waitForLoad</code></strong>) applies to the final loaded page.</p>
+        <p><strong>Other navigation commands:</strong></p>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Method</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>browser.back()</code></td><td>Navigate back in history.</td></tr>
+            <tr><td><code>browser.forward()</code></td><td>Navigate forward in history.</td></tr>
+            <tr><td><code>browser.refresh()</code></td><td>Reload the current page.</td></tr>
+            <tr><td><code>browser.url()</code></td><td>Return the current page URL.</td></tr>
+          </tbody>
+        </table>
+
+        <h2 id="when-loaded">When is the page loaded?</h2>
+        <p>Modern pages often do more <strong>after</strong> the <code>load</code> event: they fetch data lazily, fill in the UI, or load extra scripts and styles. There is no single definition of "fully loaded"; it depends on the page and framework.</p>
+        <p>In CSTesting you can <strong>interact with the page at any time</strong>. Actions (click, type, etc.) use <strong>auto-waiting</strong>: CSTesting waits for the target element to be actionable (visible, enabled, etc.) before performing the action. So you usually don't need to wait for "everything" to load—only for the elements you use.</p>
+        <p><strong>Example – navigate and click:</strong></p>
+        <pre><code>browser.gotoUrl("https://example.com");
+browser.locator("//*[contains(.,'Example Domain')]").first().click();</code></pre>
+        <p>The <strong>click</strong> auto-waits for the element to become visible and pass actionability checks, then clicks. You can think of CSTesting as a fast user: as soon as the element is ready, it acts. In many cases you don't need to worry about whether all resources have finished loading.</p>
+        <p>If you prefer to wait for the document first, call <strong><code>waitForLoad()</code></strong> or <strong><code>waitForLoad(timeoutMs)</code></strong> after <strong><code>gotoUrl</code></strong>:</p>
+        <pre><code>browser.gotoUrl("https://example.com");
+browser.waitForLoad(5_000);
+browser.locator("h1").click();</code></pre>
+
+        <h2 id="hydration">Hydration</h2>
+        <p>Sometimes you'll see a case where an action seems to do nothing—for example you click a button and nothing happens, or you type into an input and the text disappears. A common cause is <strong>poor hydration</strong> (e.g. in SPAs).</p>
+        <p>With hydration, the server first sends a static version of the page; then the dynamic part loads and the page becomes "live." If CSTesting interacts as soon as the button is visible but before the app has attached its listeners, the click may have no effect or the input may be reset when the framework takes over.</p>
+        <p>To check for this, you can slow down the network (e.g. Chrome DevTools → Network → "Slow 3G"), reload the page, and try interacting as soon as the element appears. If clicks are ignored or text is cleared, the fix is on the app side: disable interactive controls until after hydration, when the page is fully functional.</p>
+
+        <h2 id="waiting-for-navigation">Waiting for navigation</h2>
+        <p>Clicking a link or submitting a form can trigger a <strong>navigation</strong> to a new URL. In those cases it's a good idea to <strong>wait for the new URL</strong> before continuing the test.</p>
+        <p>Use <strong><code>waitForURL(urlOrPattern, timeoutMs)</code></strong> after the action that triggers the navigation. The URL can be an exact string, a substring (match when the current URL contains it), or a <strong>pattern</strong> with <code>*</code> as a wildcard.</p>
+        <pre><code>browser.locator("//*[contains(.,'Click me')]").first().click();
+browser.waitForURL("**/login", 10_000);
+browser.assertThat().hasTitle("Login");</code></pre>
+        <p><strong>Examples:</strong></p>
+        <pre><code>browser.waitForURL("https://example.com/dashboard", 5_000);   // exact or contains
+browser.waitForURL("**/dashboard", 5_000);                     // * matches any segment
+browser.waitForURL("**/users/*/profile", 5_000);              // multiple wildcards</code></pre>
+        <p>If the URL doesn't match within <strong>timeoutMs</strong>, <strong><code>waitForURL</code></strong> throws. Omit <strong>timeoutMs</strong> (or pass <code>null</code>) to use the default timeout (e.g. 30 seconds, depending on implementation).</p>
+
+        <h2 id="navigation-loading-overview">Navigation and loading (overview)</h2>
+        <p>Conceptually, showing a new document involves:</p>
+        <ol>
+          <li><strong>Navigation</strong> – The URL changes (e.g. by <strong><code>gotoUrl</code></strong> or by clicking a link). The browser resolves the URL and may follow redirects.</li>
+          <li><strong>Loading</strong> – The response is received, the document is parsed, scripts run, and the <strong>load</strong> event fires when the document and its main resources are loaded.</li>
+        </ol>
+        <p>CSTesting does not expose fine-grained navigation events (e.g. "navigation committed" or "DOMContentLoaded"). You can:</p>
+        <ul>
+          <li>Use <strong><code>gotoUrl(url)</code></strong> to start a navigation.</li>
+          <li>Use <strong><code>waitForLoad()</code></strong> / <strong><code>waitForLoad(timeoutMs)</code></strong> to wait until <strong><code>document.readyState === 'complete'</code></strong> (and typically the <code>load</code> event).</li>
+          <li>Use <strong><code>waitForURL(urlOrPattern, timeoutMs)</code></strong> to wait until the current URL matches after an action (e.g. after a click that triggers navigation).</li>
+          <li>Use <strong><code>url()</code></strong> to read the current URL at any time.</li>
+        </ul>
+        <p><strong>Optional: wait for network idle</strong></p>
+        <p>If you need to wait until the page has loaded and there are no pending network requests for a short period, you can use <strong><code>waitForNetworkLoad(timeoutMs)</code></strong> (when supported by the backend). This is stricter than <strong><code>waitForLoad</code></strong> and may not be necessary for most tests; prefer <strong><code>waitForLoad</code></strong> and auto-waiting on elements.</p>
+
+        <h2 id="summary">Summary</h2>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Topic</th><th>CSTesting</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Open URL</strong></td><td><code>browser.gotoUrl(url)</code></td></tr>
+            <tr><td><strong>Wait for document ready</strong></td><td><code>browser.waitForLoad()</code> or <code>browser.waitForLoad(timeoutMs)</code></td></tr>
+            <tr><td><strong>Back / forward / refresh</strong></td><td><code>browser.back()</code>, <code>browser.forward()</code>, <code>browser.refresh()</code></td></tr>
+            <tr><td><strong>Current URL</strong></td><td><code>browser.url()</code></td></tr>
+            <tr><td><strong>Wait for URL after action</strong></td><td><code>browser.waitForURL(urlOrPattern, timeoutMs)</code> (supports <code>*</code> wildcard)</td></tr>
+            <tr><td><strong>When to interact</strong></td><td>Anytime; actions auto-wait for elements. Use <code>waitForLoad</code> if you want document-ready first.</td></tr>
+            <tr><td><strong>Hydration issues</strong></td><td>Disable controls until the app is hydrated; use slow network to reproduce.</td></tr>
+          </tbody>
+        </table>
+        <div class="docs-prev-next">
+          <a href="docs-java-locators.html" class="docs-prev">
+            <span class="docs-prev-next-label">Previous</span>
+            <span class="docs-prev-next-title">« Locators</span>
+          </a>
+          <a href="docs-java-annotations.html" class="docs-next-block">
+            <span class="docs-prev-next-label">Next</span>
+            <span class="docs-prev-next-title">Annotations »</span>
+          </a>
+        </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer docs-content-footer" id="docs-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Learn</h4>
+          <ul>
+            <li><a href="docs-java.html">Getting started</a></li>
+            <li><a href="docs-java-writing-tests.html">Writing tests</a></li>
+            <li><a href="docs-java-running-debugging.html">Running and debugging tests</a></li>
+            <li><a href="docs-java-test-runners.html">Test runners</a></li>
+            <li><a href="docs-java-actions.html">Actions</a></li>
+            <li><a href="docs-java-waits.html">Waits</a></li>
+            <li><a href="docs-java-assertions.html">Assertions</a></li>
+            <li><a href="docs-java-dialogs.html">Dialogs</a></li>
+            <li><a href="docs-java-frames.html">Frames</a></li>
+            <li><a href="docs-java-locators.html">Locators</a></li>
+            <li><a href="docs-java-navigations.html">Navigations</a></li>
+            <li><a href="docs-java-annotations.html">Annotations</a></li>
+            <li><a href="docs.html">Node.js docs</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="https://github.com/lokesh771988/EasyTesting" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-copy">&copy; 2025 CSTesting. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    (function() {
+      try {
+        sessionStorage.setItem('cstesting-platform', 'Java');
+      } catch (e) {}
+      var logoText = document.getElementById('logo-text');
+      if (logoText) {
+        logoText.textContent = 'CSTesting for Java';
+      }
+
+      var logoLink = document.querySelector('header .logo');
+      if (logoLink) {
+        logoLink.setAttribute('href', 'index.html');
+        logoLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = 'index.html';
+        });
+      }
+
+      var toggle = document.querySelector('.docs-sidebar-toggle');
+      var sidebar = document.getElementById('docs-sidebar');
+      if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+          var open = sidebar.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', open);
+        });
+      }
+      document.querySelectorAll('.docs-nav-group-title').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var group = btn.closest('.docs-nav-group');
+          var expanded = btn.getAttribute('aria-expanded') === 'true';
+          document.querySelectorAll('.docs-nav-group').forEach(function(other) {
+            if (other !== group) {
+              other.classList.add('collapsed');
+              var otherBtn = other.querySelector('.docs-nav-group-title');
+              if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+            }
+          });
+          btn.setAttribute('aria-expanded', !expanded);
+          group.classList.toggle('collapsed', expanded);
+        });
+      });
+
+      function syncSidebarToHash() {
+        var hash = window.location.hash.slice(1);
+        var groups = document.querySelectorAll('.docs-nav-group');
+        var activeGroup = null;
+        groups.forEach(function(group) {
+          var links = group.querySelectorAll('a.docs-nav-link');
+          for (var i = 0; i < links.length; i++) {
+            var href = links[i].getAttribute('href') || '';
+            var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+            if (hash && linkHash === hash) {
+              activeGroup = group;
+              break;
+            }
+          }
+          if (!hash && links.length && group.querySelector('a[href="docs-java-navigations.html"]')) {
+            activeGroup = group;
+          }
+        });
+        if (!hash) activeGroup = activeGroup || document.querySelector('.docs-nav-group');
+        groups.forEach(function(group) {
+          var btn = group.querySelector('.docs-nav-group-title');
+          if (btn) {
+            var isOpen = group === activeGroup;
+            group.classList.toggle('collapsed', !isOpen);
+            btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          }
+        });
+        document.querySelectorAll('.docs-nav-link').forEach(function(a) {
+          var href = a.getAttribute('href') || '';
+          var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+          var isNavigationsPage = href.indexOf('docs-java-navigations.html') !== -1 && !linkHash;
+          a.classList.toggle('docs-nav-link--active', isNavigationsPage || (hash && linkHash === hash));
+        });
+      }
+      syncSidebarToHash();
+      window.addEventListener('hashchange', syncSidebarToHash);
+    })();
+  </script>
+</body>
+</html>

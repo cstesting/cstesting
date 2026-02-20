@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Running and debugging tests | CSTesting for Java</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="docs.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body class="docs-page">
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <header class="header">
+    <div class="header-inner">
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="index.html" class="logo">
+        <span class="logo-icon" aria-hidden="true">◆</span>
+        <span id="logo-text">CSTesting</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="index.html#features">Features</a>
+        <a href="docs-java.html" class="nav-active" id="docs-link">Docs</a>
+        <a href="index.html#community">Community</a>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="youtube-menu" id="youtube-trigger">YouTube</button>
+          <div class="nav-dropdown-menu" id="youtube-menu" role="menu" aria-labelledby="youtube-trigger">
+            <a href="https://www.youtube.com/@testingtutorialspoint" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">testingtutorialspoint</a>
+            <a href="https://www.youtube.com/@cstechnologiestelugu1988" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">cstechnologiestelugu</a>
+          </div>
+        </div>
+      </nav>
+      <div class="header-actions">
+        <button class="search-btn" aria-label="Search (Command+K)">Search</button>
+        <a href="index.html#get-started" class="btn btn-primary">Get started</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <button type="button" class="docs-sidebar-toggle" aria-label="Toggle docs menu" aria-expanded="false">Docs menu</button>
+    <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation navigation">
+      <nav class="docs-nav">
+        <div class="docs-nav-group">
+          <button type="button" class="docs-nav-group-title" aria-expanded="true" aria-controls="docs-group-getting-started" id="docs-group-getting-started-btn">
+            <span>Getting Started</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-getting-started">
+            <a href="docs-java.html#installation" class="docs-nav-link">Installation</a>
+            <a href="docs-java-writing-tests.html" class="docs-nav-link">Writing tests</a>
+            <a href="docs-java-running-debugging.html" class="docs-nav-link docs-nav-link--active">Running and debugging tests</a>
+            <a href="docs-java-test-runners.html" class="docs-nav-link">Test runners</a>
+          </div>
+        </div>
+        <div class="docs-nav-group collapsed">
+          <button type="button" class="docs-nav-group-title" aria-expanded="false" aria-controls="docs-group-guides" id="docs-group-guides-btn">
+            <span>Guides</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-guides">
+            <a href="docs-java-actions.html" class="docs-nav-link">Actions</a>
+            <a href="docs-java-waits.html" class="docs-nav-link">Waits</a>
+            <a href="docs-java-assertions.html" class="docs-nav-link">Assertions</a>
+            <a href="docs-java-dialogs.html" class="docs-nav-link">Dialogs</a>
+            <a href="docs-java-frames.html" class="docs-nav-link">Frames</a>
+            <a href="docs-java-locators.html" class="docs-nav-link">Locators</a>
+            <a href="docs-java-navigations.html" class="docs-nav-link">Navigations</a>
+            <a href="docs-java-annotations.html" class="docs-nav-link">Annotations</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main id="main" class="docs-content">
+      <div class="docs-content-inner">
+        <div class="docs-main-content" id="docs-main-content">
+
+        <h2 id="introduction">Running and debugging tests</h2>
+
+        <h3 id="intro">Introduction</h3>
+        <p>CSTesting tests are run using the built-in <strong>CSTestingRunner</strong> with <strong>annotations</strong> (<code>@CSTest</code>, <code>@BeforeMethod</code>, <code>@AfterMethod</code>, etc.). You pass the test class to the runner from code or from the command line. The runner creates a <strong>new browser for each test method</strong>, injects it into your test class, and closes it after each test.</p>
+        <p>By default, tests run <strong>headless</strong> (no browser window). To see the browser, run in <strong>headed mode</strong> by setting <strong><code>headless(false)</code></strong> in the browser options.</p>
+
+        <h3 id="running-with-runner">Running with CSTestingRunner</h3>
+        <p>Use <strong><code>CSTestingRunner</code></strong> with a test class that extends <strong><code>CSTestingTestBase</code></strong> and uses <strong><code>@CSTest</code></strong>, <strong><code>@BeforeMethod</code></strong>, <strong><code>@AfterMethod</code></strong>, and optionally <strong><code>@BeforeSuite</code></strong>, <strong><code>@AfterSuite</code></strong>, <strong><code>@BeforeClass</code></strong>, <strong><code>@AfterClass</code></strong>. The runner discovers all <strong><code>@CSTest</code></strong> methods in the class and runs them one by one, with a fresh browser per test.</p>
+        <p><strong>Run all tests in a class from code:</strong></p>
+        <pre><code>public static void main(String[] args) {
+    CSTestingRunner.run(MyTest.class);
+}</code></pre>
+        <p><strong>Run with custom options (e.g. headed browser):</strong></p>
+        <pre><code>CSTestingRunner.run(MyTest.class, CSTestingOptions.builder().headless(false).build());</code></pre>
+        <p>Or override <strong><code>getBrowserOptions()</code></strong> in your test class so every run uses those options:</p>
+        <pre><code>@Override
+protected CSTestingOptions getBrowserOptions() {
+    return CSTestingOptions.builder().headless(false).build();
+}</code></pre>
+        <p><strong>Run from command line (Maven):</strong></p>
+        <pre><code>mvn exec:java -Dexec.mainClass="com.cstesting.runner.CSTestingRunner" -Dexec.args="com.example.MyTest"</code></pre>
+        <p>Replace <strong><code>com.example.MyTest</code></strong> with the <strong>fully qualified name</strong> of your test class. The runner executes <strong>every <code>@CSTest</code> method</strong> in that class.</p>
+        <p><strong>Run a single test class:</strong> Pass that class name as the first argument. To run only one test method, use a test class that has a single <strong><code>@CSTest</code></strong> method, or run the class and let the runner execute all its tests.</p>
+        <p><strong>Using the annotation-tests profile (if configured in your project):</strong></p>
+        <pre><code>mvn exec:java -Pannotation-tests</code></pre>
+        <p>This runs whatever test class is configured in the profile (e.g. <code>AnnotationTestExample</code>). Change the profile in <code>pom.xml</code> to point to your own test class if needed.</p>
+        <p>See <a href="docs-java-annotations.html">Annotations</a> for the full lifecycle and all annotations.</p>
+
+        <h3 id="headed-mode">Run tests in headed mode</h3>
+        <p>By default, the browser runs <strong>headless</strong> (no window). To see the browser window while tests run, set <strong><code>headless(false)</code></strong>:</p>
+        <p><strong>When calling the runner from code:</strong></p>
+        <pre><code>CSTestingRunner.run(MyTest.class, CSTestingOptions.builder().headless(false).build());</code></pre>
+        <p><strong>When the test class is run by the runner:</strong> Override <strong><code>getBrowserOptions()</code></strong> in your test class:</p>
+        <pre><code>@Override
+protected CSTestingOptions getBrowserOptions() {
+    return CSTestingOptions.builder().headless(false).build();
+}</code></pre>
+        <p>Headed mode is useful for <strong>debugging</strong> and watching the test step through the page.</p>
+
+        <h3 id="running-from-ide">Running from the IDE</h3>
+        <ol>
+          <li><strong>Run the test class's <code>main</code> method</strong> – If your test class has <strong><code>public static void main(String[] args)</code></strong> that calls <strong><code>CSTestingRunner.run(MyTest.class)</code></strong>, run that class as a Java application. All <strong><code>@CSTest</code></strong> methods in that class will run.</li>
+          <li><strong>Debug</strong> – Run the same <code>main</code> in debug mode and set breakpoints in your test methods or in CSTesting code. Execution will stop at breakpoints during the run.</li>
+        </ol>
+
+        <h3 id="debugging-tips">Debugging tips</h3>
+        <ol>
+          <li><strong>Headed mode</strong> – Use <strong><code>headless(false)</code></strong> to see what the browser is doing.</li>
+          <li><strong>Slow down</strong> – Add <strong><code>browser.waitForTime(2000)</code></strong> (or similar) before a failing step to watch the page state.</li>
+          <li><strong>Assertions</strong> – Use <strong><code>browser.assertThat(locator).isVisible()</code></strong> and other assertions to fail fast with a clear message.</li>
+          <li><strong>Breakpoints</strong> – Run from the IDE in debug mode and set breakpoints in your test or in CSTesting; step through as each <strong><code>@CSTest</code></strong> method runs.</li>
+          <li><strong>Console / network</strong> – In headed mode, you can use Chrome DevTools (if available) to inspect console logs and network.</li>
+        </ol>
+
+        <h3 id="summary">Summary</h3>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Topic</th><th>CSTesting</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Run all tests in a class</strong></td><td><code>CSTestingRunner.run(MyTest.class)</code> or Maven: <code>mvn exec:java -Dexec.mainClass="com.cstesting.runner.CSTestingRunner" -Dexec.args="com.example.MyTest"</code>.</td></tr>
+            <tr><td><strong>Run single test class</strong></td><td>Pass that class name as the first argument to the runner. To run one test method only, use a class with a single <code>@CSTest</code> method.</td></tr>
+            <tr><td><strong>Headless (default)</strong></td><td>Default options or <code>CSTestingOptions.builder().headless(true).build()</code>.</td></tr>
+            <tr><td><strong>Headed (see browser)</strong></td><td><code>CSTestingOptions.builder().headless(false).build()</code> or override <code>getBrowserOptions()</code> in your test class.</td></tr>
+            <tr><td><strong>From IDE</strong></td><td>Run the test class's <code>main</code> (which calls <code>CSTestingRunner.run(MyTest.class)</code>). Use debug mode for breakpoints.</td></tr>
+            <tr><td><strong>Debugging</strong></td><td>Run in headed mode, add <code>waitForTime</code> if needed, use assertions and breakpoints in the IDE.</td></tr>
+          </tbody>
+        </table>
+        <div class="docs-prev-next">
+          <a href="docs-java-writing-tests.html" class="docs-prev">
+            <span class="docs-prev-next-label">Previous</span>
+            <span class="docs-prev-next-title">« Writing tests</span>
+          </a>
+          <a href="docs-java-test-runners.html" class="docs-next-block">
+            <span class="docs-prev-next-label">Next</span>
+            <span class="docs-prev-next-title">Test runners »</span>
+          </a>
+        </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer docs-content-footer" id="docs-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Learn</h4>
+          <ul>
+            <li><a href="docs-java.html">Getting started</a></li>
+            <li><a href="docs-java-writing-tests.html">Writing tests</a></li>
+            <li><a href="docs-java-running-debugging.html">Running and debugging tests</a></li>
+            <li><a href="docs-java-test-runners.html">Test runners</a></li>
+            <li><a href="docs-java-actions.html">Actions</a></li>
+            <li><a href="docs-java-waits.html">Waits</a></li>
+            <li><a href="docs-java-assertions.html">Assertions</a></li>
+            <li><a href="docs-java-dialogs.html">Dialogs</a></li>
+            <li><a href="docs-java-frames.html">Frames</a></li>
+            <li><a href="docs-java-locators.html">Locators</a></li>
+            <li><a href="docs-java-navigations.html">Navigations</a></li>
+            <li><a href="docs-java-annotations.html">Annotations</a></li>
+            <li><a href="docs.html">Node.js docs</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="https://github.com/lokesh771988/EasyTesting" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-copy">&copy; 2025 CSTesting. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    (function() {
+      try {
+        sessionStorage.setItem('cstesting-platform', 'Java');
+      } catch (e) {}
+      var logoText = document.getElementById('logo-text');
+      if (logoText) {
+        logoText.textContent = 'CSTesting for Java';
+      }
+
+      var logoLink = document.querySelector('header .logo');
+      if (logoLink) {
+        logoLink.setAttribute('href', 'index.html');
+        logoLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = 'index.html';
+        });
+      }
+
+      var toggle = document.querySelector('.docs-sidebar-toggle');
+      var sidebar = document.getElementById('docs-sidebar');
+      if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+          var open = sidebar.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', open);
+        });
+      }
+      document.querySelectorAll('.docs-nav-group-title').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var group = btn.closest('.docs-nav-group');
+          var expanded = btn.getAttribute('aria-expanded') === 'true';
+          document.querySelectorAll('.docs-nav-group').forEach(function(other) {
+            if (other !== group) {
+              other.classList.add('collapsed');
+              var otherBtn = other.querySelector('.docs-nav-group-title');
+              if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+            }
+          });
+          btn.setAttribute('aria-expanded', !expanded);
+          group.classList.toggle('collapsed', expanded);
+        });
+      });
+
+      function syncSidebarToHash() {
+        var hash = window.location.hash.slice(1);
+        var groups = document.querySelectorAll('.docs-nav-group');
+        var activeGroup = null;
+        groups.forEach(function(group) {
+          var links = group.querySelectorAll('a.docs-nav-link');
+          for (var i = 0; i < links.length; i++) {
+            var href = links[i].getAttribute('href') || '';
+            var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+            if (hash && linkHash === hash) {
+              activeGroup = group;
+              break;
+            }
+          }
+          if (!hash && links.length && group.querySelector('a[href="docs-java-running-debugging.html"]')) {
+            activeGroup = group;
+          }
+        });
+        if (!hash) activeGroup = activeGroup || document.querySelector('.docs-nav-group');
+        groups.forEach(function(group) {
+          var btn = group.querySelector('.docs-nav-group-title');
+          if (btn) {
+            var isOpen = group === activeGroup;
+            group.classList.toggle('collapsed', !isOpen);
+            btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          }
+        });
+        document.querySelectorAll('.docs-nav-link').forEach(function(a) {
+          var href = a.getAttribute('href') || '';
+          var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+          var isRunningPage = href.indexOf('docs-java-running-debugging.html') !== -1 && !linkHash;
+          a.classList.toggle('docs-nav-link--active', isRunningPage || (hash && linkHash === hash));
+        });
+      }
+      syncSidebarToHash();
+      window.addEventListener('hashchange', syncSidebarToHash);
+    })();
+  </script>
+</body>
+</html>

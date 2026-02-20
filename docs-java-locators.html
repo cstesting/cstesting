@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Locators | CSTesting for Java</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="docs.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="docs-page">
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <header class="header">
+    <div class="header-inner">
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="index.html" class="logo">
+        <span class="logo-icon" aria-hidden="true">◆</span>
+        <span id="logo-text">CSTesting</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="index.html#features">Features</a>
+        <a href="docs-java.html" class="nav-active" id="docs-link">Docs</a>
+        <a href="index.html#community">Community</a>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="youtube-menu" id="youtube-trigger">YouTube</button>
+          <div class="nav-dropdown-menu" id="youtube-menu" role="menu" aria-labelledby="youtube-trigger">
+            <a href="https://www.youtube.com/@testingtutorialspoint" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">testingtutorialspoint</a>
+            <a href="https://www.youtube.com/@cstechnologiestelugu1988" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">cstechnologiestelugu</a>
+          </div>
+        </div>
+      </nav>
+      <div class="header-actions">
+        <button class="search-btn" aria-label="Search (Command+K)">Search</button>
+        <a href="index.html#get-started" class="btn btn-primary">Get started</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <button type="button" class="docs-sidebar-toggle" aria-label="Toggle docs menu" aria-expanded="false">Docs menu</button>
+    <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation navigation">
+      <nav class="docs-nav">
+        <div class="docs-nav-group">
+          <button type="button" class="docs-nav-group-title" aria-expanded="false" aria-controls="docs-group-getting-started" id="docs-group-getting-started-btn">
+            <span>Getting Started</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-getting-started">
+            <a href="docs-java.html#installation" class="docs-nav-link">Installation</a>
+            <a href="docs-java-writing-tests.html" class="docs-nav-link">Writing tests</a>
+            <a href="docs-java-running-debugging.html" class="docs-nav-link">Running and debugging tests</a>
+            <a href="docs-java-test-runners.html" class="docs-nav-link">Test runners</a>
+          </div>
+        </div>
+        <div class="docs-nav-group">
+          <button type="button" class="docs-nav-group-title" aria-expanded="true" aria-controls="docs-group-guides" id="docs-group-guides-btn">
+            <span>Guides</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-guides">
+            <a href="docs-java-actions.html" class="docs-nav-link">Actions</a>
+            <a href="docs-java-waits.html" class="docs-nav-link">Waits</a>
+            <a href="docs-java-assertions.html" class="docs-nav-link">Assertions</a>
+            <a href="docs-java-dialogs.html" class="docs-nav-link">Dialogs</a>
+            <a href="docs-java-frames.html" class="docs-nav-link">Frames</a>
+            <a href="docs-java-locators.html" class="docs-nav-link docs-nav-link--active">Locators</a>
+            <a href="docs-java-navigations.html" class="docs-nav-link">Navigations</a>
+            <a href="docs-java-annotations.html" class="docs-nav-link">Annotations</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main id="main" class="docs-content">
+      <div class="docs-content-inner">
+        <div class="docs-main-content" id="docs-main-content">
+        <h1 class="docs-section-heading">Locators</h1>
+
+        <h2 id="introduction">Introduction</h2>
+        <p>Locators are how you find element(s) on the page in CSTesting. They work with <strong>auto-waiting</strong>: before an action (click, type, etc.), CSTesting waits for the element to be actionable. You create a locator with <strong><code>browser.locator(selector)</code></strong> and then call actions or assertions on it.</p>
+        <p>Each time a locator is used for an action, the element is resolved at that moment. If the DOM changes between calls (e.g. re-render), the next action uses the current matching element.</p>
+
+        <h2 id="quick-guide">Quick guide</h2>
+        <p>CSTesting uses <strong>selector strings</strong> (CSS, XPath, or attribute shortcuts) instead of separate methods like <code>getByRole</code> or <code>getByText</code>. The table below shows the <strong>recommended</strong> way to achieve the same goals.</p>
+
+        <table class="docs-table">
+          <thead>
+            <tr><th>Goal</th><th>CSTesting</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>By role</strong> (button, heading, etc.)</td><td>CSS or XPath: <code>"button"</code>, <code>"button[type=submit]"</code>, <code>"//h3[.='Sign up']"</code>, <code>"input[type=checkbox]"</code></td></tr>
+            <tr><td><strong>By text</strong></td><td>XPath: <code>"//*[contains(.,'Welcome, John!')]"</code> or <code>"//button[contains(.,'Sign in')]"</code></td></tr>
+            <tr><td><strong>By label</strong></td><td>Use <code>name=</code> (if input has <code>name</code>) or <code>id=</code> (and ensure <code>&lt;label for="id"&gt;</code>). For "label text" use XPath: <code>"//label[contains(.,'User Name')]/input"</code> or <code>"//input[@placeholder='User Name']"</code></td></tr>
+            <tr><td><strong>By placeholder</strong></td><td><code>"[placeholder='name@example.com']"</code> or <code>"placeholder=name@example.com"</code> (attr shortcut)</td></tr>
+            <tr><td><strong>By alt text</strong></td><td><code>"img[alt='playwright logo']"</code> or <code>"alt=playwright logo"</code> (attr shortcut)</td></tr>
+            <tr><td><strong>By title</strong></td><td><code>"[title='Issues count']"</code> or <code>"title=Issues count"</code></td></tr>
+            <tr><td><strong>By test id</strong></td><td><code>"data-testid=directions"</code> or <code>"data-testid=directions"</code> → <code>[data-testid="directions"]</code></td></tr>
+          </tbody>
+        </table>
+
+        <p><strong>Example (login-style flow):</strong></p>
+        <pre><code>browser.locator("name=user").type("John");
+browser.locator("name=password").type("secret-password");
+browser.locator("//button[contains(.,'Sign in')]").first().click();
+browser.assertThat(browser.locator("//*[contains(.,'Welcome, John!')]")).isVisible();</code></pre>
+
+        <h2 id="selector-formats">Selector formats</h2>
+        <p>Create a locator with <strong><code>browser.locator(selector)</code></strong>. The selector can be:</p>
+
+        <table class="docs-table">
+          <thead>
+            <tr><th>Format</th><th>Example</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>CSS</strong></td><td><code>"button"</code>, <code>"#id"</code>, <code>".class"</code>, <code>"button[type=submit]"</code></td><td>Default. Use for tags, ids, classes, attributes.</td></tr>
+            <tr><td><strong>XPath</strong></td><td><code>"//button"</code>, <code>"xpath=//button"</code></td><td>Use for text content, hierarchy, or complex conditions.</td></tr>
+            <tr><td><strong>id</strong></td><td><code>"id=myId"</code></td><td>Resolved to <code>#myId</code> (CSS).</td></tr>
+            <tr><td><strong>name</strong></td><td><code>"name=submit"</code></td><td>Resolved to <code>[name="submit"]</code> (CSS).</td></tr>
+            <tr><td><strong>Any attribute</strong></td><td><code>"data-testid=foo"</code>, <code>"placeholder=Email"</code></td><td>Resolved to <code>[attr="value"]</code> (CSS).</td></tr>
+          </tbody>
+        </table>
+
+        <p>When <strong>multiple elements</strong> match, use <strong><code>.first()</code></strong>, <strong><code>.last()</code></strong>, or <strong><code>.nth(index)</code></strong> before an action; otherwise the action throws.</p>
+        <pre><code>browser.locator("button").click();                    // OK if exactly one button
+browser.locator("button").first().click();            // first match
+browser.locator("li").nth(2).click();                 // third item
+browser.locator("a").last().click();                  // last link</code></pre>
+
+        <h2 id="locating-elements">Locating elements</h2>
+
+        <h3 id="locate-by-role">Locate by role</h3>
+        <p>Use <strong>CSS</strong> or <strong>XPath</strong> to target elements by their tag or ARIA role:</p>
+        <ul>
+          <li><strong>Button:</strong> <code>"button"</code>, <code>"input[type=submit]"</code>, <code>"[role='button']"</code></li>
+          <li><strong>Heading:</strong> <code>"h1"</code>, <code>"h2"</code>, <code>"//h3[.='Sign up']"</code></li>
+          <li><strong>Checkbox:</strong> <code>"input[type=checkbox]"</code></li>
+          <li><strong>Link:</strong> <code>"a"</code>, <code>"a[href='/login']"</code></li>
+        </ul>
+        <p><strong>Example – button with text "Sign in":</strong></p>
+        <pre><code>browser.locator("//button[contains(.,'Sign in')]").first().click();</code></pre>
+        <p><strong>Example – heading "Sign up", checkbox "Subscribe", button "Submit":</strong></p>
+        <pre><code>browser.assertThat(browser.locator("//h3[.='Sign up']")).isVisible();
+browser.locator("//label[contains(.,'Subscribe')]//input").check();
+browser.locator("//button[contains(.,'Submit')]").first().click();</code></pre>
+        <p><strong>When to use:</strong> Prefer role/tag-based selectors (e.g. <code>button</code>, <code>input[type=checkbox]</code>) plus text or attributes so tests align with how users see the page.</p>
+
+        <h3 id="locate-by-label">Locate by label</h3>
+        <p>Form controls often have a <code>&lt;label&gt;</code>. In CSTesting you can:</p>
+        <ul>
+          <li>Use <strong><code>name=</code></strong> if the input has a <code>name</code> (e.g. <code>"name=password"</code>).</li>
+          <li>Use <strong><code>id=</code></strong> and ensure the label has <code>for="id"</code> (e.g. <code>"id=username"</code>).</li>
+          <li>Use <strong>XPath</strong> to find the input by its label text: <code>"//label[contains(.,'Password')]//input"</code> or <code>"//input[@id=//label[contains(.,'Password')]/@for]"</code> if you have <code>for</code>/<code>id</code> association.</li>
+        </ul>
+        <p><strong>Example:</strong></p>
+        <pre><code>browser.locator("name=password").type("secret");
+// or by label text
+browser.locator("//label[contains(.,'Password')]//input").type("secret");</code></pre>
+        <p><strong>When to use:</strong> Use when locating form fields; prefer <code>name=</code> or <code>id=</code> when possible.</p>
+
+        <h3 id="locate-by-placeholder">Locate by placeholder</h3>
+        <p>Use the <strong>placeholder</strong> attribute (CSS or attribute shortcut):</p>
+        <pre><code>browser.locator("[placeholder='name@example.com']").type("playwright@microsoft.com");
+browser.locator("placeholder=name@example.com").type("user@example.com");</code></pre>
+        <p><strong>When to use:</strong> When the field has no (reliable) label but has a placeholder.</p>
+
+        <h3 id="locate-by-text">Locate by text</h3>
+        <p>Use <strong>XPath</strong> and <strong><code>contains(., 'text')</code></strong> or exact match <strong><code>.='text'</code></strong>:</p>
+        <pre><code>browser.assertThat(browser.locator("//*[contains(.,'Welcome, John')]")).isVisible();
+browser.assertThat(browser.locator("//span[.='Welcome, John']")).isVisible();</code></pre>
+        <p>For a <strong>button</strong> or <strong>link</strong> with text, narrow the tag to avoid matching random divs:</p>
+        <pre><code>browser.locator("//button[contains(.,'Sign in')]").first().click();
+browser.locator("//a[contains(.,'Get Started')]").first().click();</code></pre>
+        <p><strong>When to use:</strong> For non-interactive elements (div, span, p) use text locators. For buttons/links, combine tag + text (e.g. <code>//button[contains(.,'...')]</code>).</p>
+
+        <h3 id="locate-by-alt">Locate by alt text</h3>
+        <p>Use <strong>CSS</strong> or attribute shortcut for images:</p>
+        <pre><code>browser.locator("img[alt='playwright logo']").click();
+browser.locator("alt=playwright logo").click();</code></pre>
+        <p><strong>When to use:</strong> For <code>img</code> or <code>area</code> elements with <code>alt</code> text.</p>
+
+        <h3 id="locate-by-title">Locate by title</h3>
+        <p>Use the <strong>title</strong> attribute:</p>
+        <pre><code>browser.assertThat(browser.locator("[title='Issues count']")).hasText("25 issues");
+browser.locator("title=Issues count").getTextContent();</code></pre>
+
+        <h3 id="locate-by-test-id">Locate by test id</h3>
+        <p>Use <strong><code>data-testid=</code></strong> (or any <code>attr=value</code> for a custom attribute):</p>
+        <pre><code>browser.locator("data-testid=directions").click();
+browser.locator("[data-testid='directions']").click();</code></pre>
+        <p><strong>When to use:</strong> For a stable testing contract. Less user-facing than role/text; combine with role or text when the visible behavior matters.</p>
+        <p><strong>Custom test id attribute:</strong> If your app uses e.g. <code>data-pw</code> instead of <code>data-testid</code>, use the attribute shortcut: <code>"data-pw=directions"</code> → <code>[data-pw="directions"]</code>.</p>
+
+        <h3 id="locate-by-css-xpath">Locate by CSS or XPath</h3>
+        <p>Use <strong><code>browser.locator(selector)</code></strong> with a CSS selector or XPath. CSS is default; XPath is used when the string starts with <code>//</code> or <code>xpath=</code>.</p>
+        <pre><code>browser.locator("button").click();
+browser.locator("//button").click();
+browser.locator("css=button").click();
+browser.locator("xpath=//button").click();</code></pre>
+        <p><strong>When to use:</strong> Prefer <strong>user-facing</strong> selectors (role/tag + text, label, placeholder, test id). Avoid long CSS/XPath chains tied to layout (e.g. <code>#tsf > div:nth-child(2) > ...</code>); they break when the DOM changes.</p>
+
+        <h2 id="locators-inside-frames">Locators inside frames</h2>
+        <p>To interact with elements inside an <strong>iframe</strong>, get a browser scoped to the frame, then use <strong><code>locator</code></strong> on it:</p>
+        <pre><code>CSTestingBrowser frame = browser.frame("iframe#my-frame");
+frame.locator("button").click();
+frame.locator("name=user").type("John");</code></pre>
+        <p>See <a href="docs-java-frames.html">Frames</a> for nested frames and more examples.</p>
+
+        <h2 id="multiple-matches">Multiple matches and strictness</h2>
+        <p>Locators are <strong>strict</strong>: if an <strong>action</strong> (click, type, check, etc.) is performed and the selector matches <strong>more than one</strong> element, CSTesting throws. Use <strong><code>.first()</code></strong>, <strong><code>.last()</code></strong>, or <strong><code>.nth(index)</code></strong> to pick one.</p>
+        <p><strong>Throws if more than one button:</strong></p>
+        <pre><code>browser.locator("button").click();  // error if multiple buttons</code></pre>
+        <p><strong>OK – explicitly pick one:</strong></p>
+        <pre><code>browser.locator("button").first().click();
+browser.locator("button").nth(1).click();
+browser.locator("button").last().click();</code></pre>
+        <p><strong>Count is OK with multiple matches:</strong></p>
+        <pre><code>int n = browser.locatorCount(browser.locator("button"));
+browser.assertThat(browser.locator("button")).hasCount(3);</code></pre>
+        <p>Use <strong><code>.first()</code> / <code>.last()</code> / <code>.nth()</code></strong> only when necessary; prefer a selector that uniquely identifies the element (e.g. text, test id, or more specific CSS/XPath).</p>
+
+        <h2 id="lists">Lists</h2>
+
+        <h3 id="count-items">Count items</h3>
+        <p>Use <strong><code>assertThat(locator).hasCount(n)</code></strong> or <strong><code>browser.locatorCount(locator)</code></strong>:</p>
+        <pre><code>browser.assertThat(browser.locator("li")).hasCount(3);
+int count = browser.locatorCount(browser.locator("li"));</code></pre>
+
+        <h3 id="get-item-by-text">Get a specific item by text</h3>
+        <p>Use <strong>XPath</strong> to find the list item that contains the text, then act on it:</p>
+        <pre><code>browser.locator("//li[contains(.,'orange')]").click();</code></pre>
+
+        <h3 id="get-by-index">Get by index (nth)</h3>
+        <p>When order is the only way to distinguish items:</p>
+        <pre><code>Locator secondItem = browser.locator("li").nth(1);
+secondItem.click();</code></pre>
+        <p>Use <strong><code>.nth()</code></strong> with care: if the list order changes, the wrong element may be targeted. Prefer text or test id when possible.</p>
+
+        <h3 id="assert-text-in-list">Assert text in a list</h3>
+        <p>Assert that a locator's text matches:</p>
+        <pre><code>browser.assertThat(browser.locator("//li[contains(.,'apple')]")).isVisible();
+browser.assertThat(browser.locator("li").first()).containText("apple");</code></pre>
+
+        <h2 id="filtering">Filtering (workarounds)</h2>
+        <p>CSTesting does not have <strong><code>filter(hasText)</code></strong> or <strong><code>filter(has(locator))</code></strong>. Use instead:</p>
+        <ul>
+          <li><strong>By text:</strong> XPath <code>//element[contains(.,'text')]</code> or a more specific selector.</li>
+          <li><strong>By child/descendant:</strong> XPath e.g. <code>//li[.//h3[.='Product 2']]//button[contains(.,'Add to cart')]</code>.</li>
+          <li><strong>By index:</strong> <strong><code>.nth(index)</code></strong> when you must rely on position.</li>
+        </ul>
+        <p><strong>Example – "Product 2" "Add to cart" button:</strong></p>
+        <pre><code>browser.locator("//li[contains(.,'Product 2')]//button[contains(.,'Add to cart')]").click();</code></pre>
+        <p><strong>Example – row with "Mary" and "Say goodbye" button (chaining conditions in XPath):</strong></p>
+        <pre><code>browser.locator("//li[contains(.,'Mary') and .//button[contains(.,'Say goodbye')]]").click();</code></pre>
+
+        <h2 id="summary">Summary</h2>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Topic</th><th>CSTesting</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Create locator</strong></td><td><code>browser.locator(selector)</code></td></tr>
+            <tr><td><strong>Selector types</strong></td><td>CSS (default), XPath (<code>//...</code> or <code>xpath=...</code>), <code>id=</code>, <code>name=</code>, any <code>attr=value</code></td></tr>
+            <tr><td><strong>Multiple matches</strong></td><td>Use <code>.first()</code>, <code>.last()</code>, or <code>.nth(index)</code> before actions</td></tr>
+            <tr><td><strong>By role</strong></td><td>CSS/XPath: <code>"button"</code>, <code>"input[type=checkbox]"</code>, <code>"//h3[.='Sign up']"</code></td></tr>
+            <tr><td><strong>By text</strong></td><td>XPath: <code>"//*[contains(.,'text')]"</code>, <code>"//button[contains(.,'Sign in')]"</code></td></tr>
+            <tr><td><strong>By label</strong></td><td><code>name=</code>, <code>id=</code>, or XPath <code>//label[contains(.,'Label')]//input</code></td></tr>
+            <tr><td><strong>By placeholder / alt / title / test id</strong></td><td><code>[attr="value"]</code> or <code>attr=value</code></td></tr>
+            <tr><td><strong>In frame</strong></td><td><code>browser.frame(iframeSelector)</code> then <code>frame.locator(...)</code></td></tr>
+            <tr><td><strong>Count</strong></td><td><code>assertThat(locator).hasCount(n)</code> or <code>locatorCount(locator)</code></td></tr>
+            <tr><td><strong>Strictness</strong></td><td>Action on multiple matches throws; use <code>.first()</code> / <code>.last()</code> / <code>.nth()</code> or a unique selector</td></tr>
+          </tbody>
+        </table>
+        <div class="docs-prev-next">
+          <a href="docs-java-frames.html" class="docs-prev">
+            <span class="docs-prev-next-label">Previous</span>
+            <span class="docs-prev-next-title">« Frames</span>
+          </a>
+          <a href="docs-java-navigations.html" class="docs-next-block">
+            <span class="docs-prev-next-label">Next</span>
+            <span class="docs-prev-next-title">Navigations »</span>
+          </a>
+        </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer docs-content-footer" id="docs-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Learn</h4>
+          <ul>
+            <li><a href="docs-java.html">Getting started</a></li>
+            <li><a href="docs-java-writing-tests.html">Writing tests</a></li>
+            <li><a href="docs-java-running-debugging.html">Running and debugging tests</a></li>
+            <li><a href="docs-java-test-runners.html">Test runners</a></li>
+            <li><a href="docs-java-actions.html">Actions</a></li>
+            <li><a href="docs-java-waits.html">Waits</a></li>
+            <li><a href="docs-java-assertions.html">Assertions</a></li>
+            <li><a href="docs-java-dialogs.html">Dialogs</a></li>
+            <li><a href="docs-java-frames.html">Frames</a></li>
+            <li><a href="docs-java-locators.html">Locators</a></li>
+            <li><a href="docs-java-navigations.html">Navigations</a></li>
+            <li><a href="docs-java-annotations.html">Annotations</a></li>
+            <li><a href="docs.html">Node.js docs</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="https://github.com/lokesh771988/EasyTesting" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-copy">&copy; 2025 CSTesting. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    (function() {
+      try {
+        sessionStorage.setItem('cstesting-platform', 'Java');
+      } catch (e) {}
+      var logoText = document.getElementById('logo-text');
+      if (logoText) {
+        logoText.textContent = 'CSTesting for Java';
+      }
+
+      var logoLink = document.querySelector('header .logo');
+      if (logoLink) {
+        logoLink.setAttribute('href', 'index.html');
+        logoLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = 'index.html';
+        });
+      }
+
+      var toggle = document.querySelector('.docs-sidebar-toggle');
+      var sidebar = document.getElementById('docs-sidebar');
+      if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+          var open = sidebar.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', open);
+        });
+      }
+      document.querySelectorAll('.docs-nav-group-title').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var group = btn.closest('.docs-nav-group');
+          var expanded = btn.getAttribute('aria-expanded') === 'true';
+          document.querySelectorAll('.docs-nav-group').forEach(function(other) {
+            if (other !== group) {
+              other.classList.add('collapsed');
+              var otherBtn = other.querySelector('.docs-nav-group-title');
+              if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+            }
+          });
+          btn.setAttribute('aria-expanded', !expanded);
+          group.classList.toggle('collapsed', expanded);
+        });
+      });
+
+      function syncSidebarToHash() {
+        var hash = window.location.hash.slice(1);
+        var groups = document.querySelectorAll('.docs-nav-group');
+        var activeGroup = null;
+        groups.forEach(function(group) {
+          var links = group.querySelectorAll('a.docs-nav-link');
+          for (var i = 0; i < links.length; i++) {
+            var href = links[i].getAttribute('href') || '';
+            var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+            if (hash && linkHash === hash) {
+              activeGroup = group;
+              break;
+            }
+          }
+          if (!hash && links.length && group.querySelector('a[href="docs-java-locators.html"]')) {
+            activeGroup = group;
+          }
+        });
+        if (!hash) activeGroup = activeGroup || document.querySelector('.docs-nav-group');
+        groups.forEach(function(group) {
+          var btn = group.querySelector('.docs-nav-group-title');
+          if (btn) {
+            var isOpen = group === activeGroup;
+            group.classList.toggle('collapsed', !isOpen);
+            btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          }
+        });
+        document.querySelectorAll('.docs-nav-link').forEach(function(a) {
+          var href = a.getAttribute('href') || '';
+          var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+          var isLocatorsPage = href.indexOf('docs-java-locators.html') !== -1 && !linkHash;
+          a.classList.toggle('docs-nav-link--active', isLocatorsPage || (hash && linkHash === hash));
+        });
+      }
+      syncSidebarToHash();
+      window.addEventListener('hashchange', syncSidebarToHash);
+    })();
+  </script>
+</body>
+</html>

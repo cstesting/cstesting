@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dialogs | CSTesting for Java</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="docs.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="docs-page">
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <header class="header">
+    <div class="header-inner">
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="index.html" class="logo">
+        <span class="logo-icon" aria-hidden="true">◆</span>
+        <span id="logo-text">CSTesting</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="index.html#features">Features</a>
+        <a href="docs-java.html" class="nav-active" id="docs-link">Docs</a>
+        <a href="index.html#community">Community</a>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="youtube-menu" id="youtube-trigger">YouTube</button>
+          <div class="nav-dropdown-menu" id="youtube-menu" role="menu" aria-labelledby="youtube-trigger">
+            <a href="https://www.youtube.com/@testingtutorialspoint" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">testingtutorialspoint</a>
+            <a href="https://www.youtube.com/@cstechnologiestelugu1988" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">cstechnologiestelugu</a>
+          </div>
+        </div>
+      </nav>
+      <div class="header-actions">
+        <button class="search-btn" aria-label="Search (Command+K)">Search</button>
+        <a href="index.html#get-started" class="btn btn-primary">Get started</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <button type="button" class="docs-sidebar-toggle" aria-label="Toggle docs menu" aria-expanded="false">Docs menu</button>
+    <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation navigation">
+      <nav class="docs-nav">
+        <div class="docs-nav-group">
+          <button type="button" class="docs-nav-group-title" aria-expanded="false" aria-controls="docs-group-getting-started" id="docs-group-getting-started-btn">
+            <span>Getting Started</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-getting-started">
+            <a href="docs-java.html#installation" class="docs-nav-link">Installation</a>
+            <a href="docs-java-writing-tests.html" class="docs-nav-link">Writing tests</a>
+            <a href="docs-java-running-debugging.html" class="docs-nav-link">Running and debugging tests</a>
+            <a href="docs-java-test-runners.html" class="docs-nav-link">Test runners</a>
+          </div>
+        </div>
+        <div class="docs-nav-group">
+          <button type="button" class="docs-nav-group-title" aria-expanded="true" aria-controls="docs-group-guides" id="docs-group-guides-btn">
+            <span>Guides</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-guides">
+            <a href="docs-java-actions.html" class="docs-nav-link">Actions</a>
+            <a href="docs-java-waits.html" class="docs-nav-link">Waits</a>
+            <a href="docs-java-assertions.html" class="docs-nav-link">Assertions</a>
+            <a href="docs-java-dialogs.html" class="docs-nav-link docs-nav-link--active">Dialogs</a>
+            <a href="docs-java-frames.html" class="docs-nav-link">Frames</a>
+            <a href="docs-java-locators.html" class="docs-nav-link">Locators</a>
+            <a href="docs-java-navigations.html" class="docs-nav-link">Navigations</a>
+            <a href="docs-java-annotations.html" class="docs-nav-link">Annotations</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main id="main" class="docs-content">
+      <div class="docs-content-inner">
+        <div class="docs-main-content" id="docs-main-content">
+        <h1 class="docs-section-heading">Dialogs</h1>
+
+        <h2 id="introduction">Introduction</h2>
+        <p>CSTesting can interact with JavaScript dialogs: <strong>alert</strong>, <strong>confirm</strong>, and <strong>prompt</strong>, as well as the <strong>beforeunload</strong> confirmation when closing the page. You set how the <em>next</em> dialog will be handled <strong>before</strong> the action that triggers it (e.g. before <code>click()</code>). If you do not set a response, the action that opens the dialog can block until the dialog is handled (behavior depends on the browser/backend).</p>
+
+        <h2 id="alert-confirm-prompt">alert(), confirm(), prompt() dialogs</h2>
+        <p>You register how to handle the next dialog by calling <strong><code>acceptNextAlert()</code></strong>, <strong><code>acceptNextAlert(String promptText)</code></strong>, or <strong><code>dismissNextAlert()</code></strong> before the action that opens the dialog.</p>
+
+        <table class="docs-table">
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>browser.acceptNextAlert()</code></td><td>Next dialog will be accepted (OK). Use for <strong>alert</strong> or <strong>confirm</strong>.</td></tr>
+            <tr><td><code>browser.acceptNextAlert(String promptText)</code></td><td>Next <strong>prompt</strong> will be accepted with the given text.</td></tr>
+            <tr><td><code>browser.dismissNextAlert()</code></td><td>Next <strong>confirm</strong> or <strong>prompt</strong> will be dismissed (Cancel).</td></tr>
+            <tr><td><code>browser.getLastAlertMessage()</code></td><td>Message of the last dialog that opened (for assertions).</td></tr>
+          </tbody>
+        </table>
+
+        <p><strong>Example: accept then click</strong></p>
+        <pre><code>browser.acceptNextAlert();
+browser.locator("#btnAlert").click();   // triggers alert("Hello")
+String msg = browser.getLastAlertMessage();  // "Hello"
+assertEquals("Hello", msg);</code></pre>
+
+        <p><strong>Example: dismiss confirm</strong></p>
+        <pre><code>browser.dismissNextAlert();
+browser.locator("#btnConfirm").click();  // confirm("Sure?") -&gt; Cancel</code></pre>
+
+        <p><strong>Example: accept prompt with text</strong></p>
+        <pre><code>browser.acceptNextAlert("my input");
+browser.locator("#btnPrompt").click();  // prompt("Name?") accepted with "my input"</code></pre>
+
+        <p><strong>Important:</strong> You must set the dialog response <strong>before</strong> the action that triggers the dialog. Otherwise the action can stall, because JavaScript dialogs are modal and block further page execution until they are handled.</p>
+
+        <p><strong>Wrong</strong> — the click can hang:</p>
+        <pre><code>browser.locator("#btnAlert").click();   // Dialog opens; execution blocks here
+browser.acceptNextAlert();             // Never runs until dialog is handled</code></pre>
+
+        <p><strong>Correct</strong> — set response first:</p>
+        <pre><code>browser.acceptNextAlert();
+browser.locator("#btnAlert").click();  // Dialog opens and is accepted
+String msg = browser.getLastAlertMessage();</code></pre>
+
+        <p>If you do not call <code>acceptNextAlert</code> or <code>dismissNextAlert</code> before a dialog appears, behavior is implementation-dependent (e.g. some backends may auto-dismiss). For reliable tests, always set the next dialog response before triggering it.</p>
+
+        <h2 id="beforeunload">beforeunload dialog</h2>
+        <p>When the page is closed or navigated away, the browser may show a <strong>beforeunload</strong> confirmation ("Leave site?"). CSTesting's <strong><code>browser.close()</code></strong> closes the page; whether <code>beforeunload</code> runs and how it is handled depends on the browser and backend.</p>
+        <p>To handle the beforeunload dialog explicitly, set the next dialog response before the action that would trigger it (e.g. closing the window or navigating away):</p>
+        <pre><code>browser.dismissNextAlert();   // or acceptNextAlert() to leave
+browser.close();              // or an action that triggers beforeunload</code></pre>
+        <p>If your test triggers navigation or close in a way that shows beforeunload, call <strong><code>acceptNextAlert()</code></strong> or <strong><code>dismissNextAlert()</code></strong> before that action so the dialog does not block the test.</p>
+
+        <h2 id="print-dialogs">Print dialogs</h2>
+        <p>CSTesting does not provide a dedicated API for <strong>print dialogs</strong> (<code>window.print()</code>). The native print dialog is controlled by the OS/browser and is not a JavaScript <code>alert</code>/<code>confirm</code>/<code>prompt</code> dialog.</p>
+        <p>To test that a print dialog would be triggered, you can:</p>
+        <ul>
+          <li><strong>Stub <code>window.print</code></strong> in the page (e.g. via <code>browser.evaluate(...)</code>) and assert that it was called, or</li>
+          <li>Rely on your app's own logic and assert on the state of the page before/after the "Print" action.</li>
+        </ul>
+        <p>Example of stubbing and asserting that print was requested:</p>
+        <pre><code>browser.gotoUrl("https://example.com/page-with-print");
+browser.evaluate("window.printRequested = false; window.print = function() { window.printRequested = true; };");
+browser.locator("//button[contains(.,'Print')]").first().click();  // or your print button selector
+Object requested = browser.evaluate("window.printRequested");
+assertTrue(Boolean.TRUE.equals(requested));</code></pre>
+        <p>(Adjust the selector to match your page; use XPath if needed, e.g. <code>//button[contains(.,'Print')]</code>.)</p>
+
+        <h2 id="summary">Summary</h2>
+        <table class="docs-table">
+          <thead>
+            <tr>
+              <th>Dialog type</th>
+              <th>CSTesting API</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>alert</strong></td><td><code>acceptNextAlert()</code> before click</td><td>Use <code>getLastAlertMessage()</code> to assert text.</td></tr>
+            <tr><td><strong>confirm</strong></td><td><code>acceptNextAlert()</code> or <code>dismissNextAlert()</code> before click</td><td>Set before the action that triggers confirm.</td></tr>
+            <tr><td><strong>prompt</strong></td><td><code>acceptNextAlert(text)</code> or <code>dismissNextAlert()</code> before click</td><td>Set before the action that triggers prompt.</td></tr>
+            <tr><td><strong>beforeunload</strong></td><td><code>acceptNextAlert()</code> or <code>dismissNextAlert()</code> before close/navigate</td><td>Use when your flow triggers "Leave site?".</td></tr>
+            <tr><td><strong>Print</strong></td><td>No built-in API</td><td>Stub <code>window.print</code> and assert it was called if needed.</td></tr>
+          </tbody>
+        </table>
+        <div class="docs-prev-next">
+          <a href="docs-java-assertions.html" class="docs-prev">
+            <span class="docs-prev-next-label">Previous</span>
+            <span class="docs-prev-next-title">« Assertions</span>
+          </a>
+          <a href="docs-java-frames.html" class="docs-next-block">
+            <span class="docs-prev-next-label">Next</span>
+            <span class="docs-prev-next-title">Frames »</span>
+          </a>
+        </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer docs-content-footer" id="docs-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Learn</h4>
+          <ul>
+            <li><a href="docs-java.html">Getting started</a></li>
+            <li><a href="docs-java-writing-tests.html">Writing tests</a></li>
+            <li><a href="docs-java-running-debugging.html">Running and debugging tests</a></li>
+            <li><a href="docs-java-test-runners.html">Test runners</a></li>
+            <li><a href="docs-java-actions.html">Actions</a></li>
+            <li><a href="docs-java-waits.html">Waits</a></li>
+            <li><a href="docs-java-assertions.html">Assertions</a></li>
+            <li><a href="docs-java-dialogs.html">Dialogs</a></li>
+            <li><a href="docs-java-frames.html">Frames</a></li>
+            <li><a href="docs-java-locators.html">Locators</a></li>
+            <li><a href="docs-java-navigations.html">Navigations</a></li>
+            <li><a href="docs-java-annotations.html">Annotations</a></li>
+            <li><a href="docs.html">Node.js docs</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="https://github.com/lokesh771988/EasyTesting" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-copy">&copy; 2025 CSTesting. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    (function() {
+      try {
+        sessionStorage.setItem('cstesting-platform', 'Java');
+      } catch (e) {}
+      var logoText = document.getElementById('logo-text');
+      if (logoText) {
+        logoText.textContent = 'CSTesting for Java';
+      }
+
+      var logoLink = document.querySelector('header .logo');
+      if (logoLink) {
+        logoLink.setAttribute('href', 'index.html');
+        logoLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = 'index.html';
+        });
+      }
+
+      var toggle = document.querySelector('.docs-sidebar-toggle');
+      var sidebar = document.getElementById('docs-sidebar');
+      if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+          var open = sidebar.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', open);
+        });
+      }
+      document.querySelectorAll('.docs-nav-group-title').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var group = btn.closest('.docs-nav-group');
+          var expanded = btn.getAttribute('aria-expanded') === 'true';
+          document.querySelectorAll('.docs-nav-group').forEach(function(other) {
+            if (other !== group) {
+              other.classList.add('collapsed');
+              var otherBtn = other.querySelector('.docs-nav-group-title');
+              if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+            }
+          });
+          btn.setAttribute('aria-expanded', !expanded);
+          group.classList.toggle('collapsed', expanded);
+        });
+      });
+
+      function syncSidebarToHash() {
+        var hash = window.location.hash.slice(1);
+        var groups = document.querySelectorAll('.docs-nav-group');
+        var activeGroup = null;
+        groups.forEach(function(group) {
+          var links = group.querySelectorAll('a.docs-nav-link');
+          for (var i = 0; i < links.length; i++) {
+            var href = links[i].getAttribute('href') || '';
+            var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+            if (hash && linkHash === hash) {
+              activeGroup = group;
+              break;
+            }
+          }
+          if (!hash && links.length && group.querySelector('a[href="docs-java-dialogs.html"]')) {
+            activeGroup = group;
+          }
+        });
+        if (!hash) activeGroup = activeGroup || document.querySelector('.docs-nav-group');
+        groups.forEach(function(group) {
+          var btn = group.querySelector('.docs-nav-group-title');
+          if (btn) {
+            var isOpen = group === activeGroup;
+            group.classList.toggle('collapsed', !isOpen);
+            btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          }
+        });
+        document.querySelectorAll('.docs-nav-link').forEach(function(a) {
+          var href = a.getAttribute('href') || '';
+          var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
+          var isDialogsPage = href.indexOf('docs-java-dialogs.html') !== -1 && !linkHash;
+          a.classList.toggle('docs-nav-link--active', isDialogsPage || (hash && linkHash === hash));
+        });
+      }
+      syncSidebarToHash();
+      window.addEventListener('hashchange', syncSidebarToHash);
+    })();
+  </script>
+</body>
+</html>

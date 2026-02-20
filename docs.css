@@ -340,6 +340,136 @@
   text-decoration: underline;
 }
 
+/* Previous / Next doc navigation (two-column) */
+.docs-prev-next {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.docs-prev,
+.docs-next-block {
+  padding: 16px 20px;
+  border-radius: 8px;
+  text-decoration: none !important;
+  display: block;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.docs-prev {
+  border: 2px solid var(--accent, #2dd4bf);
+  background: #fff;
+  text-align: left;
+}
+
+.docs-prev:hover {
+  background: rgba(45, 212, 191, 0.06);
+  border-color: var(--accent, #2dd4bf);
+}
+
+.docs-next-block {
+  border: 1px solid #e5e5e5;
+  background: #fff;
+  text-align: right;
+}
+
+.docs-next-block:hover {
+  background: #fafafa;
+  border-color: #d4d4d4;
+}
+
+.docs-prev-next-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #737373;
+  margin-bottom: 4px;
+}
+
+.docs-prev-next-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent, #2dd4bf) !important;
+  text-decoration: none !important;
+}
+
+.docs-prev .docs-prev-next-title:hover,
+.docs-next-block .docs-prev-next-title:hover {
+  text-decoration: underline !important;
+}
+
+/* When only Next is present (no Previous), show single block aligned right */
+.docs-prev-next--next-only {
+  grid-template-columns: 1fr;
+  justify-items: end;
+}
+
+.docs-prev-next--next-only .docs-next-block {
+  max-width: 280px;
+}
+
+/* When only Previous is present (no Next), show single block aligned left */
+.docs-prev-next--prev-only {
+  grid-template-columns: 1fr;
+  justify-items: start;
+}
+
+.docs-prev-next--prev-only .docs-prev {
+  max-width: 280px;
+}
+
+@media (max-width: 640px) {
+  .docs-prev-next {
+    grid-template-columns: 1fr;
+  }
+
+  .docs-prev-next--next-only {
+    justify-items: stretch;
+  }
+
+  .docs-prev-next--next-only .docs-next-block {
+    max-width: none;
+  }
+
+  .docs-prev-next--prev-only {
+    justify-items: stretch;
+  }
+
+  .docs-prev-next--prev-only .docs-prev {
+    max-width: none;
+  }
+}
+
+/* Legacy single Next link (keep for any pages still using it) */
+.docs-next-link {
+  margin-top: 32px;
+  padding: 16px 20px;
+  background: #f5f5f5;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  text-align: right;
+  max-width: 280px;
+  margin-left: auto;
+}
+
+.docs-next-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #737373;
+  margin-bottom: 4px;
+}
+
+.docs-next-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent, #2dd4bf) !important;
+  text-decoration: none !important;
+}
+
+.docs-next-title:hover {
+  text-decoration: underline !important;
+}
+
 /* Mobile: collapse sidebar into toggle */
 .docs-sidebar-toggle {
   display: none;
