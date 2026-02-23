@@ -54,6 +54,9 @@
             <a href="docs.html#installation" class="docs-nav-link docs-nav-link--active">Installation</a>
             <a href="docs.html#writing-tests" class="docs-nav-link">Writing tests</a>
             <a href="docs.html#running-tests" class="docs-nav-link">Running tests</a>
+            <a href="docs.html#html-report" class="docs-nav-link">HTML test report</a>
+            <a href="docs.html#updating" class="docs-nav-link">Updating CSTesting</a>
+            <a href="docs.html#system-requirements" class="docs-nav-link">System requirements</a>
             <a href="docs.html#page-object-model" class="docs-nav-link">Page Object Model (POM)</a>
             <a href="docs.html#config-driven-tests" class="docs-nav-link">Config-driven tests</a>
             <a href="docs.html#typescript" class="docs-nav-link">TypeScript</a>
@@ -87,14 +90,14 @@
             <span class="docs-nav-group-chevron" aria-hidden="true"></span>
           </button>
           <div class="docs-nav-group-links" id="docs-group-guides">
-            <a href="docs.html#actions" class="docs-nav-link">Actions</a>
-            <a href="docs.html#dropdown" class="docs-nav-link">Dropdown</a>
-            <a href="docs.html#checkbox-and-radio" class="docs-nav-link">Checkbox and radio</a>
-            <a href="docs.html#element-state" class="docs-nav-link">Element state</a>
-            <a href="docs.html#locators" class="docs-nav-link">Locators</a>
-            <a href="docs.html#frames" class="docs-nav-link">Frames</a>
-            <a href="docs.html#dialogs" class="docs-nav-link">Dialogs</a>
-            <a href="docs.html#navigations" class="docs-nav-link">Navigations</a>
+            <a href="features/nodejs/actions.html" class="docs-nav-link">Actions</a>
+            <a href="features/nodejs/annotations-and-test-control.html" class="docs-nav-link">Annotations and test control</a>
+            <a href="features/nodejs/assertions.html" class="docs-nav-link">Assertions</a>
+            <a href="features/nodejs/dialogs.html" class="docs-nav-link">Dialogs</a>
+            <a href="features/nodejs/command-line.html" class="docs-nav-link">Command line</a>
+            <a href="features/nodejs/frames.html" class="docs-nav-link">Frames</a>
+            <a href="features/nodejs/locators.html" class="docs-nav-link">Locators</a>
+            <a href="features/nodejs/navigations.html" class="docs-nav-link">Navigations</a>
           </div>
         </div>
       </nav>
@@ -121,28 +124,50 @@
 
         <h2 id="installation">Installation</h2>
         <h3>Introduction</h3>
-        <p id="docs-intro">CSTesting is a simple, extensible Node.js testing framework. It bundles a test runner, assertions, and CDP-based browser automation (no Playwright or Cypress required).</p>
-        <p><strong>You will learn</strong></p>
+        <p id="docs-intro"><strong>CSTesting</strong> is a Node.js testing framework that includes:</p>
+        <ul>
+          <li><strong>Test runner</strong> — <code>describe</code> / <code>it</code>, hooks, assertions (Jest-style)</li>
+          <li><strong>Browser automation</strong> — CDP-based (Chrome/Chromium), no extra browser download</li>
+          <li><strong>API testing</strong> — Rest-Assured style HTTP requests and status/body assertions</li>
+          <li><strong>Config-driven tests</strong> — Run full flows from a simple config file (no code)</li>
+        </ul>
+        <p>You can run unit tests, API tests, and browser tests in one runner, and use config files for quick flows or non-developers.</p>
+
+        <h3>You will learn</h3>
         <ul>
           <li>How to install CSTesting</li>
-          <li>What's installed</li>
-          <li>How to run the example test</li>
+          <li>What gets created when you scaffold</li>
+          <li>How to run tests</li>
+          <li>How to open the HTML test report</li>
+          <li>How to update CSTesting</li>
+          <li>System requirements</li>
         </ul>
 
         <h3>Installing CSTesting</h3>
-        <p>Get started by installing CSTesting in your project.</p>
-        <h3>Using npm</h3>
+        <h4>Using npm</h4>
+        <p>Add CSTesting to a new or existing Node.js project:</p>
         <pre><code>npm install cstesting</code></pre>
-        <p>Or add to an existing project:</p>
-        <pre><code>npm install cstesting</code></pre>
-
-        <h3>What's Installed</h3>
-        <p>After installation you can run tests with:</p>
+        <p>No global install needed. Use the CLI via <code>npx</code>:</p>
         <pre><code>npx cstesting
-npx cstesting "**/*.test.js"
 npx cst</code></pre>
-        <p>Use in code:</p>
-        <pre><code>const { describe, it, expect, createBrowser } = require('cstesting');</code></pre>
+
+        <h4>Scaffold (optional)</h4>
+        <p>Scaffold a Page Object Model structure (pages + tests with sample code):</p>
+        <pre><code>npx cstesting init
+# or
+npx cst init</code></pre>
+        <p>The command does not overwrite existing files; it only creates missing folders and sample files. No prompts.</p>
+        <p>CSTesting uses the <strong>system Chrome or Chromium</strong> (via chrome-launcher). There is no separate browser download step.</p>
+
+        <h3>What's installed</h3>
+        <p>After <code>npm install cstesting</code> and (optionally) <code>npx cstesting init</code>:</p>
+        <ul>
+          <li><strong>package.json</strong> — Your project and dependencies (plus cstesting).</li>
+          <li><strong>pages/</strong> — Created by <code>init</code>. Page objects (e.g. <code>HomePage.js</code>) that wrap selectors and actions.</li>
+          <li><strong>tests/</strong> — Created by <code>init</code>. Sample test file <code>home.test.js</code>. You can add any <code>*.test.js</code>, <code>*.spec.js</code>, or (with ts-node) <code>*.test.ts</code> / <code>*.spec.ts</code>.</li>
+        </ul>
+        <p>There is no single config file for the test run. Browser options are set per call in code (e.g. <code>createBrowser({ headless: true })</code>) or in config-driven <code>.conf</code> files.</p>
+        <p><strong>Config-driven flows:</strong> You can create <code>.conf</code> files (e.g. <code>login.conf</code>) with steps like <code>goto:url</code>, <code>click=selector</code>, and run them with <code>npx cstesting run login.conf</code> — no test code required.</p>
 
         <h2 id="writing-tests">Writing tests</h2>
         <p>Create a test file (e.g. <code>math.test.js</code>):</p>
@@ -159,9 +184,42 @@ describe('Math', () => {
 });</code></pre>
 
         <h2 id="running-tests">Running tests</h2>
+        <ul>
+          <li><strong>Default:</strong> Tests run <strong>headless</strong> (no visible browser window).</li>
+          <li><strong>See the browser:</strong> In code use <code>createBrowser({ headless: false })</code>. In a <code>.conf</code> file set <code>headed=true</code> or <code>headless=false</code>.</li>
+        </ul>
         <pre><code>npx cstesting
+npx cstesting tests/
 npx cstesting "**/*.test.js"
-npx cstesting tests/</code></pre>
+npx cstesting path/to/file.test.js</code></pre>
+        <p>Test files run in sequence. Filter by path or pattern: pass a folder, a file path, or a glob.</p>
+
+        <h2 id="html-report">HTML test report</h2>
+        <p>After each run, CSTesting writes an <strong>HTML report</strong> to <code>report/report.html</code> (the <code>report/</code> folder is created if missing). The report lists all tests with pass/fail/skip, duration, and expandable steps (if you use <code>step('name')</code> in tests). Failed tests show the error message and stack.</p>
+        <p>The report path is printed in the terminal after each run. Open it in your browser:</p>
+        <pre><code># Windows
+start report\report.html
+
+# macOS
+open report/report.html
+
+# Linux
+xdg-open report/report.html</code></pre>
+
+        <h2 id="updating">Updating CSTesting</h2>
+        <p>Update to the latest version:</p>
+        <pre><code>npm install cstesting@latest</code></pre>
+        <p>No separate browser install; CSTesting uses the system Chrome/Chromium.</p>
+        <p>Check the installed version:</p>
+        <pre><code>npm list cstesting</code></pre>
+
+        <h2 id="system-requirements">System requirements</h2>
+        <ul>
+          <li><strong>Node.js:</strong> 16.0.0 or later (see <code>engines</code> in package.json).</li>
+          <li><strong>OS:</strong> Any OS where Node.js and Chrome or Chromium run (Windows, macOS, Linux).</li>
+          <li><strong>Browser:</strong> Chrome or Chromium must be installed on the machine. CSTesting launches it via chrome-launcher.</li>
+          <li><strong>Mobile emulation:</strong> Not supported.</li>
+        </ul>
 
         <h2 id="page-object-model">Page Object Model (POM)</h2>
         <p>After installing, scaffold a pages and tests structure with sample code:</p>
@@ -175,36 +233,169 @@ npx cst init</code></pre>
         </ul>
         <p>Then run: <code>npx cstesting tests/</code></p>
 
-        <h2 id="config-driven-tests">Config-driven tests (single file → run → report)</h2>
-        <p>Run tests from a config file without writing code. One function: pick file, run steps, get report.</p>
-        <p>This is not available in any other automation tool (Selenium, Playwright, Cypress, etc.). Only CSTesting lets you define and run full flows from a simple config file and get a single test case with a report. Right now we support login-style flows (goto, type into inputs, click). We will add all types of actions (dropdowns, checkboxes, waits, assertions, etc.) so you can cover any scenario from config alone.</p>
+        <h2 id="config-driven-tests">Config-driven tests</h2>
+        <h3>Introduction</h3>
+        <p><strong>Config-driven tests</strong> let you run browser flows from a <strong>config file</strong> without writing test code. You define steps (navigate, type, click) in a simple text file; CSTesting runs them in the browser and produces a report. Each section in the config becomes one test case in the report.</p>
+        <p>This is useful when you want to run or share flows quickly, when non-developers need to define tests, or when you want to keep flows in a single file that can be edited without touching code.</p>
 
-        <h3>Config format (one step per line)</h3>
+        <h3>You will learn</h3>
         <ul>
-          <li><strong><code># Test case name</code></strong> — starts a single test case; all following steps belong to it until the next <code>#</code> (report shows one test per section)</li>
-          <li><strong><code>headless=false</code></strong> or <strong><code>headed=true</code></strong> — open browser in headed mode (visible window; default is headless)</li>
-          <li><strong><code>goto:&lt;url&gt;</code></strong> — open URL</li>
-          <li><strong><code>&lt;label&gt;:&lt;locator&gt;=value:&lt;text&gt;</code></strong> — type text into element (e.g. <code>username:#email=value:john</code>)</li>
-          <li><strong><code>click=&lt;locator&gt;</code></strong> — click element (e.g. <code>click=button[type="submit"]</code>)</li>
+          <li>What config-driven tests are and when to use them</li>
+          <li>The config file format (syntax and options)</li>
+          <li>How to run a config file from the command line</li>
+          <li>How to run a config file from code</li>
+          <li>How the HTML report works for config runs</li>
+          <li>Locator syntax you can use in config</li>
         </ul>
 
-        <h3>Example <code>login.conf</code></h3>
+        <h3>What are config-driven tests?</h3>
+        <ul>
+          <li><strong>No test code</strong> — You write a <code>.conf</code> (or <code>.config</code>) file with one step per line.</li>
+          <li><strong>Browser automation</strong> — CSTesting opens Chrome/Chromium, runs each step in order (goto, type into inputs, click), and stops on the first failure in a test case.</li>
+          <li><strong>One test case per section</strong> — Lines starting with <code>#</code> start a new test case; all following steps belong to it until the next <code>#</code>. The report shows one row per test case with expandable steps.</li>
+          <li><strong>Same report as code tests</strong> — After the run, an HTML report is written to <code>report/report.html</code> with pass/fail, duration, and step list.</li>
+        </ul>
+        <p>Supported steps today: <strong>goto</strong>, <strong>type</strong> (into an input), and <strong>click</strong>. More actions (e.g. dropdowns, checkboxes, waits) may be added in future versions.</p>
+
+        <h3>Config file format</h3>
+        <p>Use <strong>one step per line</strong>. Empty lines and lines that don't match any step are ignored.</p>
+
+        <h4>1. Test case name (section header)</h4>
+        <p>A line that starts with <code>#</code> starts a new test case. The rest of the line is the test case name (used in the report).</p>
+        <pre><code># Login Page - Mercury Tours
+# My first flow</code></pre>
+        <p>All following steps (until the next <code>#</code>) belong to this test case. If the file has no <code>#</code> line, all steps form a single test case.</p>
+
+        <h4>2. Browser mode (headless / headed)</h4>
+        <ul>
+          <li><strong><code>headless=true</code></strong> — Run without a visible browser window (default).</li>
+          <li><strong><code>headless=false</code></strong> — Run with a visible browser window.</li>
+          <li><strong><code>headed=true</code></strong> — Same as <code>headless=false</code> (visible window).</li>
+          <li><strong><code>headed=false</code></strong> — Same as <code>headless=true</code>.</li>
+        </ul>
+        <p>These lines are options, not steps; they don't appear as steps in the report. The last value before a step applies.</p>
+        <pre><code>headed=true
+# Login flow
+goto:https://example.com/login</code></pre>
+
+        <h4>3. Navigate to a URL</h4>
+        <pre><code>goto:https://example.com/login</code></pre>
+        <p>The browser navigates to the URL. CSTesting waits for the page load (with a timeout) before continuing.</p>
+
+        <h4>4. Type text into an element</h4>
+        <p>Format: <strong><code>&lt;label&gt;:&lt;locator&gt;=value:&lt;text&gt;</code></strong></p>
+        <ul>
+          <li><strong>label</strong> — Short name for the step (e.g. <code>username</code>, <code>password</code>). Shown in the report.</li>
+          <li><strong>locator</strong> — How to find the element (see <a href="#locators-in-config">Locators in config</a>).</li>
+          <li><strong>text</strong> — The value to type. Everything after <code>=value:</code> is used as the text (so the text can contain spaces or colons).</li>
+        </ul>
+        <p>Examples:</p>
+        <pre><code>username:#email=value:user@test.com
+password:#password=value:secret
+name:[name="userName"]=value:mercury</code></pre>
+        <p>The runner waits for the element to be present (with a timeout), then fills it (focus, set value, fire input/change events). Use this for text inputs and similar fields.</p>
+
+        <h4>5. Click an element</h4>
+        <p>Format: <strong><code>click=&lt;locator&gt;</code></strong></p>
+        <p>Examples:</p>
+        <pre><code>click=button[type="submit"]
+click=[name="submit"]
+click=#login-btn</code></pre>
+        <p>The runner waits for the element, clicks it, then waits for the page load. Use this for submit buttons, links, or any clickable element.</p>
+
+        <h3>Full example</h3>
+        <p><strong>login.conf</strong></p>
         <pre><code># Login Page (visible browser)
 headed=true
 goto:https://example.com/login
 username:#email=value:user@test.com
 password:#password=value:secret
-click=button[type="submit"]</code></pre>
+click=button[type="submit"]
 
-        <p>Run and get report:</p>
+# Second test case - same file
+# Simple visit
+goto:https://example.com
+click=a</code></pre>
+        <ul>
+          <li>First test case: <strong>Login Page (visible browser)</strong> — headed, goto login page, type username and password, click submit.</li>
+          <li>Second test case: <strong>Simple visit</strong> — goto example.com, click the first link.</li>
+        </ul>
+
+        <h3>Running a config file</h3>
+        <h4>From the command line</h4>
+        <p><strong>Option 1:</strong> Use the <code>run</code> subcommand and pass the config path.</p>
         <pre><code>npx cstesting run login.conf
-# or
-npx cstesting login.conf</code></pre>
-        <p>All steps under a <code>#</code> section run as one test case in order; pass/fail is for the whole case and the HTML report shows one row per test case with expandable steps.</p>
+npx cstesting run path/to/my.conf</code></pre>
+        <p><strong>Option 2:</strong> Pass the config file directly (only if the path has extension <code>.conf</code> or <code>.config</code>).</p>
+        <pre><code>npx cstesting login.conf
+npx cstesting flows/demo.config</code></pre>
+        <p>The CLI looks for the file in the current directory (or the path you give). After the run, the summary is printed (passed/failed/total, duration) and the report path is shown (e.g. <code>report/report.html</code>).</p>
 
-        <h3>Programmatic</h3>
+        <h4>From code</h4>
+        <p>Use <code>runConfigFile</code> to run a config file and get the result (same shape as the normal test run result).</p>
         <pre><code>const { runConfigFile } = require('cstesting');
-const result = await runConfigFile('login.conf');</code></pre>
+
+async function main() {
+  const result = await runConfigFile('login.conf');
+  console.log('Passed:', result.passed, 'Failed:', result.failed, 'Total:', result.total);
+  if (result.failed > 0) {
+    for (const { test, error } of result.errors) {
+      console.log('  Failed:', test, error.message);
+    }
+  }
+}
+main();</code></pre>
+        <p>You can override headless mode from code:</p>
+        <pre><code>const result = await runConfigFile('login.conf', { headless: false });</code></pre>
+        <p>If you pass <code>headless</code>, it overrides the <code>headless</code> / <code>headed</code> lines in the config file.</p>
+
+        <h3>HTML report</h3>
+        <p>After a config run, the same HTML report is written as for code-based tests:</p>
+        <ul>
+          <li><strong>Location</strong> — <code>report/report.html</code> (relative to the current working directory; the <code>report/</code> folder is created if needed).</li>
+          <li><strong>Content</strong> — One row per test case (each <code>#</code> section). You can expand a row to see the list of steps (goto, type username, click submit, etc.). Failed test cases show the error message and stack.</li>
+          <li><strong>Opening the report</strong> — The path is printed in the terminal. Open the file in your browser (e.g. <code>start report\report.html</code> on Windows, <code>open report/report.html</code> on macOS).</li>
+        </ul>
+
+        <h3 id="locators-in-config">Locators in config</h3>
+        <p>Locators in config use the same rules as in code. You can use:</p>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Syntax</th><th>Meaning</th><th>Example</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>#id</code></td><td>Element with <code>id="id"</code></td><td><code>#email</code></td></tr>
+            <tr><td><code>.class</code></td><td>Element with that class</td><td><code>.btn-primary</code></td></tr>
+            <tr><td><code>[name="x"]</code></td><td>Attribute <code>name="x"</code></td><td><code>[name="userName"]</code></td></tr>
+            <tr><td><code>[id="x"]</code></td><td>Attribute <code>id="x"</code></td><td><code>[id="submit"]</code></td></tr>
+            <tr><td>Any <code>[attr="value"]</code></td><td>Attribute selector</td><td><code>[data-testid="login"]</code></td></tr>
+            <tr><td>Full CSS selector</td><td>Standard CSS</td><td><code>button[type="submit"]</code></td></tr>
+            <tr><td>XPath</td><td>XPath expression</td><td><code>//button[text()='Submit']</code></td></tr>
+          </tbody>
+        </table>
+        <p>Examples in config:</p>
+        <pre><code>username:#email=value:john
+password:[name="password"]=value:secret
+click=button[type="submit"]
+click=[name="submit"]</code></pre>
+        <p>For <strong>type</strong> steps, the locator should point to an input or focusable element. For <strong>click</strong> steps, it should point to a clickable element (button, link, etc.). The runner waits for the element to be present (up to a timeout) before acting.</p>
+
+        <h3>Summary</h3>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Topic</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>File</strong></td><td>Plain text file, one step per line; extension <code>.conf</code> or <code>.config</code>.</td></tr>
+            <tr><td><strong>Sections</strong></td><td><code># Test case name</code> starts a new test case; all steps until the next <code>#</code> belong to it.</td></tr>
+            <tr><td><strong>Options</strong></td><td><code>headless=true/false</code>, <code>headed=true/false</code> — control visible browser.</td></tr>
+            <tr><td><strong>Steps</strong></td><td><code>goto:&lt;url&gt;</code>, <code>&lt;label&gt;:&lt;locator&gt;=value:&lt;text&gt;</code>, <code>click=&lt;locator&gt;</code>.</td></tr>
+            <tr><td><strong>Run</strong></td><td><code>npx cstesting run login.conf</code> or <code>npx cstesting login.conf</code>.</td></tr>
+            <tr><td><strong>From code</strong></td><td><code>runConfigFile('login.conf')</code> or <code>runConfigFile('login.conf', { headless: false })</code>.</td></tr>
+            <tr><td><strong>Report</strong></td><td>Same as code tests: <code>report/report.html</code> with one row per test case and expandable steps.</td></tr>
+          </tbody>
+        </table>
+        <p>Config-driven tests are intended for flows that fit the current step types (goto, type, click). For more complex logic, assertions, or API calls, use the regular test runner and write tests in code (see <a href="docs.html#writing-tests">Writing tests</a> and <a href="docs.html#page-object-model">Page Object Model</a>).</p>
 
         <h2 id="typescript">TypeScript</h2>
         <p><strong>Install</strong></p>
@@ -842,6 +1033,112 @@ await browser.waitForSelector('h1', { timeout: 10000 });</code></pre>
           </li>
         </ul>
         <p><code>browser.goto(url)</code> waits for the <strong>load</strong> event. After a click that navigates, use <code>browser.waitForURL('**/login')</code>, <code>browser.waitForLoad()</code>, or <code>waitForSelector</code> to wait for the new page.</p>
+
+        <h2 id="annotations-and-test-control">Annotations and test control</h2>
+        <h3>Introduction</h3>
+        <p>CSTesting lets you <strong>focus</strong> or <strong>skip</strong> tests and suites so you can run a subset of tests or temporarily disable some. Skipped tests are counted and shown in the HTML report.</p>
+        <p>This page describes what is supported. Features like tags, custom annotations, conditional skip, or "expected to fail" are <strong>not implemented</strong> in the current version; the table at the end summarizes supported vs not supported.</p>
+
+        <h3>You will learn</h3>
+        <ul>
+          <li>How to focus tests (run only certain tests)</li>
+          <li>How to skip tests or suites</li>
+          <li>What is not yet supported (tags, annotations, conditional skip, etc.)</li>
+        </ul>
+
+        <h3>Focus a test or suite</h3>
+        <p>When you mark tests or suites with <strong>only</strong>, only those run. All others are skipped. Use this to quickly run one test or one group while developing.</p>
+
+        <h4>Run only one test</h4>
+        <pre><code>const { describe, it, expect, createBrowser, beforeAll, afterAll } = require('cstesting');
+
+describe('My suite', () => {
+  it('this test runs', async () => {
+    expect(1).toBe(1);
+  });
+
+  it.only('only this test runs', async () => {
+    expect(2).toBe(2);
+  });
+
+  it('this test is skipped', async () => {
+    expect(3).toBe(3);
+  });
+});</code></pre>
+        <p>When you use <code>it.only</code>, only that test runs in the whole project (across all loaded files). The other tests in the same suite are skipped.</p>
+
+        <h4>Run only one suite</h4>
+        <pre><code>describe('this suite runs', () => {
+  it('test one', () => {});
+  it('test two', () => {});
+});
+
+describe.only('only this suite runs', () => {
+  it('test a', () => {});
+  it('test b', () => {});
+});
+
+describe('this suite is skipped', () => {
+  it('test x', () => {});
+});</code></pre>
+        <p>When you use <code>describe.only</code>, only that suite's tests run. All other suites (and their tests) are skipped.</p>
+        <p>You can combine <code>describe.only</code> and <code>it.only</code>: if any suite or test has <code>only</code>, only the ones marked with <code>only</code> run.</p>
+
+        <h3>Skip a test or suite</h3>
+        <p>Mark a test or suite as <strong>skip</strong> so it is not run. Skipped tests are still counted and appear in the terminal summary and in the HTML report under "Skipped".</p>
+
+        <h4>Skip one test</h4>
+        <pre><code>it.skip('skip this test', async () => {
+  // This test is not run.
+});</code></pre>
+
+        <h4>Skip a whole suite</h4>
+        <pre><code>describe.skip('skip this suite', () => {
+  it('test one', () => {});
+  it('test two', () => {});
+});</code></pre>
+        <p>Use <strong>skip</strong> when a test is broken, not applicable yet, or you want to disable it without deleting it.</p>
+
+        <h3>Report</h3>
+        <ul>
+          <li><strong>Focus (only):</strong> Tests/suites without <code>only</code> are skipped when any <code>only</code> is present. They appear in the report as <strong>Skipped</strong>.</li>
+          <li><strong>Skip:</strong> Tests/suites marked with <code>skip</code> are not run and appear as <strong>Skipped</strong> in the report.</li>
+        </ul>
+        <p>The HTML report has a "Skipped" section listing all skipped tests (both from <code>only</code> and from <code>skip</code>). The terminal output shows: <code>Passed: X  Failed: Y  Skipped: Z  Total: N</code>.</p>
+
+        <h3>What is not supported (current version)</h3>
+        <p>The following are <strong>not implemented</strong> in CSTesting. Use the workarounds below if you need similar behavior.</p>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Feature</th><th>Supported?</th><th>Workaround</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Focus</strong> (<code>it.only</code>, <code>describe.only</code>)</td><td>Yes</td><td>—</td></tr>
+            <tr><td><strong>Skip</strong> (<code>it.skip</code>, <code>describe.skip</code>)</td><td>Yes</td><td>—</td></tr>
+            <tr><td><strong>Expected to fail</strong> (run test and expect it to fail)</td><td>No</td><td>Run the test normally; if it fails, that's the outcome. No "must fail" annotation.</td></tr>
+            <tr><td><strong>Fixme</strong> (skip because broken/slow, with message)</td><td>No</td><td>Use <code>it.skip('message')</code> to skip; the message is in the test name only.</td></tr>
+            <tr><td><strong>Slow</strong> (e.g. triple timeout)</td><td>No</td><td>No per-test timeout or "slow" annotation. Use a longer global timeout or split slow tests.</td></tr>
+            <tr><td><strong>Tags</strong> (e.g. <code>@fast</code>, <code>@slow</code> in title or options)</td><td>No</td><td>Put keywords in the test/suite name and run by file or folder (e.g. <code>npx cstesting tests/fast/</code>). No <code>--grep</code> by tag.</td></tr>
+            <tr><td><strong>Custom annotations</strong> (type + description, e.g. issue URL)</td><td>No</td><td>No annotation API; report does not show custom annotations. Add context in the test name or in <code>step()</code> text.</td></tr>
+            <tr><td><strong>Conditional skip</strong> (e.g. skip if browser is Firefox)</td><td>No</td><td>CSTesting runs one browser (Chrome). Use a normal <code>if</code> and return early, or skip the whole suite with <code>describe.skip</code> if needed.</td></tr>
+            <tr><td><strong>Runtime annotations</strong> (add annotation during test)</td><td>No</td><td>No <code>test.info()</code> or similar. Use <code>step('description')</code> to add steps that appear in the report.</td></tr>
+            <tr><td><strong>Filter by tag from CLI</strong> (<code>--grep</code>, <code>--grep-invert</code>)</td><td>No</td><td>Filter by path/pattern only: <code>npx cstesting path/to/file.test.js</code> or <code>npx cstesting tests/smoke/</code>.</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Summary</h3>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Action</th><th>Syntax</th><th>Effect</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Focus one test</td><td><code>it.only('name', fn)</code></td><td>Only this test runs (others skipped).</td></tr>
+            <tr><td>Focus one suite</td><td><code>describe.only('name', fn)</code></td><td>Only tests in this suite run.</td></tr>
+            <tr><td>Skip one test</td><td><code>it.skip('name', fn)</code></td><td>This test is not run (reported as skipped).</td></tr>
+            <tr><td>Skip one suite</td><td><code>describe.skip('name', fn)</code></td><td>No tests in this suite run (all reported as skipped).</td></tr>
+          </tbody>
+        </table>
+        <p>Skipped tests (from <strong>only</strong> or <strong>skip</strong>) are included in the total count and listed in the HTML report under "Skipped". Tags, custom annotations, conditional skip, and grep by tag are not available in the current version.</p>
 
         </div>
       </div>

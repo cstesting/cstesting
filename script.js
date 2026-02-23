@@ -23,7 +23,7 @@
       logoText.textContent = platform ? 'CSTesting for ' + platform : 'CSTesting';
     }
     if (docsLink) {
-      docsLink.href = platform === 'Java' ? 'docs-java.html' : 'docs.html';
+      docsLink.href = platform === 'Java' ? 'docs-java.html' : (platform === 'NodeJS' ? 'features/nodejs/getting-started.html' : 'docs.html');
     }
   }
 
@@ -31,7 +31,7 @@
   var isMainPage = !document.body.classList.contains('docs-page');
   if (storedPlatform) {
     if (docsLink) {
-      docsLink.href = storedPlatform === 'Java' ? 'docs-java.html' : 'docs.html';
+      docsLink.href = storedPlatform === 'Java' ? 'docs-java.html' : (storedPlatform === 'NodeJS' ? 'features/nodejs/getting-started.html' : 'docs.html');
     }
     if (!isMainPage && logoText) {
       logoText.textContent = 'CSTesting for ' + storedPlatform;

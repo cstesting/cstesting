@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frames | CSTesting for Node.js</title>
+  <link rel="stylesheet" href="../../styles.css" />
+  <link rel="stylesheet" href="../../docs.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="docs-page">
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <header class="header">
+    <div class="header-inner">
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="../../index.html" class="logo">
+        <span class="logo-icon" aria-hidden="true">◆</span>
+        <span id="logo-text">CSTesting</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="../../index.html#features">Features</a>
+        <a href="getting-started.html" class="nav-active">Docs</a>
+        <a href="../../index.html#community">Community</a>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="youtube-menu" id="youtube-trigger">YouTube</button>
+          <div class="nav-dropdown-menu" id="youtube-menu" role="menu" aria-labelledby="youtube-trigger">
+            <a href="https://www.youtube.com/@testingtutorialspoint" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">testingtutorialspoint</a>
+            <a href="https://www.youtube.com/@cstechnologiestelugu1988" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">cstechnologiestelugu</a>
+          </div>
+        </div>
+      </nav>
+      <div class="header-actions">
+        <button class="search-btn" aria-label="Search (Command+K)">Search</button>
+        <a href="../../index.html#get-started" class="btn btn-primary">Get started</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <button type="button" class="docs-sidebar-toggle" aria-label="Toggle docs menu" aria-expanded="false">Docs menu</button>
+    <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation navigation">
+      <nav class="docs-nav">
+        <div class="docs-nav-group">
+          <button type="button" class="docs-nav-group-title" aria-expanded="true" aria-controls="docs-group-getting-started" id="docs-group-getting-started-btn">
+            <span>Getting Started</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-getting-started">
+            <a href="getting-started.html#installation" class="docs-nav-link">Installation</a>
+            <a href="writing-tests.html" class="docs-nav-link">Writing tests</a>
+            <a href="running-debugging.html" class="docs-nav-link">Running and debugging tests</a>
+            <a href="page-object-model.html" class="docs-nav-link">Page Object Model (POM)</a>
+            <a href="config-driven-tests.html" class="docs-nav-link">Config-driven tests</a>
+            <a href="typescript.html" class="docs-nav-link">TypeScript</a>
+          </div>
+        </div>
+        <div class="docs-nav-group collapsed">
+          <button type="button" class="docs-nav-group-title" aria-expanded="false" aria-controls="docs-group-guides" id="docs-group-guides-btn">
+            <span>Guides</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-guides">
+            <a href="actions.html" class="docs-nav-link">Actions</a>
+            <a href="annotations-and-test-control.html" class="docs-nav-link">Annotations and test control</a>
+            <a href="assertions.html" class="docs-nav-link">Assertions</a>
+            <a href="dialogs.html" class="docs-nav-link">Dialogs</a>
+            <a href="command-line.html" class="docs-nav-link">Command line</a>
+            <a href="frames.html" class="docs-nav-link docs-nav-link--active">Frames</a>
+            <a href="locators.html" class="docs-nav-link">Locators</a>
+            <a href="navigations.html" class="docs-nav-link">Navigations</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main id="main" class="docs-content">
+      <div class="docs-content-inner">
+        <div class="docs-main-content" id="docs-main-content">
+        <h1 class="docs-section-heading">Frames</h1>
+
+        <h2 id="introduction">Introduction</h2>
+        <p>A page can have one or more <strong>iframes</strong>. In CSTesting, page-level actions (like <code>browser.click(selector)</code>) run in the <strong>main frame</strong>. To interact with elements inside an iframe, you get a <strong>frame handle</strong> with <code>browser.frame(iframeSelector)</code> and then use the same API on that handle: click, type, locator, select, check, and so on. You do not switch the main page; the frame handle targets the iframe's document.</p>
+        <p><strong>Same-origin only:</strong> Frames are accessed via the main page's <code>contentDocument</code>. Cross-origin iframes cannot be accessed (browser security). Only same-origin iframes are supported.</p>
+        <p>CSTesting supports <strong>nested frames</strong>: an iframe that contains another iframe. Call <code>.frame(selector)</code> on the outer frame handle to get an inner frame handle.</p>
+
+        <h2 id="you-will-learn">You will learn</h2>
+        <ul>
+          <li>How to get a frame (by selector)</li>
+          <li>How to interact inside a frame (click, type, locator)</li>
+          <li>Nested frames (iframe inside iframe)</li>
+          <li>Waiting for frame content (waitForSelector)</li>
+          <li>What is not supported (frame by name/URL, cross-origin)</li>
+        </ul>
+
+        <hr />
+        <h2 id="getting-a-frame">Getting a frame</h2>
+        <p>Use <strong>browser.frame(iframeSelector)</strong> and pass a selector that matches the <strong>iframe element</strong> (e.g. CSS or XPath). The selector is evaluated in the <strong>main frame</strong>. The returned handle lets you run actions inside that iframe.</p>
+        <pre><code>// Get frame by CSS selector (class, id, etc.)
+const frame = browser.frame('iframe.login-frame');
+const frame = browser.frame('#sidebar-iframe');
+const frame = browser.frame('[name="content"]');
+
+// Get frame by XPath if needed
+const frame = browser.frame('//iframe[@title="Widget"]');</code></pre>
+        <p>There is no <strong>page.frame('frame-name')</strong> by string name only, or <strong>page.frame({ url: /regex/ })</strong>. You target the iframe by a selector that finds the <code>&lt;iframe&gt;</code> element in the main document (e.g. <code>[name="frame-login"]</code> for <code>&lt;iframe name="frame-login"&gt;</code>).</p>
+
+        <hr />
+        <h2 id="interacting-inside-frame">Interacting inside a frame</h2>
+        <p>The frame handle has the same interaction API as the page: <strong>click</strong>, <strong>type</strong>, <strong>locator</strong>, <strong>select</strong>, <strong>check</strong>, <strong>uncheck</strong>, <strong>hover</strong>, <strong>dragAndDrop</strong>, and so on. All selectors inside these calls are evaluated <strong>inside that frame's document</strong>.</p>
+        <p><strong>Example: locate and fill an input inside the frame</strong></p>
+        <pre><code>await browser.goto('https://example.com/page-with-iframe');
+
+const frame = browser.frame('.frame-class');
+await frame.type('#username-input', 'John');
+await frame.type('#password-input', 'secret');
+await frame.click('button[type="submit"]');</code></pre>
+        <p><strong>Using a locator inside the frame</strong></p>
+        <pre><code>const frame = browser.frame('iframe#login');
+const username = frame.locator('#username-input');
+await username.type('John');
+await frame.locator('button[type="submit"]').click();</code></pre>
+        <p><strong>Other actions</strong></p>
+        <pre><code>const frame = browser.frame('iframe#form');
+await frame.click('#agree');
+await frame.check('#newsletter');
+await frame.select('#country', { label: 'United States' });
+const text = await frame.locator('h1').textContent();
+expect(text).toContain('Welcome');</code></pre>
+
+        <hr />
+        <h2 id="nested-frames">Nested frames</h2>
+        <p>If an iframe contains another iframe, get the <strong>outer</strong> frame first, then call <strong>.frame(selector)</strong> on it. The inner selector is evaluated <strong>inside the outer frame's document</strong> (so it finds the inner iframe element there).</p>
+        <pre><code>// Page structure: page → iframe#outer → iframe#inner → element
+const outerFrame = browser.frame('iframe#outer');
+const innerFrame = outerFrame.frame('iframe#inner');
+
+// Interact inside the inner frame
+await innerFrame.type('#username', 'John');
+await innerFrame.click('button');</code></pre>
+        <p><strong>Example: two levels of nesting</strong></p>
+        <pre><code>&lt;!-- Main page --&gt;
+&lt;iframe id="parent" src="..."&gt;
+  &lt;!-- Parent frame --&gt;
+  &lt;iframe id="child" src="..."&gt;
+    &lt;!-- Child frame: input and button here --&gt;
+  &lt;/iframe&gt;
+&lt;/iframe&gt;</code></pre>
+        <pre><code>const parentFrame = browser.frame('#parent');
+const childFrame = parentFrame.frame('#child');
+await childFrame.type('#user-name', 'John');
+await childFrame.click('button[type="submit"]');</code></pre>
+        <p>You can chain as many levels as you have: <strong>browser.frame('A').frame('B').frame('C')</strong> for three levels.</p>
+
+        <hr />
+        <h2 id="waiting-for-frame">Waiting for frame content</h2>
+        <p>Frames (especially nested or lazy-loaded ones) may not have content immediately. Use <strong>waitForSelector</strong> on the frame handle to wait until an element exists inside that frame (or until a timeout).</p>
+        <pre><code>const frame = browser.frame('iframe#dynamic');
+await frame.waitForSelector('#username', { timeout: 10000 });
+await frame.type('#username', 'John');</code></pre>
+        <p>For a <strong>nested</strong> frame that loads late, wait inside the inner frame after getting it:</p>
+        <pre><code>const outerFrame = browser.frame('iframe#outer');
+const innerFrame = outerFrame.frame('iframe#inner');
+await innerFrame.waitForSelector('.content', { timeout: 5000 });
+await innerFrame.click('.content button');</code></pre>
+
+        <hr />
+        <h2 id="frame-api-summary">Frame handle API summary</h2>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Method</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>frame(iframeSelector)</strong></td><td>Get a nested frame (iframe inside this frame). Returns another FrameHandle.</td></tr>
+            <tr><td><strong>waitForSelector(selector, { timeout? })</strong></td><td>Wait until selector matches inside this frame.</td></tr>
+            <tr><td><strong>click(selector)</strong>, <strong>doubleClick</strong>, <strong>rightClick</strong>, <strong>hover</strong></td><td>Mouse actions inside the frame.</td></tr>
+            <tr><td><strong>type(selector, text)</strong></td><td>Type text into an element inside the frame.</td></tr>
+            <tr><td><strong>select(selector, option)</strong></td><td>Select option(s) in a <code>&lt;select&gt;</code> inside the frame.</td></tr>
+            <tr><td><strong>check(selector)</strong>, <strong>uncheck(selector)</strong></td><td>Check/uncheck checkbox or radio inside the frame.</td></tr>
+            <tr><td><strong>dragAndDrop(source, target)</strong></td><td>Drag from source to target inside the frame.</td></tr>
+            <tr><td><strong>locator(selector)</strong></td><td>Get a locator for an element inside the frame (then .click(), .type(), etc.).</td></tr>
+            <tr><td><strong>getByAttribute(attr, value)</strong></td><td>Locate by attribute inside the frame.</td></tr>
+            <tr><td><strong>getTextContent(selector)</strong></td><td>Get text of element inside the frame.</td></tr>
+            <tr><td><strong>getAttribute(selector, attrName)</strong></td><td>Get attribute value of element inside the frame.</td></tr>
+            <tr><td><strong>isVisible(selector)</strong>, <strong>isDisabled(selector)</strong>, <strong>isEditable(selector)</strong>, <strong>isSelected(selector)</strong></td><td>Element state inside the frame.</td></tr>
+            <tr><td><strong>evaluate(expression)</strong></td><td>Run JavaScript in the frame's context.</td></tr>
+            <tr><td><strong>content()</strong></td><td>Get the frame document's HTML string.</td></tr>
+          </tbody>
+        </table>
+        <p>There is no <strong>goto</strong> or <strong>url()</strong> on a frame handle; the frame's document is already loaded. Use <strong>evaluate</strong> if you need something from the frame's window (e.g. <code>frame.evaluate('location.href')</code>).</p>
+
+        <hr />
+        <h2 id="not-supported">What is not supported (current version)</h2>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Feature</th><th>Supported?</th><th>Workaround</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Frame by selector</strong> (browser.frame('iframe#id'))</td><td>Yes</td><td>—</td></tr>
+            <tr><td><strong>Nested frames</strong> (frame.frame('inner'))</td><td>Yes</td><td>—</td></tr>
+            <tr><td><strong>Same API as page</strong> (click, type, locator, etc.)</td><td>Yes</td><td>—</td></tr>
+            <tr><td><strong>waitForSelector</strong> inside frame</td><td>Yes</td><td>—</td></tr>
+            <tr><td><strong>Frame by name only</strong> (e.g. page.frame('frame-login'))</td><td>No</td><td>Use a selector: <code>browser.frame('[name="frame-login"]')</code>.</td></tr>
+            <tr><td><strong>Frame by URL</strong> (e.g. page.frame({ url: /domain/ }))</td><td>No</td><td>Use a selector that identifies the iframe (e.g. by id, name, or other attribute).</td></tr>
+            <tr><td><strong>Cross-origin iframes</strong></td><td>No</td><td>Only same-origin iframes (contentDocument) are supported. Cross-origin requires a different approach (e.g. CDP target switching), not exposed in the current API.</td></tr>
+          </tbody>
+        </table>
+
+        <hr />
+        <h2 id="summary">Summary</h2>
+        <ul>
+          <li>Use <strong>browser.frame(iframeSelector)</strong> to get a handle to an iframe. Selector is evaluated in the main frame and must match the <code>&lt;iframe&gt;</code> element.</li>
+          <li>Interact with the frame via the handle: <strong>frame.click()</strong>, <strong>frame.type()</strong>, <strong>frame.locator()</strong>, etc. Selectors in these calls run inside the frame's document.</li>
+          <li><strong>Nested frames:</strong> call <strong>outerFrame.frame(innerIframeSelector)</strong> to get an iframe inside another iframe. Chain as needed: <strong>browser.frame('A').frame('B')</strong>.</li>
+          <li>Use <strong>frame.waitForSelector(selector)</strong> when the frame content loads late.</li>
+          <li><strong>Same-origin only.</strong> No frame by name/URL helpers; use a selector (e.g. <code>[name="..."]</code>) to target the iframe element.</li>
+        </ul>
+
+        <div class="docs-prev-next">
+          <a href="command-line.html" class="docs-prev">
+            <span class="docs-prev-next-label">Previous</span>
+            <span class="docs-prev-next-title">« Command line</span>
+          </a>
+          <a href="locators.html" class="docs-next">
+            <span class="docs-prev-next-label">Next</span>
+            <span class="docs-prev-next-title">Locators »</span>
+          </a>
+        </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer docs-content-footer" id="docs-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Learn</h4>
+          <ul>
+            <li><a href="getting-started.html">Getting started</a></li>
+            <li><a href="writing-tests.html">Writing tests</a></li>
+            <li><a href="running-debugging.html">Running and debugging tests</a></li>
+            <li><a href="page-object-model.html">Page Object Model (POM)</a></li>
+            <li><a href="config-driven-tests.html">Config-driven tests</a></li>
+            <li><a href="typescript.html">TypeScript</a></li>
+            <li><a href="actions.html">Actions</a></li>
+            <li><a href="annotations-and-test-control.html">Annotations and test control</a></li>
+            <li><a href="assertions.html">Assertions</a></li>
+            <li><a href="dialogs.html">Dialogs</a></li>
+            <li><a href="command-line.html">Command line</a></li>
+            <li><a href="frames.html">Frames</a></li>
+            <li><a href="locators.html">Locators</a></li>
+            <li><a href="navigations.html">Navigations</a></li>
+            <li><a href="../../docs-java.html">Java docs</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="https://github.com/lokesh771988/EasyTesting" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-copy">&copy; 2025 CSTesting. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="../../script.js"></script>
+  <script>
+    (function() {
+      try { sessionStorage.setItem('cstesting-platform', 'NodeJS'); } catch (e) {}
+      var logoText = document.getElementById('logo-text');
+      if (logoText) logoText.textContent = 'CSTesting for Node.js';
+      var toggle = document.querySelector('.docs-sidebar-toggle');
+      var sidebar = document.getElementById('docs-sidebar');
+      if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+          var open = sidebar.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', open);
+        });
+      }
+      document.querySelectorAll('.docs-nav-group-title').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var group = btn.closest('.docs-nav-group');
+          var expanded = btn.getAttribute('aria-expanded') === 'true';
+          document.querySelectorAll('.docs-nav-group').forEach(function(other) {
+            if (other !== group) {
+              other.classList.add('collapsed');
+              var otherBtn = other.querySelector('.docs-nav-group-title');
+              if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+            }
+          });
+          btn.setAttribute('aria-expanded', !expanded);
+          group.classList.toggle('collapsed', expanded);
+        });
+      });
+      function syncSidebarToHash() {
+        document.querySelectorAll('.docs-nav-link').forEach(function(a) {
+          var href = a.getAttribute('href') || '';
+          var isThisPage = href.indexOf('frames.html') !== -1;
+          a.classList.toggle('docs-nav-link--active', isThisPage);
+        });
+      }
+      syncSidebarToHash();
+      window.addEventListener('hashchange', syncSidebarToHash);
+    })();
+  </script>
+</body>
+</html>

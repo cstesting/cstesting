@@ -151,9 +151,9 @@
 }
 
 .docs-nav-link--active {
-  color: var(--accent, #2dd4bf);
-  font-weight: 500;
-  background: rgba(45, 212, 191, 0.1);
+  color: var(--text-secondary, #a3a3a3);
+  font-weight: 400;
+  background: transparent;
 }
 
 /* Main content - only this area scrolls when scrolling the page */
@@ -256,6 +256,13 @@
   font-size: 1.125rem;
   font-weight: 600;
   margin: 24px 0 12px;
+  color: #171717;
+}
+
+.docs-content h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 20px 0 10px;
   color: #171717;
 }
 

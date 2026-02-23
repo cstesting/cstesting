@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Command line | CSTesting for Node.js</title>
+  <link rel="stylesheet" href="../../styles.css" />
+  <link rel="stylesheet" href="../../docs.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="docs-page">
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <header class="header">
+    <div class="header-inner">
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="../../index.html" class="logo">
+        <span class="logo-icon" aria-hidden="true">◆</span>
+        <span id="logo-text">CSTesting</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="../../index.html#features">Features</a>
+        <a href="getting-started.html" class="nav-active">Docs</a>
+        <a href="../../index.html#community">Community</a>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="youtube-menu" id="youtube-trigger">YouTube</button>
+          <div class="nav-dropdown-menu" id="youtube-menu" role="menu" aria-labelledby="youtube-trigger">
+            <a href="https://www.youtube.com/@testingtutorialspoint" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">testingtutorialspoint</a>
+            <a href="https://www.youtube.com/@cstechnologiestelugu1988" role="menuitem" class="nav-dropdown-item" target="_blank" rel="noopener noreferrer">cstechnologiestelugu</a>
+          </div>
+        </div>
+      </nav>
+      <div class="header-actions">
+        <button class="search-btn" aria-label="Search (Command+K)">Search</button>
+        <a href="../../index.html#get-started" class="btn btn-primary">Get started</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <button type="button" class="docs-sidebar-toggle" aria-label="Toggle docs menu" aria-expanded="false">Docs menu</button>
+    <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation navigation">
+      <nav class="docs-nav">
+        <div class="docs-nav-group">
+          <button type="button" class="docs-nav-group-title" aria-expanded="true" aria-controls="docs-group-getting-started" id="docs-group-getting-started-btn">
+            <span>Getting Started</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-getting-started">
+            <a href="getting-started.html#installation" class="docs-nav-link">Installation</a>
+            <a href="writing-tests.html" class="docs-nav-link">Writing tests</a>
+            <a href="running-debugging.html" class="docs-nav-link">Running and debugging tests</a>
+            <a href="page-object-model.html" class="docs-nav-link">Page Object Model (POM)</a>
+            <a href="config-driven-tests.html" class="docs-nav-link">Config-driven tests</a>
+            <a href="typescript.html" class="docs-nav-link">TypeScript</a>
+          </div>
+        </div>
+        <div class="docs-nav-group collapsed">
+          <button type="button" class="docs-nav-group-title" aria-expanded="false" aria-controls="docs-group-guides" id="docs-group-guides-btn">
+            <span>Guides</span>
+            <span class="docs-nav-group-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="docs-nav-group-links" id="docs-group-guides">
+            <a href="actions.html" class="docs-nav-link">Actions</a>
+            <a href="annotations-and-test-control.html" class="docs-nav-link">Annotations and test control</a>
+            <a href="assertions.html" class="docs-nav-link">Assertions</a>
+            <a href="dialogs.html" class="docs-nav-link">Dialogs</a>
+            <a href="command-line.html" class="docs-nav-link docs-nav-link--active">Command line</a>
+            <a href="frames.html" class="docs-nav-link">Frames</a>
+            <a href="locators.html" class="docs-nav-link">Locators</a>
+            <a href="navigations.html" class="docs-nav-link">Navigations</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main id="main" class="docs-content">
+      <div class="docs-content-inner">
+        <div class="docs-main-content" id="docs-main-content">
+        <h1 class="docs-section-heading">Command line</h1>
+
+        <h2 id="introduction">Introduction</h2>
+        <p>CSTesting provides a command line interface for running tests, scaffolding a project, and running config-driven flows. Use the <code>cstesting</code> command (or the short alias <code>cst</code>). There are no optional flags (such as <code>--headed</code> or <code>--grep</code>); you control what runs by passing a file path, directory, or pattern.</p>
+
+        <hr />
+        <h2 id="invocation">Invocation</h2>
+        <pre><code>npx cstesting [command-or-pattern]
+npx cst [command-or-pattern]</code></pre>
+        <p>If you install CSTesting globally, you can run <code>cstesting</code> or <code>cst</code> without <code>npx</code>.</p>
+
+        <hr />
+        <h2 id="essential-commands">Essential commands</h2>
+        <h3>Run tests</h3>
+        <p>Run test files. Discovered files must match one of: <code>*.test.js</code>, <code>*.spec.js</code>, <code>*.test.ts</code>, <code>*.spec.ts</code>. Tests run in <strong>headless</strong> mode by default (no visible browser). To see the browser, set <code>headless: false</code> in your test code or use a config file with <code>headed=true</code>.</p>
+        <p><strong>Syntax</strong></p>
+        <pre><code>npx cstesting [pattern]</code></pre>
+        <ul>
+          <li><strong>No argument</strong> — Uses default pattern <code>**/*.test.js</code> in the current directory (and subdirectories, excluding <code>node_modules</code> and <code>dist</code>).</li>
+          <li><strong>Pattern</strong> — A file path, directory path, or glob. Only matching test files are run.</li>
+        </ul>
+        <p><strong>Examples</strong></p>
+        <pre><code># Run all tests (default: **/*.test.js)
+npx cstesting
+
+# Run a single test file
+npx cstesting tests/example.test.js
+npx cstesting tests/landing-page.spec.ts
+
+# Run all tests in a directory (and subdirectories)
+npx cstesting tests/
+npx cstesting tests/todo-page/
+npx cstesting tests/landing-page/
+
+# Run tests matching a glob
+npx cstesting "**/*.test.js"
+npx cstesting "**/login*.test.js"
+
+# Run only tests that have a given tag (tag-based running)
+npx cstesting --tag smoke
+npx cstesting --tag smoke,regression tests/
+npx cstesting -t login example/browser1.test.js</code></pre>
+        <p>See <a href="tags.html">Tags</a> for how to tag tests and suites and use <code>--tag</code> / <code>-t</code>.</p>
+        <p>Test files are run <strong>one file after another</strong> (sequential). After the run, a summary is printed (Passed, Failed, Skipped, Total, duration) and the path to the HTML report is shown (e.g. <code>report/report.html</code>).</p>
+        <p><strong>Discovered file types</strong></p>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Extension</th><th>Discovered</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>.test.js</code></td><td>Yes</td></tr>
+            <tr><td><code>.spec.js</code></td><td>Yes</td></tr>
+            <tr><td><code>.test.ts</code></td><td>Yes (requires <code>ts-node</code> in project)</td></tr>
+            <tr><td><code>.spec.ts</code></td><td>Yes (requires <code>ts-node</code> in project)</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Scaffold (init)</h3>
+        <p>Create the Page Object Model structure: <code>pages/</code> and <code>tests/</code> folders with sample <code>HomePage.js</code> and <code>home.test.js</code>. Does not overwrite existing files.</p>
+        <p><strong>Syntax</strong></p>
+        <pre><code>npx cstesting init
+npx cst init</code></pre>
+        <p><strong>Example</strong></p>
+        <pre><code>npx cstesting init</code></pre>
+        <p>Output: lists created files and reminds you to run <code>npx cstesting tests/</code>.</p>
+
+        <h3>Run config file</h3>
+        <p>Run a config-driven flow from a <code>.conf</code> or <code>.config</code> file (no test code). See <a href="config-driven-tests.html">Config-driven tests</a>.</p>
+        <p><strong>Syntax</strong></p>
+        <pre><code>npx cstesting run &lt;config-file&gt;
+npx cstesting &lt;config-file&gt;</code></pre>
+        <p><strong>Examples</strong></p>
+        <pre><code># Using the run subcommand
+npx cstesting run login.conf
+npx cstesting run path/to/demo.config
+
+# Or pass the config file directly (only for .conf / .config extension)
+npx cstesting login.conf</code></pre>
+        <p>The CLI looks for the file in the current directory (or the given path). After the run, the summary and report path are printed.</p>
+
+        <h2 id="output-and-report">Output and report</h2>
+        <ul>
+          <li><strong>Terminal</strong> — For each test file, the relative path is printed. Failed tests show suite name, test name, and error. At the end: <code>Passed: X  Failed: Y  Skipped: Z  Total: N  (duration ms)</code> and <code>Report: &lt;path&gt;</code>.</li>
+          <li><strong>HTML report</strong> — Written to <code>report/report.html</code> (relative to current working directory). The report is <strong>not</strong> opened automatically. Open it manually (e.g. <code>start report\report.html</code> on Windows, <code>open report/report.html</code> on macOS).</li>
+          <li><strong>Exit code</strong> — Process exits with code <code>1</code> if any test failed or if a config run had failures; otherwise <code>0</code>.</li>
+        </ul>
+        <p>There is <strong>no</strong> <code>show-report</code> command. Open the report file in your browser yourself.</p>
+
+        <hr />
+        <h2 id="not-supported">What is not supported (current version)</h2>
+        <p>The following CLI features from other tools are <strong>not</strong> implemented in CSTesting. Use the workarounds where applicable.</p>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Feature</th><th>Supported?</th><th>Workaround</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Run tests</strong> (file, dir, pattern)</td><td>Yes</td><td>—</td></tr>
+            <tr><td><strong>init</strong> (scaffold)</td><td>Yes</td><td>—</td></tr>
+            <tr><td><strong>run</strong> config file</td><td>Yes</td><td>—</td></tr>
+            <tr><td><strong>--help</strong></td><td>No</td><td>See this doc or README.</td></tr>
+            <tr><td><strong>--headed</strong></td><td>No</td><td>Set <code>headless: false</code> in code or use <code>headed=true</code> in a .conf file.</td></tr>
+            <tr><td><strong>--grep</strong> / <strong>-g</strong> (filter by test title)</td><td>No</td><td>Filter by file path or directory: run specific files or folders.</td></tr>
+            <tr><td><strong>--workers</strong> / <strong>-j</strong> (parallel workers)</td><td>No</td><td>Tests run sequentially per file.</td></tr>
+            <tr><td><strong>--debug</strong></td><td>No</td><td>Use Node/IDE debugger; run with <code>headless: false</code> to watch the browser.</td></tr>
+            <tr><td><strong>--ui</strong> (interactive UI mode)</td><td>No</td><td>Not available.</td></tr>
+            <tr><td><strong>--project</strong> (browser/project)</td><td>No</td><td>CSTesting uses a single browser (Chrome/Chromium).</td></tr>
+            <tr><td><strong>--timeout</strong></td><td>No</td><td>No per-run or per-test timeout flag.</td></tr>
+            <tr><td><strong>--max-failures</strong> / <strong>-x</strong></td><td>No</td><td>All test files run; no "stop after N failures" option.</td></tr>
+            <tr><td><strong>--last-failed</strong></td><td>No</td><td>Re-run failed tests manually by path if needed.</td></tr>
+            <tr><td><strong>--list</strong> (list tests without running)</td><td>No</td><td>Not available.</td></tr>
+            <tr><td><strong>show-report</strong> (open HTML report)</td><td>No</td><td>Open <code>report/report.html</code> manually.</td></tr>
+            <tr><td><strong>install</strong> (browsers)</td><td>No</td><td>CSTesting uses system Chrome/Chromium; no browser install command.</td></tr>
+            <tr><td><strong>codegen</strong> (record and generate tests)</td><td>No</td><td>Not available.</td></tr>
+            <tr><td><strong>show-trace</strong> / trace viewer</td><td>No</td><td>Not available.</td></tr>
+            <tr><td><strong>merge-reports</strong></td><td>No</td><td>Not available.</td></tr>
+            <tr><td><strong>clear-cache</strong></td><td>No</td><td>Not available.</td></tr>
+            <tr><td><strong>Config file</strong> (<strong>-c</strong> / <strong>--config</strong>)</td><td>No</td><td>No global config file; options are per call in code or in .conf for config-driven runs.</td></tr>
+            <tr><td><strong>Run test at line</strong> (e.g. <code>file.spec.ts:42</code>)</td><td>No</td><td>Pass the whole file path only.</td></tr>
+            <tr><td><strong>Test list file</strong> (--test-list)</td><td>No</td><td>Not available.</td></tr>
+          </tbody>
+        </table>
+
+        <hr />
+        <h2 id="summary">Summary</h2>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Command</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>npx cstesting</code></td><td>Run all tests (default pattern <code>**/*.test.js</code>).</td></tr>
+            <tr><td><code>npx cstesting &lt;path&gt;</code></td><td>Run tests: path can be a file, directory, or glob (e.g. <code>tests/</code>, <code>tests/a.test.js</code>, <code>**/*.test.js</code>).</td></tr>
+            <tr><td><code>npx cstesting init</code></td><td>Scaffold <code>pages/</code> and <code>tests/</code> with sample POM files.</td></tr>
+            <tr><td><code>npx cstesting run &lt;config&gt;</code></td><td>Run a config-driven flow (e.g. <code>login.conf</code>).</td></tr>
+            <tr><td><code>npx cstesting &lt;file.conf&gt;</code></td><td>Same as <code>run</code> when the argument has extension <code>.conf</code> or <code>.config</code>.</td></tr>
+          </tbody>
+        </table>
+        <p><strong>Alias:</strong> <code>npx cst</code> is the same as <code>npx cstesting</code>.</p>
+        <p>No other subcommands or flags exist. For the latest behavior, run the CLI and refer to this document or the project README.</p>
+
+        <div class="docs-prev-next">
+          <a href="dialogs.html" class="docs-prev">
+            <span class="docs-prev-next-label">Previous</span>
+            <span class="docs-prev-next-title">« Dialogs</span>
+          </a>
+          <a href="frames.html" class="docs-next">
+            <span class="docs-prev-next-label">Next</span>
+            <span class="docs-prev-next-title">Frames »</span>
+          </a>
+        </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer docs-content-footer" id="docs-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Learn</h4>
+          <ul>
+            <li><a href="getting-started.html">Getting started</a></li>
+            <li><a href="writing-tests.html">Writing tests</a></li>
+            <li><a href="running-debugging.html">Running and debugging tests</a></li>
+            <li><a href="page-object-model.html">Page Object Model (POM)</a></li>
+            <li><a href="config-driven-tests.html">Config-driven tests</a></li>
+            <li><a href="typescript.html">TypeScript</a></li>
+            <li><a href="actions.html">Actions</a></li>
+            <li><a href="assertions.html">Assertions</a></li>
+            <li><a href="dialogs.html">Dialogs</a></li>
+            <li><a href="command-line.html">Command line</a></li>
+            <li><a href="frames.html">Frames</a></li>
+            <li><a href="locators.html">Locators</a></li>
+            <li><a href="navigations.html">Navigations</a></li>
+            <li><a href="annotations-and-test-control.html">Annotations and test control</a></li>
+            <li><a href="../../docs-java.html">Java docs</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="https://github.com/lokesh771988/EasyTesting" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-copy">&copy; 2025 CSTesting. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="../../script.js"></script>
+  <script>
+    (function() {
+      try { sessionStorage.setItem('cstesting-platform', 'NodeJS'); } catch (e) {}
+      var logoText = document.getElementById('logo-text');
+      if (logoText) logoText.textContent = 'CSTesting for Node.js';
+      var toggle = document.querySelector('.docs-sidebar-toggle');
+      var sidebar = document.getElementById('docs-sidebar');
+      if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+          var open = sidebar.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', open);
+        });
+      }
+      document.querySelectorAll('.docs-nav-group-title').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var group = btn.closest('.docs-nav-group');
+          var expanded = btn.getAttribute('aria-expanded') === 'true';
+          document.querySelectorAll('.docs-nav-group').forEach(function(other) {
+            if (other !== group) {
+              other.classList.add('collapsed');
+              var otherBtn = other.querySelector('.docs-nav-group-title');
+              if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+            }
+          });
+          btn.setAttribute('aria-expanded', !expanded);
+          group.classList.toggle('collapsed', expanded);
+        });
+      });
+      function syncSidebarToHash() {
+        document.querySelectorAll('.docs-nav-link').forEach(function(a) {
+          var href = a.getAttribute('href') || '';
+          var isThisPage = href.indexOf('command-line.html') !== -1;
+          a.classList.toggle('docs-nav-link--active', isThisPage);
+        });
+      }
+      syncSidebarToHash();
+      window.addEventListener('hashchange', syncSidebarToHash);
+    })();
+  </script>
+</body>
+</html>
