@@ -19,7 +19,7 @@
         <span></span><span></span><span></span>
       </button>
       <a href="../../index.html" class="logo">
-        <span class="logo-icon" aria-hidden="true">◆</span>
+        <img src="../../assets/logo-option-c.svg" alt="" class="logo-icon" width="36" height="36" aria-hidden="true">
         <span id="logo-text">CSTesting</span>
       </a>
       <nav class="nav" aria-label="Main">
@@ -35,7 +35,10 @@
         </div>
       </nav>
       <div class="header-actions">
-        <button class="search-btn" aria-label="Search (Command+K)">Search</button>
+        <div class="search-wrap" id="search-wrap">
+          <input type="text" class="search-input" id="doc-search-input" placeholder="Search docs..." aria-label="Search documentation" autocomplete="off">
+          <div class="search-results" id="search-results" role="listbox" aria-hidden="true"></div>
+        </div>
         <a href="../../index.html#get-started" class="btn btn-primary">Get started</a>
       </div>
     </div>
@@ -45,8 +48,8 @@
     <button type="button" class="docs-sidebar-toggle" aria-label="Toggle docs menu" aria-expanded="false">Docs menu</button>
     <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation navigation">
       <nav class="docs-nav">
-        <div class="docs-nav-group">
-          <button type="button" class="docs-nav-group-title" aria-expanded="true" aria-controls="docs-group-getting-started" id="docs-group-getting-started-btn">
+        <div class="docs-nav-group collapsed">
+          <button type="button" class="docs-nav-group-title" aria-expanded="false" aria-controls="docs-group-getting-started" id="docs-group-getting-started-btn">
             <span>Getting Started</span>
             <span class="docs-nav-group-chevron" aria-hidden="true"></span>
           </button>
@@ -59,8 +62,8 @@
             <a href="typescript.html" class="docs-nav-link">TypeScript</a>
           </div>
         </div>
-        <div class="docs-nav-group collapsed">
-          <button type="button" class="docs-nav-group-title" aria-expanded="false" aria-controls="docs-group-guides" id="docs-group-guides-btn">
+        <div class="docs-nav-group">
+          <button type="button" class="docs-nav-group-title" aria-expanded="true" aria-controls="docs-group-guides" id="docs-group-guides-btn">
             <span>Guides</span>
             <span class="docs-nav-group-chevron" aria-hidden="true"></span>
           </button>

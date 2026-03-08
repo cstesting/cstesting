@@ -104,6 +104,11 @@ body {
   color: var(--accent);
   font-size: 1.5rem;
 }
+.logo .logo-icon[width] {
+  flex-shrink: 0;
+  display: block;
+  object-fit: contain;
+}
 
 .nav {
   display: flex;
@@ -213,6 +218,91 @@ body {
 .search-btn:hover {
   color: var(--text-secondary);
   border-color: var(--text-muted);
+}
+
+/* Doc search (index page) */
+.search-wrap {
+  position: relative;
+  width: 200px;
+  min-width: 0;
+  flex-shrink: 0;
+  transition: width 0.2s;
+}
+.search-wrap.is-open {
+  width: 260px;
+}
+.search-input {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+.search-input:focus {
+  border-color: var(--accent);
+}
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  max-height: 320px;
+  overflow-y: auto;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  z-index: 100;
+  display: none;
+}
+.search-results.is-visible {
+  display: block;
+}
+.search-results-group {
+  padding: 6px 0;
+}
+.search-results-group-title {
+  padding: 6px 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.search-results-item {
+  display: block;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.search-results-item:hover,
+.search-results-item:focus {
+  background: rgba(255,255,255,0.08);
+  color: inherit;
+}
+.search-results-item small {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.search-results-empty {
+  padding: 16px 12px;
+  font-size: 0.875rem;
+  color: var(--text-muted);
 }
 
 /* Buttons */
@@ -573,7 +663,8 @@ body {
     transform: none;
   }
 
-  .header-actions .search-btn {
+  .header-actions .search-btn,
+  .header-actions .search-wrap {
     display: none;
   }
 

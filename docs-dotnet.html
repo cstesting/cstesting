@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation | CSTesting for Java</title>
+  <title>Installation | CSTesting for C#</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="docs.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -24,7 +24,7 @@
       </a>
       <nav class="nav" aria-label="Main">
         <a href="index.html#features">Features</a>
-        <a href="docs-java.html" class="nav-active" id="docs-link">Docs</a>
+        <a href="docs-dotnet.html" class="nav-active" id="docs-link">Docs</a>
         <a href="index.html#community">Community</a>
         <div class="nav-dropdown">
           <button type="button" class="nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="youtube-menu" id="youtube-trigger">YouTube</button>
@@ -54,10 +54,10 @@
             <span class="docs-nav-group-chevron" aria-hidden="true"></span>
           </button>
           <div class="docs-nav-group-links" id="docs-group-getting-started">
-            <a href="docs-java.html#installation" class="docs-nav-link docs-nav-link--active">Installation</a>
-            <a href="docs-java-writing-tests.html" class="docs-nav-link">Writing tests</a>
-            <a href="docs-java-running-debugging.html" class="docs-nav-link">Running and debugging tests</a>
-            <a href="docs-java-test-runners.html" class="docs-nav-link">Test runners</a>
+            <a href="docs-dotnet.html#installation" class="docs-nav-link docs-nav-link--active">Installation</a>
+            <a href="docs-dotnet-writing-tests.html" class="docs-nav-link">Writing tests</a>
+            <a href="docs-dotnet-running-debugging.html" class="docs-nav-link">Running and debugging tests</a>
+            <a href="docs-dotnet-test-runners.html" class="docs-nav-link">Test runners</a>
           </div>
         </div>
         <div class="docs-nav-group collapsed">
@@ -66,14 +66,14 @@
             <span class="docs-nav-group-chevron" aria-hidden="true"></span>
           </button>
           <div class="docs-nav-group-links" id="docs-group-guides">
-            <a href="docs-java-actions.html" class="docs-nav-link">Actions</a>
-            <a href="docs-java-waits.html" class="docs-nav-link">Waits</a>
-            <a href="docs-java-assertions.html" class="docs-nav-link">Assertions</a>
-            <a href="docs-java-dialogs.html" class="docs-nav-link">Dialogs</a>
-            <a href="docs-java-frames.html" class="docs-nav-link">Frames</a>
-            <a href="docs-java-locators.html" class="docs-nav-link">Locators</a>
-            <a href="docs-java-navigations.html" class="docs-nav-link">Navigations</a>
-            <a href="docs-java-annotations.html" class="docs-nav-link">Annotations</a>
+            <a href="docs-dotnet-actions.html" class="docs-nav-link">Actions</a>
+            <a href="docs-dotnet-waits.html" class="docs-nav-link">Waits</a>
+            <a href="docs-dotnet-assertions.html" class="docs-nav-link">Assertions</a>
+            <a href="docs-dotnet-dialogs.html" class="docs-nav-link">Dialogs</a>
+            <a href="docs-dotnet-frames.html" class="docs-nav-link">Frames</a>
+            <a href="docs-dotnet-locators.html" class="docs-nav-link">Locators</a>
+            <a href="docs-dotnet-navigations.html" class="docs-nav-link">Navigations</a>
+            <a href="docs-dotnet-annotations.html" class="docs-nav-link">NUnit &amp; lifecycle</a>
           </div>
         </div>
       </nav>
@@ -87,88 +87,48 @@
         <h2 id="installation">Installation</h2>
 
         <h3 id="introduction">Introduction</h3>
-        <p>CSTesting for Java is a browser automation library designed for end-to-end testing and scripting. It drives <strong>Chrome</strong> via the <strong>Chrome DevTools Protocol (CDP)</strong> — no Playwright, no npx, no Node server. Run tests on Windows, Linux, and macOS, locally or on CI, headless or headed.</p>
-        <p>CSTesting is distributed as a Maven artifact. The easiest way to use it is to add one dependency to your project's <code>pom.xml</code> as described below. If you're not familiar with Maven, please refer to its <a href="https://maven.apache.org/guides/" target="_blank" rel="noopener noreferrer">documentation</a>.</p>
+        <p>CSTesting for C# is a .NET client for browser automation with the same API style as the Node.js and Java clients. Use <strong>Playwright</strong> under the hood. Project location: <code>C:\CSTesting-DotNet</code>.</p>
 
-        <h3 id="usage">Usage</h3>
-        <p>Get started by adding the dependency and running the example below.</p>
-        <p><strong>pom.xml</strong> (add the dependency):</p>
-        <pre><code>&lt;dependency&gt;
-  &lt;groupId&gt;io.github.cstesttool&lt;/groupId&gt;
-  &lt;artifactId&gt;cstesting-java&lt;/artifactId&gt;
-  &lt;version&gt;0.1.4&lt;/version&gt;
-&lt;/dependency&gt;</code></pre>
+        <h3 id="requirements">Requirements</h3>
+        <ul>
+          <li><strong>.NET 8.0 SDK</strong></li>
+          <li><strong>Playwright browsers</strong> — install once: <code>pwsh bin/Debug/net8.0/playwright.ps1 install</code> or <code>playwright install chromium</code> from your test project output.</li>
+        </ul>
 
-        <p><strong>App.java</strong> (<code>src/main/java/org/example/App.java</code>):</p>
-        <pre><code>package org.example;
+        <h3 id="install">Install</h3>
+        <pre><code># Add project reference (e.g. from your test project)
+dotnet add reference path/to/CSTesting/src/CSTesting/CSTesting.csproj
 
-import com.cstesting.CSTesting;
-import com.cstesting.CSTestingBrowser;
-import com.cstesting.CSTestingOptions;
+# Or use NuGet when published
+dotnet add package CSTesting</code></pre>
+        <p>From <code>C:\CSTesting-DotNet</code>, reference the project: <code>dotnet add reference C:\CSTesting-DotNet\src\CSTesting\CSTesting.csproj</code>.</p>
 
-public class App {
-    public static void main(String[] args) {
-        CSTestingBrowser browser = CSTesting.createBrowser(
-            CSTestingOptions.builder().headless(true).build()
-        );
-        try {
-            browser.gotoUrl("https://example.com");
-            System.out.println(browser.title());
-        } finally {
-            browser.close();
-        }
-    }
-}</code></pre>
+        <h3 id="quick-start">Quick start</h3>
+        <pre><code>using CSTesting;
+using static CSTesting.CSTesting;
 
-        <p>Compile and run:</p>
-        <pre><code>mvn compile exec:java -Dexec.mainClass="org.example.App"</code></pre>
+var options = new CSTestingOptions { Headless = true };
+await using var browser = await CreateBrowserAsync(options);
+await browser.GotoAsync("https://example.com");
+await browser.ClickAsync("a");
+await browser.TypeAsync("input", "hello");
+var text = await browser.Locator("h1").GetTextContentAsync();
+await browser.CloseAsync();</code></pre>
 
-        <p>No browser binaries are downloaded — CSTesting uses your system Chrome. To use a custom Chrome path, set <code>-Dcstesting.chrome.path=/path/to/chrome</code>.</p>
-
-        <h3 id="first-script">First script</h3>
-        <p>In this script we navigate to a page and take a screenshot (requires a small helper to save the page as PNG; here we use the title and URL as the "result"):</p>
-        <pre><code>package org.example;
-
-import com.cstesting.CSTesting;
-import com.cstesting.CSTestingBrowser;
-import com.cstesting.CSTestingOptions;
-
-public class App {
-    public static void main(String[] args) {
-        CSTestingBrowser browser = CSTesting.createBrowser(
-            CSTestingOptions.builder().headless(true).build()
-        );
-        try {
-            browser.gotoUrl("https://example.com");
-            browser.waitForLoad(5_000);
-            System.out.println("Title: " + browser.title());
-            System.out.println("URL: " + browser.url());
-            browser.locator("h1").getTextContent();  // example interaction
-        } finally {
-            browser.close();
-        }
-    }
-}</code></pre>
-
-        <p>By default, the browser runs in headless mode. To see the browser window, set <code>headless(false)</code>:</p>
-        <pre><code>CSTestingBrowser browser = CSTesting.createBrowser(
-    CSTestingOptions.builder().headless(false).build()
-);</code></pre>
-
-        <h3 id="running-the-example">Running the example</h3>
-        <pre><code>mvn compile exec:java -Dexec.mainClass="org.example.App"</code></pre>
-
-        <p>Browsers launched with CSTesting run headless by default (no visible window). Pass <code>CSTestingOptions.builder().headless(false).build()</code> to show the browser UI.</p>
+        <h3 id="nunit-base">NUnit base class</h3>
+        <p>Record in the EasyTesting (CSTesting) Node app and export as C#. The generated test extends <code>CSTestingTestBase</code> and uses <code>Browser</code> in <code>[SetUp]</code> / <code>[TearDown]</code> / <code>[Test]</code>:</p>
+        <pre><code>npx cstesting record https://example.com --output RecordedTest.cs --format cs</code></pre>
+        <p>Add the generated file to your .NET test project and run <code>dotnet test</code>.</p>
 
         <h3 id="system-requirements">System requirements</h3>
         <ul>
-          <li><strong>Java 11 or higher</strong></li>
-          <li><strong>Chrome</strong> installed (used via CDP). On Windows: typical Chrome install path. On macOS: <code>/Applications/Google Chrome.app</code>. On Linux: <code>google-chrome</code> or <code>chromium</code>. Override with <code>-Dcstesting.chrome.path=/path/to/chrome</code> if needed.</li>
-          <li><strong>OS:</strong> Windows 10+, macOS 10.14+, or Linux (e.g. Debian, Ubuntu) on x86-64 or arm64.</li>
+          <li><strong>.NET 8.0</strong></li>
+          <li><strong>Playwright</strong> browsers installed (Chromium, etc.).</li>
+          <li><strong>OS:</strong> Windows, macOS, or Linux.</li>
         </ul>
 
         <div class="docs-prev-next docs-prev-next--next-only">
-          <a href="docs-java-writing-tests.html" class="docs-next-block">
+          <a href="docs-dotnet-writing-tests.html" class="docs-next-block">
             <span class="docs-prev-next-label">Next</span>
             <span class="docs-prev-next-title">Writing tests »</span>
           </a>
@@ -184,18 +144,18 @@ public class App {
         <div class="footer-col">
           <h4>Learn</h4>
           <ul>
-            <li><a href="docs-java.html">Getting started</a></li>
-            <li><a href="docs-java-writing-tests.html">Writing tests</a></li>
-            <li><a href="docs-java-running-debugging.html">Running and debugging tests</a></li>
-            <li><a href="docs-java-test-runners.html">Test runners</a></li>
-            <li><a href="docs-java-actions.html">Actions</a></li>
-            <li><a href="docs-java-waits.html">Waits</a></li>
-            <li><a href="docs-java-assertions.html">Assertions</a></li>
-            <li><a href="docs-java-dialogs.html">Dialogs</a></li>
-            <li><a href="docs-java-frames.html">Frames</a></li>
-            <li><a href="docs-java-locators.html">Locators</a></li>
-            <li><a href="docs-java-navigations.html">Navigations</a></li>
-            <li><a href="docs-java-annotations.html">Annotations</a></li>
+            <li><a href="docs-dotnet.html">Getting started</a></li>
+            <li><a href="docs-dotnet-writing-tests.html">Writing tests</a></li>
+            <li><a href="docs-dotnet-running-debugging.html">Running and debugging tests</a></li>
+            <li><a href="docs-dotnet-test-runners.html">Test runners</a></li>
+            <li><a href="docs-dotnet-actions.html">Actions</a></li>
+            <li><a href="docs-dotnet-waits.html">Waits</a></li>
+            <li><a href="docs-dotnet-assertions.html">Assertions</a></li>
+            <li><a href="docs-dotnet-dialogs.html">Dialogs</a></li>
+            <li><a href="docs-dotnet-frames.html">Frames</a></li>
+            <li><a href="docs-dotnet-locators.html">Locators</a></li>
+            <li><a href="docs-dotnet-navigations.html">Navigations</a></li>
+            <li><a href="docs-dotnet-annotations.html">NUnit &amp; lifecycle</a></li>
             <li><a href="docs.html">Node.js docs</a></li>
           </ul>
         </div>
@@ -213,23 +173,14 @@ public class App {
   <script src="script.js"></script>
   <script>
     (function() {
-      try {
-        sessionStorage.setItem('cstesting-platform', 'Java');
-      } catch (e) {}
+      try { sessionStorage.setItem('cstesting-platform', 'CSharp'); } catch (e) {}
       var logoText = document.getElementById('logo-text');
-      if (logoText) {
-        logoText.textContent = 'CSTesting for Java';
-      }
-
+      if (logoText) logoText.textContent = 'CSTesting for C#';
       var logoLink = document.querySelector('header .logo');
       if (logoLink) {
         logoLink.setAttribute('href', 'index.html');
-        logoLink.addEventListener('click', function(e) {
-          e.preventDefault();
-          window.location.href = 'index.html';
-        });
+        logoLink.addEventListener('click', function(e) { e.preventDefault(); window.location.href = 'index.html'; });
       }
-
       var toggle = document.querySelector('.docs-sidebar-toggle');
       var sidebar = document.getElementById('docs-sidebar');
       if (toggle && sidebar) {
@@ -253,7 +204,6 @@ public class App {
           group.classList.toggle('collapsed', expanded);
         });
       });
-
       function syncSidebarToHash() {
         var hash = window.location.hash.slice(1);
         var groups = document.querySelectorAll('.docs-nav-group');
@@ -263,10 +213,7 @@ public class App {
           for (var i = 0; i < links.length; i++) {
             var href = links[i].getAttribute('href') || '';
             var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
-            if (hash && linkHash === hash) {
-              activeGroup = group;
-              break;
-            }
+            if (hash && linkHash === hash) { activeGroup = group; break; }
           }
         });
         if (!hash) activeGroup = document.querySelector('.docs-nav-group');

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation | CSTesting for Java</title>
+  <title>Installation | CSTesting for Python</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="docs.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -24,7 +24,7 @@
       </a>
       <nav class="nav" aria-label="Main">
         <a href="index.html#features">Features</a>
-        <a href="docs-java.html" class="nav-active" id="docs-link">Docs</a>
+        <a href="docs-python.html" class="nav-active" id="docs-link">Docs</a>
         <a href="index.html#community">Community</a>
         <div class="nav-dropdown">
           <button type="button" class="nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="youtube-menu" id="youtube-trigger">YouTube</button>
@@ -54,10 +54,10 @@
             <span class="docs-nav-group-chevron" aria-hidden="true"></span>
           </button>
           <div class="docs-nav-group-links" id="docs-group-getting-started">
-            <a href="docs-java.html#installation" class="docs-nav-link docs-nav-link--active">Installation</a>
-            <a href="docs-java-writing-tests.html" class="docs-nav-link">Writing tests</a>
-            <a href="docs-java-running-debugging.html" class="docs-nav-link">Running and debugging tests</a>
-            <a href="docs-java-test-runners.html" class="docs-nav-link">Test runners</a>
+            <a href="docs-python.html#installation" class="docs-nav-link docs-nav-link--active">Installation</a>
+            <a href="docs-python-writing-tests.html" class="docs-nav-link">Writing tests</a>
+            <a href="docs-python-running-debugging.html" class="docs-nav-link">Running and debugging tests</a>
+            <a href="docs-python-test-runners.html" class="docs-nav-link">Test runners</a>
           </div>
         </div>
         <div class="docs-nav-group collapsed">
@@ -66,14 +66,14 @@
             <span class="docs-nav-group-chevron" aria-hidden="true"></span>
           </button>
           <div class="docs-nav-group-links" id="docs-group-guides">
-            <a href="docs-java-actions.html" class="docs-nav-link">Actions</a>
-            <a href="docs-java-waits.html" class="docs-nav-link">Waits</a>
-            <a href="docs-java-assertions.html" class="docs-nav-link">Assertions</a>
-            <a href="docs-java-dialogs.html" class="docs-nav-link">Dialogs</a>
-            <a href="docs-java-frames.html" class="docs-nav-link">Frames</a>
-            <a href="docs-java-locators.html" class="docs-nav-link">Locators</a>
-            <a href="docs-java-navigations.html" class="docs-nav-link">Navigations</a>
-            <a href="docs-java-annotations.html" class="docs-nav-link">Annotations</a>
+            <a href="docs-python-actions.html" class="docs-nav-link">Actions</a>
+            <a href="docs-python-waits.html" class="docs-nav-link">Waits</a>
+            <a href="docs-python-assertions.html" class="docs-nav-link">Assertions</a>
+            <a href="docs-python-dialogs.html" class="docs-nav-link">Dialogs</a>
+            <a href="docs-python-frames.html" class="docs-nav-link">Frames</a>
+            <a href="docs-python-locators.html" class="docs-nav-link">Locators</a>
+            <a href="docs-python-navigations.html" class="docs-nav-link">Navigations</a>
+            <a href="docs-python-lifecycle.html" class="docs-nav-link">Lifecycle &amp; hooks</a>
           </div>
         </div>
       </nav>
@@ -87,88 +87,67 @@
         <h2 id="installation">Installation</h2>
 
         <h3 id="introduction">Introduction</h3>
-        <p>CSTesting for Java is a browser automation library designed for end-to-end testing and scripting. It drives <strong>Chrome</strong> via the <strong>Chrome DevTools Protocol (CDP)</strong> — no Playwright, no npx, no Node server. Run tests on Windows, Linux, and macOS, locally or on CI, headless or headed.</p>
-        <p>CSTesting is distributed as a Maven artifact. The easiest way to use it is to add one dependency to your project's <code>pom.xml</code> as described below. If you're not familiar with Maven, please refer to its <a href="https://maven.apache.org/guides/" target="_blank" rel="noopener noreferrer">documentation</a>.</p>
+        <p>CSTesting for Python is a testing framework with a test runner, assertions, API testing, and optional browser automation via <strong>Playwright</strong>. It mirrors the EasyTesting/CSTesting Node API. Use it from <code>C:\CSTesting-Python</code> or install from PyPI.</p>
 
-        <h3 id="usage">Usage</h3>
-        <p>Get started by adding the dependency and running the example below.</p>
-        <p><strong>pom.xml</strong> (add the dependency):</p>
-        <pre><code>&lt;dependency&gt;
-  &lt;groupId&gt;io.github.cstesttool&lt;/groupId&gt;
-  &lt;artifactId&gt;cstesting-java&lt;/artifactId&gt;
-  &lt;version&gt;0.1.4&lt;/version&gt;
-&lt;/dependency&gt;</code></pre>
+        <h3 id="install">Install</h3>
+        <pre><code># Core only (describe, it, expect — no browser)
+pip install -e .
 
-        <p><strong>App.java</strong> (<code>src/main/java/org/example/App.java</code>):</p>
-        <pre><code>package org.example;
+# With browser support (Playwright)
+pip install -e ".[browser]"
+playwright install chromium</code></pre>
+        <p>If using the project at <code>C:\CSTesting-Python</code>, run the above from that directory (e.g. <code>pip install -e "C:\CSTesting-Python[browser]"</code> then <code>playwright install chromium</code>).</p>
 
-import com.cstesting.CSTesting;
-import com.cstesting.CSTestingBrowser;
-import com.cstesting.CSTestingOptions;
+        <h3 id="quick-start">Quick start (unit tests)</h3>
+        <p>Create a test file (e.g. <code>math_test.py</code>):</p>
+        <pre><code>from cstesting import describe, it, expect
 
-public class App {
-    public static void main(String[] args) {
-        CSTestingBrowser browser = CSTesting.createBrowser(
-            CSTestingOptions.builder().headless(true).build()
-        );
-        try {
-            browser.gotoUrl("https://example.com");
-            System.out.println(browser.title());
-        } finally {
-            browser.close();
-        }
-    }
-}</code></pre>
+def _suite():
+    it("adds numbers", lambda: expect(1 + 1).to_be(2))
+    it("compares objects", lambda: expect({"a": 1}).to_equal({"a": 1}))
 
-        <p>Compile and run:</p>
-        <pre><code>mvn compile exec:java -Dexec.mainClass="org.example.App"</code></pre>
+describe("Math", _suite)</code></pre>
+        <p>Run tests:</p>
+        <pre><code>python -m cstesting
+python -m cstesting "**/*.test.py"
+python -m cstesting example/math_test.py</code></pre>
 
-        <p>No browser binaries are downloaded — CSTesting uses your system Chrome. To use a custom Chrome path, set <code>-Dcstesting.chrome.path=/path/to/chrome</code>.</p>
+        <h3 id="browser-quick-start">Quick start (browser)</h3>
+        <p>Requires <code>pip install playwright &amp;&amp; playwright install chromium</code>.</p>
+        <pre><code>import asyncio
+from cstesting import describe, it, expect, before_all, after_all, create_browser
 
-        <h3 id="first-script">First script</h3>
-        <p>In this script we navigate to a page and take a screenshot (requires a small helper to save the page as PNG; here we use the title and URL as the "result"):</p>
-        <pre><code>package org.example;
+browser = None
 
-import com.cstesting.CSTesting;
-import com.cstesting.CSTestingBrowser;
-import com.cstesting.CSTestingOptions;
+def _suite():
+    def _before():
+        global browser
+        browser = asyncio.get_event_loop().run_until_complete(create_browser(headless=True))
+    def _after():
+        global browser
+        if browser:
+            asyncio.get_event_loop().run_until_complete(browser.close())
+    before_all(_before)
+    after_all(_after)
 
-public class App {
-    public static void main(String[] args) {
-        CSTestingBrowser browser = CSTesting.createBrowser(
-            CSTestingOptions.builder().headless(true).build()
-        );
-        try {
-            browser.gotoUrl("https://example.com");
-            browser.waitForLoad(5_000);
-            System.out.println("Title: " + browser.title());
-            System.out.println("URL: " + browser.url());
-            browser.locator("h1").getTextContent();  // example interaction
-        } finally {
-            browser.close();
-        }
-    }
-}</code></pre>
+    async def _test():
+        await browser.goto("https://example.com")
+        html = await browser.content()
+        expect(html).to_contain("Example Domain")
+    it("loads the page", _test)
 
-        <p>By default, the browser runs in headless mode. To see the browser window, set <code>headless(false)</code>:</p>
-        <pre><code>CSTestingBrowser browser = CSTesting.createBrowser(
-    CSTestingOptions.builder().headless(false).build()
-);</code></pre>
-
-        <h3 id="running-the-example">Running the example</h3>
-        <pre><code>mvn compile exec:java -Dexec.mainClass="org.example.App"</code></pre>
-
-        <p>Browsers launched with CSTesting run headless by default (no visible window). Pass <code>CSTestingOptions.builder().headless(false).build()</code> to show the browser UI.</p>
+describe("Browser", _suite)</code></pre>
+        <p>API: <code>create_browser(headless=True, browser='chromium')</code>, <code>browser.goto(url)</code>, <code>browser.click(selector)</code>, <code>browser.type(selector, text)</code>, <code>browser.locator(selector)</code> → <code>.click()</code>, <code>.type(text)</code>, <code>.first</code>, <code>.nth(n)</code>.</p>
 
         <h3 id="system-requirements">System requirements</h3>
         <ul>
-          <li><strong>Java 11 or higher</strong></li>
-          <li><strong>Chrome</strong> installed (used via CDP). On Windows: typical Chrome install path. On macOS: <code>/Applications/Google Chrome.app</code>. On Linux: <code>google-chrome</code> or <code>chromium</code>. Override with <code>-Dcstesting.chrome.path=/path/to/chrome</code> if needed.</li>
-          <li><strong>OS:</strong> Windows 10+, macOS 10.14+, or Linux (e.g. Debian, Ubuntu) on x86-64 or arm64.</li>
+          <li><strong>Python 3.8+</strong></li>
+          <li><strong>Browser:</strong> <code>playwright install chromium</code> (for browser automation).</li>
+          <li><strong>OS:</strong> Windows, macOS, or Linux.</li>
         </ul>
 
         <div class="docs-prev-next docs-prev-next--next-only">
-          <a href="docs-java-writing-tests.html" class="docs-next-block">
+          <a href="docs-python-writing-tests.html" class="docs-next-block">
             <span class="docs-prev-next-label">Next</span>
             <span class="docs-prev-next-title">Writing tests »</span>
           </a>
@@ -184,18 +163,18 @@ public class App {
         <div class="footer-col">
           <h4>Learn</h4>
           <ul>
-            <li><a href="docs-java.html">Getting started</a></li>
-            <li><a href="docs-java-writing-tests.html">Writing tests</a></li>
-            <li><a href="docs-java-running-debugging.html">Running and debugging tests</a></li>
-            <li><a href="docs-java-test-runners.html">Test runners</a></li>
-            <li><a href="docs-java-actions.html">Actions</a></li>
-            <li><a href="docs-java-waits.html">Waits</a></li>
-            <li><a href="docs-java-assertions.html">Assertions</a></li>
-            <li><a href="docs-java-dialogs.html">Dialogs</a></li>
-            <li><a href="docs-java-frames.html">Frames</a></li>
-            <li><a href="docs-java-locators.html">Locators</a></li>
-            <li><a href="docs-java-navigations.html">Navigations</a></li>
-            <li><a href="docs-java-annotations.html">Annotations</a></li>
+            <li><a href="docs-python.html">Getting started</a></li>
+            <li><a href="docs-python-writing-tests.html">Writing tests</a></li>
+            <li><a href="docs-python-running-debugging.html">Running and debugging tests</a></li>
+            <li><a href="docs-python-test-runners.html">Test runners</a></li>
+            <li><a href="docs-python-actions.html">Actions</a></li>
+            <li><a href="docs-python-waits.html">Waits</a></li>
+            <li><a href="docs-python-assertions.html">Assertions</a></li>
+            <li><a href="docs-python-dialogs.html">Dialogs</a></li>
+            <li><a href="docs-python-frames.html">Frames</a></li>
+            <li><a href="docs-python-locators.html">Locators</a></li>
+            <li><a href="docs-python-navigations.html">Navigations</a></li>
+            <li><a href="docs-python-lifecycle.html">Lifecycle &amp; hooks</a></li>
             <li><a href="docs.html">Node.js docs</a></li>
           </ul>
         </div>
@@ -213,23 +192,14 @@ public class App {
   <script src="script.js"></script>
   <script>
     (function() {
-      try {
-        sessionStorage.setItem('cstesting-platform', 'Java');
-      } catch (e) {}
+      try { sessionStorage.setItem('cstesting-platform', 'Python'); } catch (e) {}
       var logoText = document.getElementById('logo-text');
-      if (logoText) {
-        logoText.textContent = 'CSTesting for Java';
-      }
-
+      if (logoText) logoText.textContent = 'CSTesting for Python';
       var logoLink = document.querySelector('header .logo');
       if (logoLink) {
         logoLink.setAttribute('href', 'index.html');
-        logoLink.addEventListener('click', function(e) {
-          e.preventDefault();
-          window.location.href = 'index.html';
-        });
+        logoLink.addEventListener('click', function(e) { e.preventDefault(); window.location.href = 'index.html'; });
       }
-
       var toggle = document.querySelector('.docs-sidebar-toggle');
       var sidebar = document.getElementById('docs-sidebar');
       if (toggle && sidebar) {
@@ -253,7 +223,6 @@ public class App {
           group.classList.toggle('collapsed', expanded);
         });
       });
-
       function syncSidebarToHash() {
         var hash = window.location.hash.slice(1);
         var groups = document.querySelectorAll('.docs-nav-group');
@@ -263,10 +232,7 @@ public class App {
           for (var i = 0; i < links.length; i++) {
             var href = links[i].getAttribute('href') || '';
             var linkHash = href.indexOf('#') !== -1 ? href.slice(href.indexOf('#') + 1) : '';
-            if (hash && linkHash === hash) {
-              activeGroup = group;
-              break;
-            }
+            if (hash && linkHash === hash) { activeGroup = group; break; }
           }
         });
         if (!hash) activeGroup = document.querySelector('.docs-nav-group');
