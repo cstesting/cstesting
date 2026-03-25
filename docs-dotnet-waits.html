@@ -85,20 +85,13 @@
         <h1 class="docs-section-heading">Waits</h1>
 
         <h2 id="introduction">Introduction</h2>
-        <p>CSTesting performs a set of <strong>actionability checks</strong> on elements before performing actions, so that actions run only when the element is ready. It auto-waits for the relevant checks to pass and then runs the requested action. If the checks do not pass within the timeout (default 30 seconds), the action fails with an error.</p>
-        <p>For example, for <strong><code>locator.click()</code></strong>, CSTesting ensures that:</p>
-        <ul>
-          <li>The locator resolves to an element (when using <code>.first()</code>, <code>.last()</code>, or <code>.nth(index)</code> for multiple matches).</li>
-          <li>The element is <strong>Visible</strong>.</li>
-          <li>The element is <strong>Enabled</strong>.</li>
-        </ul>
-        <p>For <strong><code>locator.type(text)</code></strong>, CSTesting ensures the element is visible and <strong>Editable</strong>. Other actions use the checks that apply (see table below).</p>
-        <p>Here is the list of actionability checks performed for each action in CSTesting:</p>
+        <p>CSTesting.DotNet uses <strong>Playwright</strong> under the hood. Playwright performs <strong>actionability checks</strong> before actions such as <strong><code>await locator.ClickAsync()</code></strong> (visible, stable, enabled as applicable). If conditions are not met within the timeout (default 30 seconds), the action throws.</p>
+        <p>For <strong><code>await locator.TypeAsync(text)</code></strong>, the element must be visible and editable. Summary:</p>
 
         <table class="docs-table">
           <thead>
             <tr>
-              <th>Action</th>
+              <th>Action (ICSTestingLocator)</th>
               <th>Visible</th>
               <th>Enabled</th>
               <th>Editable</th>
@@ -106,61 +99,55 @@
           </thead>
           <tbody>
             <tr>
-              <td><code>locator.check()</code></td>
+              <td><code>CheckAsync</code></td>
               <td>Yes</td>
               <td>Yes</td>
               <td>—</td>
             </tr>
             <tr>
-              <td><code>locator.click()</code></td>
+              <td><code>ClickAsync</code></td>
               <td>Yes</td>
               <td>Yes</td>
               <td>—</td>
             </tr>
             <tr>
-              <td><code>locator.doubleClick()</code></td>
+              <td><code>DoubleClickAsync</code></td>
               <td>Yes</td>
               <td>Yes</td>
               <td>—</td>
             </tr>
             <tr>
-              <td><code>locator.rightClick()</code></td>
+              <td><code>RightClickAsync</code></td>
               <td>Yes</td>
               <td>Yes</td>
               <td>—</td>
             </tr>
             <tr>
-              <td><code>locator.uncheck()</code></td>
+              <td><code>UncheckAsync</code></td>
               <td>Yes</td>
               <td>Yes</td>
               <td>—</td>
             </tr>
             <tr>
-              <td><code>locator.hover()</code></td>
+              <td><code>HoverAsync</code></td>
               <td>Yes</td>
               <td>—</td>
               <td>—</td>
             </tr>
             <tr>
-              <td><code>locator.dragAndDrop(other)</code></td>
+              <td><code>DragToAsync</code></td>
               <td>Yes (both)</td>
               <td>—</td>
               <td>—</td>
             </tr>
             <tr>
-              <td><code>locator.type(text)</code></td>
+              <td><code>TypeAsync</code></td>
               <td>Yes</td>
               <td>—</td>
               <td>Yes</td>
             </tr>
             <tr>
-              <td><code>locator.select(option)</code></td>
-              <td>Yes</td>
-              <td>Yes</td>
-              <td>—</td>
-            </tr>
-            <tr>
-              <td><code>locator.selectOptions(...)</code></td>
+              <td><code>SelectAsync</code> / <code>SelectByLabelAsync</code></td>
               <td>Yes</td>
               <td>Yes</td>
               <td>—</td>
@@ -168,35 +155,25 @@
           </tbody>
         </table>
 
-        <p>You typically do <strong>not</strong> need to call <code>waitForSelector</code> before an action; CSTesting waits for the element to be actionable first. After navigation, use <strong><code>browser.waitForLoad()</code></strong> for page-level readiness.</p>
+        <p><strong>Explicit waits on <code>ICSTestingBrowser</code>:</strong> <code>WaitForLoadAsync</code>, <code>WaitForSelectorAsync(selector, timeoutMs?)</code>, <code>WaitForURLAsync(urlOrPattern, timeoutMs?)</code>, <code>SleepAsync(ms)</code>.</p>
+
+        <p>You typically do <strong>not</strong> need to call <code>WaitForSelectorAsync</code> before every action; Playwright waits for the element to be actionable. After navigation, you can use <strong><code>await browser.WaitForLoadAsync()</code></strong> for page-level readiness.</p>
 
         <h2 id="assertions">Assertions</h2>
-        <p>CSTesting provides <strong><code>assertThat(locator)</code></strong> for element assertions and <strong><code>assertThat()</code></strong> for page assertions. These evaluate <strong>once</strong> (no auto-retry). To wait then assert, use <strong><code>waitForSelector</code></strong> first, or rely on auto-wait before a follow-up action.</p>
+        <p>The .NET API has no <code>assertThat</code>. After waiting, assert with <strong>NUnit</strong> using values from <code>await browser...</code> (see <a href="docs-dotnet-assertions.html">Assertions</a>).</p>
 
         <table class="docs-table">
           <thead>
             <tr>
-              <th>Assertion</th>
-              <th>Description</th>
+              <th>Check</th>
+              <th>Typical pattern</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td><code>assertThat(locator).isVisible()</code></td><td>Element is visible</td></tr>
-            <tr><td><code>assertThat(locator).isEditable()</code></td><td>Element is editable (not disabled, not readonly)</td></tr>
-            <tr><td><code>assertThat(locator).isEmpty()</code></td><td>Element value or text is empty</td></tr>
-            <tr><td><code>assertThat(locator).isEnabled()</code></td><td>Element is enabled</td></tr>
-            <tr><td><code>assertThat(locator).isDisabled()</code></td><td>Element is disabled</td></tr>
-            <tr><td><code>assertThat(locator).contains(expected)</code></td><td>Text or value contains the string</td></tr>
-            <tr><td><code>assertThat(locator).hasText(expected)</code></td><td>Text content matches or contains</td></tr>
-            <tr><td><code>assertThat(locator).containText(expected)</code></td><td>Text content contains the string</td></tr>
-            <tr><td><code>assertThat(locator).hasValue(expected)</code></td><td>Input/select value equals</td></tr>
-            <tr><td><code>assertThat(locator).containValue(expected)</code></td><td>Input/select value contains</td></tr>
-            <tr><td><code>assertThat(locator).hasAttribute(name)</code></td><td>Element has the attribute</td></tr>
-            <tr><td><code>assertThat(locator).hasAttribute(name, value)</code></td><td>Attribute equals the value</td></tr>
-            <tr><td><code>assertThat(locator).count(n)</code></td><td>Number of matching elements equals n</td></tr>
-            <tr><td><code>assertThat(locator).hasCount(n)</code></td><td>Same as <code>count(n)</code></td></tr>
-            <tr><td><code>assertThat().hasTitle(expected)</code></td><td>Page title contains or equals</td></tr>
-            <tr><td><code>assertThat().hasURL(pattern)</code></td><td>Page URL contains or matches pattern (<code>*</code> wildcard)</td></tr>
+            <tr><td>Visible</td><td><code>Assert.That(await browser.Locator("h1").IsVisibleAsync(), Is.True);</code></td></tr>
+            <tr><td>Text</td><td><code>Assert.That(await browser.Locator("h1").GetTextContentAsync(), Does.Contain("x"));</code></td></tr>
+            <tr><td>URL</td><td><code>Assert.That(await browser.GetUrlAsync(), Does.Contain("example"));</code></td></tr>
+            <tr><td>Title</td><td><code>Assert.That(await browser.EvaluateAsync&lt;string&gt;("document.title"), Does.Contain("x"));</code></td></tr>
           </tbody>
         </table>
 
@@ -234,12 +211,13 @@
           <li>After the server responds, the button is replaced with an enabled one.</li>
           <li><strong><code>locator.click()</code></strong> waits for the element to exist, be visible, and be enabled, then clicks.</li>
         </ol>
-        <pre><code>browser.gotoUrl("https://example.com/signup");
-browser.locator("name=username").type("alice");
+        <pre><code>await browser.GotoAsync("https://example.com/signup");
+await browser.TypeAsync("name=username", "alice");
 // Sign Up may be disabled until username is validated.
-browser.locator("//button[contains(.,'Sign Up')]").first().click();
-browser.assertThat().hasURL("**/welcome");</code></pre>
-        <p>No explicit <code>waitForSelector</code> or sleep is needed; the click auto-waits for the button to be ready (within the default timeout).</p>
+await browser.Locator("//button[contains(.,'Sign Up')]").First().ClickAsync();
+await browser.WaitForURLAsync("**/welcome", 10_000);
+Assert.That(await browser.GetUrlAsync(), Does.Contain("welcome"));</code></pre>
+        <p>No explicit <code>WaitForSelectorAsync</code> is always required; the click auto-waits for the button to be ready (within Playwright’s timeout).</p>
         <div class="docs-prev-next">
           <a href="docs-dotnet-actions.html" class="docs-prev">
             <span class="docs-prev-next-label">Previous</span>

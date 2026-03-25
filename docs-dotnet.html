@@ -95,12 +95,14 @@
         </ul>
 
         <h3 id="install">Install</h3>
-        <pre><code># Add project reference (e.g. from your test project)
+        <pre><code># Add project references (from your test project)
 dotnet add reference path/to/CSTesting/src/CSTesting/CSTesting.csproj
+dotnet add reference path/to/CSTesting/src/CSTesting.NUnit/CSTesting.NUnit.csproj
 
-# Or use NuGet when published
-dotnet add package CSTesting</code></pre>
-        <p>From <code>C:\CSTesting-DotNet</code>, reference the project: <code>dotnet add reference C:\CSTesting-DotNet\src\CSTesting\CSTesting.csproj</code>.</p>
+# Or NuGet when published:
+# dotnet add package CSTesting
+# dotnet add package CSTesting.NUnit</code></pre>
+        <p>From <code>C:\CSTesting-DotNet</code>: <code>dotnet add reference C:\CSTesting-DotNet\src\CSTesting\CSTesting.csproj</code> and the <code>CSTesting.NUnit</code> project if you use the NUnit fixture base.</p>
 
         <h3 id="quick-start">Quick start</h3>
         <pre><code>using CSTesting;
@@ -115,7 +117,7 @@ var text = await browser.Locator("h1").GetTextContentAsync();
 await browser.CloseAsync();</code></pre>
 
         <h3 id="nunit-base">NUnit base class</h3>
-        <p>Record in the EasyTesting (CSTesting) Node app and export as C#. The generated test extends <code>CSTestingTestBase</code> and uses <code>Browser</code> in <code>[SetUp]</code> / <code>[TearDown]</code> / <code>[Test]</code>:</p>
+        <p>Record in the EasyTesting (CSTesting) Node app and export as C#. Tests typically extend <code>CSTestingNUnitBrowserFixtureBase</code> (or <code>CSTestingTestBase</code>) and assign <code>Browser</code> in <code>[SetUp]</code> — see <code>SampleRecordedTest.cs</code> in <code>C:\CSTesting-DotNet</code>:</p>
         <pre><code>npx cstesting record https://example.com --output RecordedTest.cs --format cs</code></pre>
         <p>Add the generated file to your .NET test project and run <code>dotnet test</code>.</p>
 

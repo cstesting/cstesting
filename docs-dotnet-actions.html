@@ -86,96 +86,54 @@
         <h1 id="actions">Actions</h1>
 
         <h3 id="introduction">Introduction</h3>
-        <p>CSTesting can interact with HTML elements such as text inputs, checkboxes, radio buttons, select options, mouse clicks (click, double-click, right-click), typing text, hover, and drag-and-drop. Use <strong>locators</strong> (e.g. <code>browser.locator("selector")</code>) to target elements; all actions accept either a selector string or a <code>Locator</code>. When multiple elements match, use <code>.first()</code>, <code>.last()</code>, or <code>.nth(index)</code> before performing an action.</p>
+        <p>CSTesting.DotNet (<code>C:\CSTesting-DotNet</code>) exposes <strong><code>ICSTestingBrowser</code></strong> and <strong><code>ICSTestingLocator</code></strong> with <strong>async</strong> methods: <code>GotoAsync</code>, <code>ClickAsync</code>, <code>TypeAsync</code>, <code>CheckAsync</code>, <code>SelectAsync</code>, <code>HoverAsync</code>, <code>DragAndDropAsync</code>, etc. (see <code>README.md</code>). Use <strong><code>Browser.Locator(selector)</code></strong> then <strong><code>.First()</code></strong> / <strong><code>.Last()</code></strong> / <strong><code>.Nth(n)</code></strong> when multiple elements match.</p>
 
         <h3 id="text-input">Text input</h3>
-        <p><strong><code>type(selector, text)</code></strong> or <strong><code>locator.type(text)</code></strong> is the main way to fill form fields. It focuses the element, clears any existing value, and types the given text. It works for <code>&lt;input&gt;</code>, <code>&lt;textarea&gt;</code>, and similar elements.</p>
-        <pre><code>// By selector
-browser.type("id=username", "Peter");
-browser.type("name=email", "user@example.com");
+        <p><strong><code>await browser.TypeAsync(selector, text)</code></strong> or <strong><code>await browser.Locator(selector).TypeAsync(text)</code></strong> fills inputs (Playwright <code>Fill</code> behavior).</p>
+        <pre><code>await browser.TypeAsync("id=username", "Peter");
+await browser.TypeAsync("name=email", "user@example.com");
 
-// By locator (chain with first() if multiple match)
-browser.locator("id=username").type("Peter");
-browser.locator("[name='Birth date']").type("2020-02-02");
-browser.locator("textarea").first().type("Hello");</code></pre>
+await browser.Locator("id=username").TypeAsync("Peter");
+await browser.Locator("[name='Birth date']").TypeAsync("2020-02-02");
+await browser.Locator("textarea").First().TypeAsync("Hello");</code></pre>
 
         <h3 id="checkboxes-radio">Checkboxes and radio buttons</h3>
-        <p>Use <strong><code>check(selector)</code></strong> / <strong><code>check(Locator)</code></strong> to check a checkbox or select a radio button, and <strong><code>uncheck(selector)</code></strong> / <strong><code>uncheck(Locator)</code></strong> to uncheck. Works with <code>input[type=checkbox]</code> and <code>input[type=radio]</code>. No-op if the element is already in the desired state.</p>
-        <pre><code>// Check the checkbox
-browser.locator("id=agree").check();
-browser.check("name=subscribe");
+        <p><strong><code>CheckAsync</code></strong> / <strong><code>UncheckAsync</code></strong> on selector or locator.</p>
+        <pre><code>await browser.Locator("id=agree").CheckAsync();
+await browser.CheckAsync("name=subscribe");
 
-// Assert the checked state
-browser.assertThat(browser.locator("name=subscribe")).isVisible();  // or use isSelected via getValue/evaluate if needed
+Assert.That(await browser.IsSelectedAsync("name=subscribe"), Is.True);
 
-// Select a radio button
-browser.locator("id=size-xl").check();
-browser.check("name=size");  // if only one with name=size; otherwise use locator("name=size").nth(1).check()</code></pre>
+await browser.Locator("id=size-xl").CheckAsync();</code></pre>
 
         <h3 id="select-options">Select options</h3>
-        <p>Use <strong><code>select(selector, option)</code></strong> for a single-select dropdown and <strong><code>selectOptions(selector, options...)</code></strong> for one or more options (single or multi-select). Option can be a <strong>value</strong>, <strong>visible label</strong>, or <strong>0-based index</strong> (Integer). Use <strong><code>deselectOptions</code></strong> to clear options in a multi-select.</p>
-        <pre><code>// Single selection by value or label
-browser.locator("#color").select("blue");
-browser.locator("#color").select("Blue");   // label
-
-// Single selection by index
-browser.locator("#color").select(2);
-
-// Multi-select
-browser.locator("#colors").selectOptions("red", "green", "blue");
-browser.locator("#colors").selectOptions(0, 2, 4);
-
-// Deselect
-browser.locator("#colors").deselectOptions("blue");
-
-// Read selected
-List&lt;String&gt; values = browser.getSelectedValues(browser.locator("#colors"));
-List&lt;String&gt; labels = browser.getSelectedLabels(browser.locator("#colors"));</code></pre>
+        <p>Use <strong><code>await browser.SelectAsync(selector, value)</code></strong> for option <strong>value</strong>, or <strong><code>await browser.SelectByLabelAsync(selector, label)</code></strong> for visible text. On a locator: <strong><code>await loc.SelectAsync(value)</code></strong> / <strong><code>SelectByLabelAsync(label)</code></strong>.</p>
+        <pre><code>await browser.SelectAsync("#color", "blue");
+await browser.SelectByLabelAsync("#color", "Blue");</code></pre>
 
         <h3 id="mouse-click">Mouse click</h3>
-        <p><strong><code>click(selector)</code></strong> / <strong><code>click(Locator)</code></strong> performs a left click. <strong><code>doubleClick</code></strong> and <strong><code>rightClick</code></strong> are also available. <strong><code>hover(selector)</code></strong> / <strong><code>hover(Locator)</code></strong> moves the mouse to the element. Actions use the <strong>center</strong> of the element.</p>
-        <pre><code>// Generic click
-browser.locator("button").click();
-browser.click("id=submit");
+        <p><strong><code>ClickAsync</code></strong>, <strong><code>DoubleClickAsync</code></strong>, <strong><code>RightClickAsync</code></strong>, <strong><code>HoverAsync</code></strong> on selector or locator.</p>
+        <pre><code>await browser.Locator("button").ClickAsync();
+await browser.ClickAsync("id=submit");
 
-// Double click
-browser.locator("text=Item").doubleClick();
-browser.doubleClick("#item");
-
-// Right click (context menu)
-browser.locator("text=Item").rightClick();
-browser.rightClick("#row");
-
-// Hover
-browser.locator("#menu").hover();</code></pre>
-
-        <p>Under the hood, actions (when using the CDP implementation) scroll the element into view and wait for it to be visible before performing the click or other action.</p>
+await browser.DoubleClickAsync("#item");
+await browser.RightClickAsync("#row");
+await browser.HoverAsync("#menu");</code></pre>
 
         <h3 id="type-characters">Type characters</h3>
-        <p>Use <strong><code>type(selector, text)</code></strong> or <strong><code>locator.type(text)</code></strong> to enter text. This replaces the current value (like a "fill"). For character-by-character input or special key events, use <strong><code>evaluate()</code></strong> to run JavaScript (e.g. dispatch <code>KeyboardEvent</code>) if your app relies on key-level handling.</p>
-        <pre><code>browser.locator("#area").type("Hello World!");</code></pre>
+        <p>Use <strong><code>TypeAsync</code></strong> for fills. For special keys after focus, <strong><code>await browser.PressKeyAsync("Enter")</code></strong> or <strong><code>await locator.PressKeyAsync("Tab")</code></strong>.</p>
+        <pre><code>await browser.Locator("#area").TypeAsync("Hello World!");
+await browser.PressKeyAsync("Enter");</code></pre>
 
         <h3 id="drag-drop">Drag and drop</h3>
-        <p>Use <strong><code>dragAndDrop(fromSelector, toSelector)</code></strong> or <strong><code>fromLocator.dragAndDrop(toLocator)</code></strong> to drag one element to another. The action moves the mouse to the source, presses the button, moves to the target, and releases.</p>
-        <pre><code>browser.dragAndDrop("#source", "#target");
-browser.locator(".card").first().dragAndDrop(browser.locator(".drop-zone"));</code></pre>
+        <p><strong><code>await browser.DragAndDropAsync(sourceSelector, targetSelector)</code></strong> or <strong><code>await locator.DragToAsync(targetSelector)</code></strong>.</p>
+        <pre><code>await browser.DragAndDropAsync("#source", "#target");
+await browser.Locator(".card").First().DragToAsync(".drop-zone");</code></pre>
 
         <h3 id="scrolling">Scrolling</h3>
-        <p>CSTesting scrolls the target element into view before actions like click when needed. For explicit scrolling, use:</p>
-        <ul>
-          <li><strong><code>scrollToPageTop()</code></strong> / <strong><code>scrollToPageBottom()</code></strong> – scroll to top or bottom of the page.</li>
-          <li><strong><code>scrollUp()</code></strong> / <strong><code>scrollDown()</code></strong> – scroll by one viewport height.</li>
-          <li><strong><code>scrollBy(dx, dy)</code></strong> – scroll by a pixel offset (e.g. <code>scrollBy(0, 300)</code> to scroll down 300px).</li>
-          <li><strong><code>scrollToSelector(selector)</code></strong> / <strong><code>locator.scrollToSelector()</code></strong> – scroll until the element is in view (centered).</li>
-        </ul>
-        <pre><code>// Scroll so the button is visible, then click
-browser.scrollToSelector("#submit");
-browser.locator("#submit").click();
-
-// Scroll the page
-browser.scrollToPageBottom();
-browser.scrollBy(0, 300);
-browser.locator("#footer").scrollToSelector();   // scroll element into view</code></pre>
+        <p>CSTesting scrolls elements into view before clicks. There are no dedicated <code>scrollToPageTop</code> helpers on <code>ICSTestingBrowser</code>; use <strong><code>await browser.EvaluateAsync&lt;object&gt;("() => window.scrollTo(0, document.body.scrollHeight)")</code></strong> or <strong><code>EvaluateAsync</code></strong> to call <code>element.scrollIntoView()</code> if needed.</p>
+        <pre><code>await browser.EvaluateAsync&lt;object&gt;("() => document.querySelector('#submit').scrollIntoView()");
+await browser.ClickAsync("#submit");</code></pre>
         <div class="docs-prev-next">
           <a href="docs-dotnet-test-runners.html" class="docs-prev">
             <span class="docs-prev-next-label">Previous</span>

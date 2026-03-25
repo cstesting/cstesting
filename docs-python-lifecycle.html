@@ -85,175 +85,126 @@
         <h1 class="docs-section-heading">Lifecycle &amp; hooks</h1>
 
         <h2 id="introduction">Introduction</h2>
-        <p>CSTesting provides <strong>TestNG-style annotations</strong> and a <strong>runner</strong> so you can structure tests with suite/class/method lifecycle. You mark test methods with <strong><code>@CSTest</code></strong> and use <strong><code>@BeforeSuite</code></strong>, <strong><code>@AfterSuite</code></strong>, <strong><code>@BeforeClass</code></strong>, <strong><code>@AfterClass</code></strong>, <strong><code>@BeforeMethod</code></strong>, and <strong><code>@AfterMethod</code></strong> for setup and teardown. Extend <strong><code>CSTestingTestBase</code></strong> to get a <strong><code>browser</code></strong> field that the runner injects before each test method. The runner creates a <strong>new browser for each test</strong>, runs the lifecycle methods in order, and closes the browser after <strong><code>@AfterMethod</code></strong>.</p>
+        <p>CSTesting for Python (<code>C:\CSTesting-Python</code>) uses <strong>functions</strong>, not Java annotations. Inside a <strong><code>describe</code></strong> suite you register hooks and tests with <code>before_all</code>, <code>after_all</code>, <code>beforeEach</code> / <code>before_each</code>, <code>afterEach</code> / <code>after_each</code>, and <code>it</code>. Use <strong><code>describe.only</code></strong> / <strong><code>it.only</code></strong> and <strong><code>describe.skip</code></strong> / <strong><code>it.skip</code></strong> like Jest. The implementation is in <code>cstesting/runner.py</code>.</p>
 
-        <h2 id="list-of-annotations">List of annotations</h2>
+        <h2 id="list-of-annotations">Hooks and tests (Python)</h2>
         <table class="docs-table">
           <thead>
-            <tr><th>Annotation</th><th>When it runs</th></tr>
+            <tr><th>API</th><th>When it runs</th></tr>
           </thead>
           <tbody>
-            <tr><td><strong><code>@BeforeSuite</code></strong></td><td>Once before the entire run (before any <code>@BeforeClass</code> or test). No browser is created yet.</td></tr>
-            <tr><td><strong><code>@AfterSuite</code></strong></td><td>Once after the entire run (after all tests and <code>@AfterClass</code>). Browser is already closed.</td></tr>
-            <tr><td><strong><code>@BeforeClass</code></strong></td><td>Once before any test method in the class. No browser yet.</td></tr>
-            <tr><td><strong><code>@AfterClass</code></strong></td><td>Once after all test methods in the class. Browser already closed.</td></tr>
-            <tr><td><strong><code>@BeforeMethod</code></strong></td><td>Before each <code>@CSTest</code> method. <strong>Browser is created and injected</strong> before this runs.</td></tr>
-            <tr><td><strong><code>@AfterMethod</code></strong></td><td>After each <code>@CSTest</code> method. Browser is still open; the runner closes it after this.</td></tr>
-            <tr><td><strong><code>@CSTest</code></strong></td><td>The test method. Runs with <code>browser</code> set.</td></tr>
+            <tr><td><strong><code>before_all(fn)</code></strong></td><td>Once at the start of this suite (after the parent suite has started its own work).</td></tr>
+            <tr><td><strong><code>after_all(fn)</code></strong></td><td>Once after this suite’s tests and nested child suites finish.</td></tr>
+            <tr><td><strong><code>beforeEach(fn)</code></strong> / <strong><code>before_each(fn)</code></strong></td><td>Before each <code>it</code> in this suite. The runner does <strong>not</strong> pass a browser argument—open Playwright yourself (see below).</td></tr>
+            <tr><td><strong><code>afterEach(fn)</code></strong> / <strong><code>after_each(fn)</code></strong></td><td>After each <code>it</code> in this suite (still runs if the test failed).</td></tr>
+            <tr><td><strong><code>it("name", fn)</code></strong></td><td>One test. <code>fn</code> may be sync or <code>async def</code>; it takes <strong>no</strong> parameters from the runner.</td></tr>
           </tbody>
         </table>
-        <p>All lifecycle and test methods must be <strong>public</strong>, <strong>no-argument</strong> instance methods. Multiple methods can share the same annotation (e.g. several <code>@BeforeMethod</code> methods); they are all invoked in declaration order.</p>
+        <p>Register hooks by calling <code>before_all(my_fn)</code> inside the suite function. Hooks can be sync or async; the runner awaits coroutines. Multiple <code>beforeEach</code> registrations run in order.</p>
 
         <h2 id="execution-order">Execution order</h2>
-        <p>The runner runs in this order:</p>
+        <p>Implementation in <code>cstesting/runner.py</code> for each <code>describe</code> suite:</p>
         <ol>
-          <li><strong><code>@BeforeSuite</code></strong> (all methods)</li>
-          <li><strong><code>@BeforeClass</code></strong> (all methods)</li>
-          <li>For <strong>each</strong> <code>@CSTest</code> method:
-            <ul>
-              <li>Create a new browser and inject it into the test instance</li>
-              <li><strong><code>@BeforeMethod</code></strong> (all methods)</li>
-              <li><strong><code>@CSTest</code></strong> (the test method)</li>
-              <li><strong><code>@AfterMethod</code></strong> (all methods)</li>
-              <li>Close the browser</li>
-            </ul>
-          </li>
-          <li><strong><code>@AfterClass</code></strong> (all methods)</li>
-          <li><strong><code>@AfterSuite</code></strong> (all methods)</li>
+          <li><strong><code>before_all</code></strong></li>
+          <li>Every <strong><code>it</code></strong> registered directly on this suite: for each, run <strong><code>beforeEach</code></strong> hooks, the test, then <strong><code>afterEach</code></strong> hooks</li>
+          <li>Each nested <strong><code>describe</code></strong> child suite (full subtree)</li>
+          <li><strong><code>after_all</code></strong></li>
         </ol>
-        <p>So each test method gets a <strong>fresh browser</strong>; nothing is shared between tests except the same test class instance for suite/class hooks.</p>
+        <p>Define a suite with <strong><code>describe("Name", _suite)</code></strong> where <code>_suite</code> is a function that calls <code>before_all</code>, <code>it</code>, nested <code>describe</code>, etc. This matches <code>README.md</code> and <code>example/math_test.py</code> in <code>C:\CSTesting-Python</code>.</p>
 
-        <h2 id="base-class">Base class: CSTestingTestBase</h2>
-        <p>Your test class should <strong>extend <code>CSTestingTestBase</code></strong>. The base class provides:</p>
-        <table class="docs-table">
-          <thead>
-            <tr><th>Member</th><th>Description</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><strong><code>protected CSTestingBrowser browser</code></strong></td><td>Set by the runner before each test. Use it in <code>@BeforeMethod</code>, <code>@CSTest</code>, and <code>@AfterMethod</code>.</td></tr>
-            <tr><td><strong><code>protected CSTestingOptions getBrowserOptions()</code></strong></td><td>Override to customize browser options (e.g. headless vs headed). Default: headless.</td></tr>
-            <tr><td><strong><code>public void setBrowser(CSTestingBrowser browser)</code></strong></td><td>Called by the runner to inject the browser. You normally don't call this yourself.</td></tr>
-          </tbody>
-        </table>
-        <p><strong>Example – run with a visible browser:</strong></p>
-        <pre><code>@Override
-protected CSTestingOptions getBrowserOptions() {
-    return CSTestingOptions.builder().headless(false).build();
-}</code></pre>
+        <h2 id="base-class">Browser with hooks</h2>
+        <p>The runner does not create a Playwright browser for you. Typical pattern: <strong><code>create_browser</code></strong> in <code>before_all</code>, store on a module-level variable (or page object), <strong><code>browser.close()</code></strong> in <code>after_all</code>—same as <code>README.md</code> and <code>templates/tests/home_test.py</code>. For a fresh browser per test, call <code>create_browser</code> inside each <code>it</code> (with <code>try</code>/<code>finally</code>).</p>
+        <p><strong>Headed mode:</strong> use <code>create_browser(headless=False)</code> (CLI <code>--headed</code> applies to config-driven runs, not to this hook pattern).</p>
 
-        <h2 id="cstest">@CSTest</h2>
-        <p>Mark a method as a test with <strong><code>@CSTest</code></strong>. You can optionally set a <strong>description</strong> (e.g. for reports or logs):</p>
-        <pre><code>@CSTest
-public void testLogin() {
-    browser.gotoUrl("https://example.com/login");
-    browser.locator("name=user").type("alice");
-    browser.locator("button[type=submit]").click();
-    browser.assertThat().hasURL("**/welcome");
-}
+        <h2 id="cstest"><code>it</code> tests</h2>
+        <pre><code>import asyncio
+from cstesting import describe, it, expect, before_all, after_all, create_browser
 
-@CSTest(description = "Check example.com title")
-public void testTitle() {
-    browser.gotoUrl("https://example.com");
-    browser.assertThat().hasTitle("Example");
-}</code></pre>
+browser = None
 
-        <h2 id="runner">Runner: CSTestingRunner</h2>
-        <p><strong><code>CSTestingRunner</code></strong> discovers and runs all <code>@CSTest</code> methods in a class and runs the lifecycle annotations.</p>
-        <p><strong>From code:</strong></p>
-        <pre><code>// Default options (headless)
-CSTestingRunner.run(MyTestClass.class);
+def _suite():
+    def _before():
+        global browser
+        loop = asyncio.get_event_loop()
+        browser = loop.run_until_complete(create_browser(headless=True))
 
-// Custom options (e.g. headed)
-CSTestingRunner.run(MyTestClass.class, CSTestingOptions.builder().headless(false).build());</code></pre>
-        <p><strong>From command line (no <code>main()</code> in the test class):</strong></p>
-        <pre><code>mvn exec:java -Dexec.mainClass="com.cstesting.runner.CSTestingRunner" -Dexec.args="com.example.MyTest"</code></pre>
-        <p>Or with the <strong>annotation-tests</strong> profile (if configured to run a specific class):</p>
-        <pre><code>mvn exec:java -Pannotation-tests</code></pre>
-        <p><strong>Entry point with class name as argument:</strong></p>
-        <pre><code>java -cp ... com.cstesting.runner.CSTestingRunner com.example.MyTest</code></pre>
-        <p>The first argument must be the <strong>fully qualified class name</strong> of the test class.</p>
+    def _after():
+        global browser
+        if browser:
+            asyncio.get_event_loop().run_until_complete(browser.close())
 
-        <h2 id="full-example">Full example</h2>
-        <pre><code>import com.cstesting.annotations.*;
-import com.cstesting.runner.CSTestingRunner;
-import com.cstesting.runner.CSTestingTestBase;
+    before_all(_before)
+    after_all(_after)
 
-public class MyTest extends CSTestingTestBase {
+    async def _login():
+        await browser.goto("https://example.com/login")
+        await browser.type("name=user", "alice")
+        await browser.click('button[type="submit"]')
+        await browser.wait_for_url("**/welcome", {"timeout": 10000})
 
-    @BeforeSuite
-    public void beforeSuite() {
-        System.out.println("Before suite");
-    }
+    it("redirects after login", _login)
 
-    @AfterSuite
-    public void afterSuite() {
-        System.out.println("After suite");
-    }
+    async def _title():
+        await browser.goto("https://example.com")
+        title = await browser.evaluate("document.title")
+        expect(title).to_equal("Example")
 
-    @BeforeClass
-    public void beforeClass() {
-        System.out.println("Before class");
-    }
+    it("shows title", _title)
 
-    @AfterClass
-    public void afterClass() {
-        System.out.println("After class");
-    }
+describe("Login", _suite)</code></pre>
+        <p>Use <strong><code>it.only</code></strong> / <strong><code>describe.only</code></strong> to focus one test or suite; <strong><code>it.skip</code></strong> / <strong><code>describe.skip</code></strong> to skip.</p>
 
-    @BeforeMethod
-    public void setUp() {
-        // browser is already created and set by the runner
-    }
+        <h2 id="runner">Runner: CLI and <code>run()</code></h2>
+        <pre><code>python -m cstesting
+python -m cstesting example/math_test.py
+python -m cstesting tests/
+python -m cstesting --tag smoke "**/*.test.py"</code></pre>
+        <p>Programmatically (after registering suites at import time): <strong><code>from cstesting import run</code></strong> then <code>result = run()</code>. See <code>README.md</code> in <code>C:\CSTesting-Python</code>.</p>
 
-    @AfterMethod
-    public void tearDown() {
-        // runs before the runner closes the browser
-    }
+        <h2 id="full-example">Full example (hooks only)</h2>
+        <pre><code>from cstesting import describe, it, before_all, after_all, beforeEach, afterEach, expect
 
-    @CSTest(description = "Check example.com title")
-    public void testTitle() {
-        browser.gotoUrl("https://example.com");
-        browser.assertThat().hasTitle("Example");
-    }
+def _suite():
+    def suite_setup():
+        print("before all")
 
-    @CSTest
-    public void testHeading() {
-        browser.gotoUrl("https://example.com");
-        browser.assertThat(browser.locator("h1")).isVisible();
-    }
+    def suite_teardown():
+        print("after all")
 
-    public static void main(String[] args) {
-        CSTestingRunner.run(MyTest.class);
-    }
-}</code></pre>
-        <p><strong>Run:</strong></p>
-        <ul>
-          <li>From IDE: run <code>main</code>, or run the class with JUnit/TestNG if you integrate the runner there.</li>
-          <li>From Maven: <code>mvn exec:java -Dexec.mainClass="com.cstesting.runner.CSTestingRunner" -Dexec.args="com.example.MyTest"</code></li>
-        </ul>
+    def before_each_test():
+        print("before each")
 
-        <h2 id="without-base-class">Running without extending CSTestingTestBase</h2>
-        <p>The runner can inject the browser into a class that does <strong>not</strong> extend <code>CSTestingTestBase</code> if the class has either:</p>
-        <ul>
-          <li>A <strong><code>setBrowser(CSTestingBrowser browser)</code></strong> method, or</li>
-          <li>A <strong>field named <code>browser</code></strong> (any visibility) of type <code>CSTestingBrowser</code>.</li>
-        </ul>
-        <p>The runner will use reflection to set the browser before each test. Prefer extending <strong><code>CSTestingTestBase</code></strong> for a clear contract and <code>getBrowserOptions()</code> support.</p>
+    def after_each_test():
+        print("after each")
+
+    before_all(suite_setup)
+    after_all(suite_teardown)
+    beforeEach(before_each_test)
+    afterEach(after_each_test)
+
+    it("one", lambda: expect(1).to_be(1))
+    it("two", lambda: expect(2).to_be(2))
+
+describe("Example suite", _suite)</code></pre>
+        <p><strong>Note:</strong> Register hooks with <code>before_all(fn)</code> etc. Do not use <code>@before_all</code> as a decorator—those helpers return <code>None</code> and would replace your function name.</p>
+        <p><strong>Run:</strong> <code>python -m cstesting your_file.py</code></p>
+
+        <h2 id="without-base-class">Nested <code>describe</code></h2>
+        <p>Inside <code>_suite</code>, call <strong><code>describe("Child", _child_suite)</code></strong> to add a nested suite. Child suites run after all <code>it</code> calls registered on the parent in the same <code>_suite</code> function (see <code>runner.py</code>).</p>
 
         <h2 id="summary">Summary</h2>
         <table class="docs-table">
           <thead>
-            <tr><th>Topic</th><th>CSTesting</th></tr>
+            <tr><th>Topic</th><th>Python CSTesting</th></tr>
           </thead>
           <tbody>
-            <tr><td><strong>Test method</strong></td><td><code>@CSTest</code> or <code>@CSTest(description = "...")</code></td></tr>
-            <tr><td><strong>Suite</strong></td><td><code>@BeforeSuite</code>, <code>@AfterSuite</code> — once per run</td></tr>
-            <tr><td><strong>Class</strong></td><td><code>@BeforeClass</code>, <code>@AfterClass</code> — once per class</td></tr>
-            <tr><td><strong>Method</strong></td><td><code>@BeforeMethod</code>, <code>@AfterMethod</code> — per test; browser is set before <code>@BeforeMethod</code></td></tr>
-            <tr><td><strong>Base class</strong></td><td>Extend <code>CSTestingTestBase</code> for <code>browser</code> and <code>getBrowserOptions()</code></td></tr>
-            <tr><td><strong>Run from code</strong></td><td><code>CSTestingRunner.run(MyTest.class)</code> or <code>run(MyTest.class, options)</code></td></tr>
-            <tr><td><strong>Run from CLI</strong></td><td><code>CSTestingRunner</code> with fully qualified class name as first argument</td></tr>
-            <tr><td><strong>Browser</strong></td><td>One new browser per test; closed after <code>@AfterMethod</code></td></tr>
+            <tr><td><strong>Test case</strong></td><td><code>it("name", fn)</code> — sync or async, no runner-injected args</td></tr>
+            <tr><td><strong>Suite</strong></td><td><code>describe("name", suite_fn)</code></td></tr>
+            <tr><td><strong>Once per suite</strong></td><td><code>before_all(fn)</code>, <code>after_all(fn)</code></td></tr>
+            <tr><td><strong>Per test</strong></td><td><code>beforeEach(fn)</code>, <code>afterEach(fn)</code> (aliases <code>before_each</code>, <code>after_each</code>)</td></tr>
+            <tr><td><strong>Browser</strong></td><td>You call <code>create_browser</code> / <code>close</code>; not injected by the runner</td></tr>
+            <tr><td><strong>Assertions</strong></td><td><code>expect(...)</code></td></tr>
+            <tr><td><strong>CLI</strong></td><td><code>python -m cstesting [path|glob]</code>, tags via <code>--tag</code></td></tr>
           </tbody>
         </table>
         <div class="docs-prev-next docs-prev-next--prev-only">

@@ -85,103 +85,81 @@
         <h1 class="docs-section-heading">Writing tests</h1>
 
         <h2 id="writing-tests-intro">Introduction</h2>
-        <p>CSTesting assertions are designed for the dynamic web. Use <strong><code>assertThat()</code></strong> for page-level checks (title, URL) and <strong><code>assertThat(locator)</code></strong> for element-level checks (visible, attribute, text, value). Assertions throw <strong><code>AssertionError</code></strong> on failure. Use <strong><code>waitForSelector</code></strong>, <strong><code>waitForLoad</code></strong>, or <strong><code>waitForURL</code></strong> when you need to wait for conditions before asserting or acting.</p>
-        <p>The example below shows how to write a test using assertions, locators, and selectors.</p>
-        <pre><code>package org.example;
+        <p>CSTesting for Python (<code>C:\CSTesting-Python</code>) uses <strong><code>describe</code></strong> / <strong><code>it</code></strong> from <code>cstesting</code> and <strong><code>expect(actual)</code></strong> for assertions (Jest-style). Browser automation is <strong>async</strong> (Playwright): use <code>async def</code> tests and <code>await</code> on <code>browser.goto</code>, <code>locator.click()</code>, etc. Install with browser extras: <code>pip install -e ".[browser]"</code> and <code>playwright install chromium</code>.</p>
+        <p>The example below matches the patterns in the project <code>example/</code> and <code>README.md</code>.</p>
+        <pre><code>import asyncio
+from cstesting import describe, it, expect, before_all, after_all, create_browser
 
-import com.cstesting.CSTesting;
-import com.cstesting.CSTestingBrowser;
-import com.cstesting.CSTestingOptions;
+browser = None
 
-public class App {
-    public static void main(String[] args) {
-        CSTestingBrowser browser = CSTesting.createBrowser(
-            CSTestingOptions.builder().headless(true).build()
-        );
-        try {
-            browser.gotoUrl("https://example.com");
+def _suite():
+    def _before():
+        global browser
+        browser = asyncio.get_event_loop().run_until_complete(
+            create_browser(headless=True)
+        )
 
-            // Expect the page title to contain a substring.
-            browser.assertThat().hasTitle("Example");
+    def _after():
+        global browser
+        if browser:
+            asyncio.get_event_loop().run_until_complete(browser.close())
 
-            // Create a locator and expect an attribute to match.
-            var link = browser.locator("a").first();
-            browser.assertThat(link).hasAttribute("href");
+    before_all(_before)
+    after_all(_after)
 
-            // Click the link (e.g. "More information...").
-            link.click();
+    async def _test():
+        await browser.goto("https://example.com")
+        title = await browser.evaluate("document.title")
+        expect(title).to_contain("Example")
+        h1 = await browser.locator("h1").first().text_content()
+        expect(h1).to_contain("Example")
 
-            // Wait for navigation and expect a heading to be visible.
-            browser.waitForLoad(5_000);
-            browser.assertThat(browser.locator("h1")).isVisible();
-        } finally {
-            browser.close();
-        }
-    }
-}</code></pre>
+    it("loads example.com", _test)
+
+describe("Browser smoke", _suite)</code></pre>
 
         <h2 id="assertions">Assertions</h2>
-        <p>Use <strong><code>browser.assertThat()</code></strong> for the page and <strong><code>browser.assertThat(locator)</code></strong> for elements. Assertions are fluent and throw <code>AssertionError</code> if the condition is not met.</p>
-        <p><strong>Page assertions:</strong></p>
-        <pre><code>// Title contains or equals the expected string.
-browser.assertThat().hasTitle("Example Domain");
+        <p>Use <strong><code>from cstesting import expect</code></strong>. Matchers throw <code>AssertionError</code> on failure. Negate with <code>expect(x).not_.to_be(y)</code> (Python reserves <code>not</code>).</p>
+        <table class="docs-table">
+          <thead><tr><th>Matcher</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td><code>to_be</code></td><td><code>expect(1 + 1).to_be(2)</code></td></tr>
+            <tr><td><code>to_equal</code></td><td><code>expect({"a": 1}).to_equal({"a": 1})</code></td></tr>
+            <tr><td><code>to_be_truthy</code> / <code>to_be_falsy</code></td><td><code>expect(x).to_be_truthy()</code></td></tr>
+            <tr><td><code>to_contain</code></td><td><code>expect("hello").to_contain("ell")</code></td></tr>
+            <tr><td><code>to_have_length</code></td><td><code>expect([1, 2, 3]).to_have_length(3)</code></td></tr>
+            <tr><td><code>to_throw</code></td><td><code>expect(lambda: 1/0).to_throw()</code></td></tr>
+          </tbody>
+        </table>
+        <p><strong>Page title / URL:</strong> there is no <code>assertThat().hasTitle</code> in Python—read values then assert:</p>
+        <pre><code>title = await browser.evaluate("document.title")
+expect(title).to_contain("Example Domain")
 
-// URL contains the string or matches a pattern (use * as wildcard).
-browser.assertThat().hasURL("https://example.com");
-browser.assertThat().hasURL("**/example*");</code></pre>
-
-        <p><strong>Element assertions:</strong></p>
-        <pre><code>// Visibility and state.
-browser.assertThat(browser.locator("button")).isVisible();
-browser.assertThat(browser.locator("#name")).isEditable();
-browser.assertThat(browser.locator("input")).isEnabled();
-browser.assertThat(browser.locator("[disabled]")).isDisabled();
-
-// Text and value.
-browser.assertThat(browser.locator("h1")).hasText("Example");
-browser.assertThat(browser.locator("h1")).containText("Example");
-browser.assertThat(browser.locator("#search")).hasValue("query");
-browser.assertThat(browser.locator("#search")).containValue("query");
-
-// Attributes.
-browser.assertThat(browser.locator("a").first()).hasAttribute("href");
-browser.assertThat(browser.locator("a").first()).hasAttribute("href", "https://example.com");
-
-// Count of matching elements.
-browser.assertThat(browser.locator("button")).count(3);
-browser.assertThat(browser.locator("li")).hasCount(5);</code></pre>
+current = await browser.url()
+expect("example.com" in current).to_be_truthy()</code></pre>
 
         <h2 id="locators">Locators</h2>
-        <p>Locators represent a way to find element(s) on the page. Create them with <strong><code>browser.locator(selector)</code></strong> and use them for actions (<code>.click()</code>, <code>.type()</code>, etc.) and assertions. If the selector matches <strong>multiple</strong> elements, use <strong><code>.first()</code></strong>, <strong><code>.last()</code></strong>, or <strong><code>.nth(index)</code></strong> before performing an action.</p>
-        <p><strong>Selector formats:</strong> CSS (default), XPath (<code>//button</code> or <code>xpath=//button</code>), <code>id=value</code>, <code>name=value</code>, or any <code>attr=value</code>.</p>
-        <pre><code>// By text (XPath).
-var getStarted = browser.locator("//a[contains(.,'Get Started')]").first();
-browser.assertThat(getStarted).hasAttribute("href", "/docs/intro");
-getStarted.click();
+        <p>Create locators with <strong><code>browser.locator(selector)</code></strong>. Actions are <strong>async</strong>: <code>await browser.locator("button").click()</code>, <code>await browser.click("#id")</code>. For multiple matches use <code>.first()</code>, <code>.last()</code>, or <code>.nth(n)</code>.</p>
+        <p><strong>Selector shortcuts</strong> (same as Node): <code>id=</code>, <code>name=</code>, <code>class=</code>, CSS, or XPath starting with <code>//</code>.</p>
+        <pre><code>await browser.locator("name=email").type("user@example.com")
+await browser.locator("//button[contains(.,'Sign in')]").first().click()
+text = await browser.locator("h1").first().text_content()
+expect(text).to_contain("Welcome")</code></pre>
 
-// By CSS or id/name.
-browser.assertThat(browser.locator("h1")).isVisible();
-browser.assertThat(browser.locator("id=submit")).isEnabled();
-browser.locator("name=email").type("user@example.com");</code></pre>
-
-        <p>See <a href="#locators">Locators</a> for the full list of selector formats and locator methods.</p>
+        <p>See <a href="docs-python-locators.html">Locators</a> for selector formats and <a href="docs-python-assertions.html">Assertions</a> for <code>expect</code>.</p>
 
         <h2 id="test-isolation">Test isolation</h2>
-        <p>Create a <strong>new browser</strong> for each test so that tests do not share state (cookies, storage, or tabs). Open the browser at the start of the test and close it in a <code>finally</code> block (or use try-with-resources if you wrap the API).</p>
-        <pre><code>public void testLogin() {
-    CSTestingBrowser browser = CSTesting.createBrowser(
-        CSTestingOptions.builder().headless(true).build()
-    );
-    try {
-        browser.gotoUrl("https://example.com/login");
-        browser.locator("name=user").type("alice");
-        browser.locator("name=pass").type("secret");
-        browser.locator("button[type=submit]").click();
-        browser.assertThat().hasURL("**/welcome");
-    } finally {
-        browser.close();
-    }
-}</code></pre>
+        <p>Use <strong><code>before_all</code></strong> / <strong><code>after_all</code></strong> for one browser per suite (as in <code>templates/tests/home_test.py</code>), or launch a new browser inside each <code>it</code> if you need a fresh context per test. Always <code>await browser.close()</code> in <code>after_all</code> (or <code>finally</code>).</p>
+        <pre><code>async def _login_test():
+    b = await create_browser(headless=True)
+    try:
+        await b.goto("https://example.com/login")
+        await b.locator("name=user").type("alice")
+        await b.locator("name=pass").type("secret")
+        await b.locator('button[type="submit"]').click()
+        await b.wait_for_url("**/welcome", {"timeout": 10000})
+    finally:
+        await b.close()</code></pre>
         <div class="docs-prev-next">
           <a href="docs-python.html#installation" class="docs-prev">
             <span class="docs-prev-next-label">Previous</span>

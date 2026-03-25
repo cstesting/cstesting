@@ -118,13 +118,13 @@
               <td>—</td>
             </tr>
             <tr>
-              <td><code>locator.doubleClick()</code></td>
+              <td><code>locator.double_click()</code></td>
               <td>Yes</td>
               <td>Yes</td>
               <td>—</td>
             </tr>
             <tr>
-              <td><code>locator.rightClick()</code></td>
+              <td><code>locator.right_click()</code></td>
               <td>Yes</td>
               <td>Yes</td>
               <td>—</td>
@@ -142,7 +142,7 @@
               <td>—</td>
             </tr>
             <tr>
-              <td><code>locator.dragAndDrop(other)</code></td>
+              <td><code>browser.drag_and_drop(src, dst)</code></td>
               <td>Yes (both)</td>
               <td>—</td>
               <td>—</td>
@@ -159,46 +159,13 @@
               <td>Yes</td>
               <td>—</td>
             </tr>
-            <tr>
-              <td><code>locator.selectOptions(...)</code></td>
-              <td>Yes</td>
-              <td>Yes</td>
-              <td>—</td>
-            </tr>
           </tbody>
         </table>
 
-        <p>You typically do <strong>not</strong> need to call <code>waitForSelector</code> before an action; CSTesting waits for the element to be actionable first. After navigation, use <strong><code>browser.waitForLoad()</code></strong> for page-level readiness.</p>
+        <p>With Playwright, you usually do <strong>not</strong> call <code>wait_for_selector</code> before <code>click</code> / <code>type</code>—actions wait for the target. For navigation readiness use <strong><code>await browser.wait_for_load()</code></strong> or <strong><code>await browser.wait_for_url(...)</code></strong>. To wait explicitly: <strong><code>await browser.wait_for_selector(sel, {"timeout": 5000})</code></strong>.</p>
 
-        <h2 id="assertions">Assertions</h2>
-        <p>CSTesting provides <strong><code>assertThat(locator)</code></strong> for element assertions and <strong><code>assertThat()</code></strong> for page assertions. These evaluate <strong>once</strong> (no auto-retry). To wait then assert, use <strong><code>waitForSelector</code></strong> first, or rely on auto-wait before a follow-up action.</p>
-
-        <table class="docs-table">
-          <thead>
-            <tr>
-              <th>Assertion</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td><code>assertThat(locator).isVisible()</code></td><td>Element is visible</td></tr>
-            <tr><td><code>assertThat(locator).isEditable()</code></td><td>Element is editable (not disabled, not readonly)</td></tr>
-            <tr><td><code>assertThat(locator).isEmpty()</code></td><td>Element value or text is empty</td></tr>
-            <tr><td><code>assertThat(locator).isEnabled()</code></td><td>Element is enabled</td></tr>
-            <tr><td><code>assertThat(locator).isDisabled()</code></td><td>Element is disabled</td></tr>
-            <tr><td><code>assertThat(locator).contains(expected)</code></td><td>Text or value contains the string</td></tr>
-            <tr><td><code>assertThat(locator).hasText(expected)</code></td><td>Text content matches or contains</td></tr>
-            <tr><td><code>assertThat(locator).containText(expected)</code></td><td>Text content contains the string</td></tr>
-            <tr><td><code>assertThat(locator).hasValue(expected)</code></td><td>Input/select value equals</td></tr>
-            <tr><td><code>assertThat(locator).containValue(expected)</code></td><td>Input/select value contains</td></tr>
-            <tr><td><code>assertThat(locator).hasAttribute(name)</code></td><td>Element has the attribute</td></tr>
-            <tr><td><code>assertThat(locator).hasAttribute(name, value)</code></td><td>Attribute equals the value</td></tr>
-            <tr><td><code>assertThat(locator).count(n)</code></td><td>Number of matching elements equals n</td></tr>
-            <tr><td><code>assertThat(locator).hasCount(n)</code></td><td>Same as <code>count(n)</code></td></tr>
-            <tr><td><code>assertThat().hasTitle(expected)</code></td><td>Page title contains or equals</td></tr>
-            <tr><td><code>assertThat().hasURL(pattern)</code></td><td>Page URL contains or matches pattern (<code>*</code> wildcard)</td></tr>
-          </tbody>
-        </table>
+        <h2 id="assertions">After waiting, assert with <code>expect</code></h2>
+        <p>Python CSTesting has no <code>assertThat</code>. Read state with <code>await</code>, then <strong><code>from cstesting import expect</code></strong>. See <a href="docs-python-assertions.html">Assertions</a>.</p>
 
         <h2 id="visible">Visible</h2>
         <p>An element is considered <strong>visible</strong> when it has a non-zero size and is not <code>visibility: hidden</code> in computed style.</p>
@@ -234,12 +201,14 @@
           <li>After the server responds, the button is replaced with an enabled one.</li>
           <li><strong><code>locator.click()</code></strong> waits for the element to exist, be visible, and be enabled, then clicks.</li>
         </ol>
-        <pre><code>browser.gotoUrl("https://example.com/signup");
-browser.locator("name=username").type("alice");
-// Sign Up may be disabled until username is validated.
-browser.locator("//button[contains(.,'Sign Up')]").first().click();
-browser.assertThat().hasURL("**/welcome");</code></pre>
-        <p>No explicit <code>waitForSelector</code> or sleep is needed; the click auto-waits for the button to be ready (within the default timeout).</p>
+        <pre><code>from cstesting import expect
+
+await browser.goto("https://example.com/signup")
+await browser.locator("name=username").type("alice")
+# Sign Up may be disabled until username is validated — click waits
+await browser.locator("//button[contains(.,'Sign Up')]").first().click()
+await browser.wait_for_url("**/welcome", {"timeout": 10000})</code></pre>
+        <p>No extra sleep is needed; Playwright waits for the button to be actionable (within the timeout).</p>
         <div class="docs-prev-next">
           <a href="docs-python-actions.html" class="docs-prev">
             <span class="docs-prev-next-label">Previous</span>

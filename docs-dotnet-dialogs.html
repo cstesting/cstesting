@@ -88,7 +88,7 @@
         <p>CSTesting can interact with JavaScript dialogs: <strong>alert</strong>, <strong>confirm</strong>, and <strong>prompt</strong>, as well as the <strong>beforeunload</strong> confirmation when closing the page. You set how the <em>next</em> dialog will be handled <strong>before</strong> the action that triggers it (e.g. before <code>click()</code>). If you do not set a response, the action that opens the dialog can block until the dialog is handled (behavior depends on the browser/backend).</p>
 
         <h2 id="alert-confirm-prompt">alert(), confirm(), prompt() dialogs</h2>
-        <p>You register how to handle the next dialog by calling <strong><code>acceptNextAlert()</code></strong>, <strong><code>acceptNextAlert(String promptText)</code></strong>, or <strong><code>dismissNextAlert()</code></strong> before the action that opens the dialog.</p>
+        <p>On <strong><code>ICSTestingBrowser</code></strong> (<code>C:\CSTesting-DotNet</code>), register the <em>next</em> dialog before the action that opens it: <strong><code>AcceptNextDialog()</code></strong>, <strong><code>AcceptNextDialog(promptText)</code></strong> for prompts, <strong><code>DismissNextDialog()</code></strong>, or <strong><code>SetDialogHandler(accept, promptText)</code></strong>.</p>
 
         <table class="docs-table">
           <thead>
@@ -98,46 +98,41 @@
             </tr>
           </thead>
           <tbody>
-            <tr><td><code>browser.acceptNextAlert()</code></td><td>Next dialog will be accepted (OK). Use for <strong>alert</strong> or <strong>confirm</strong>.</td></tr>
-            <tr><td><code>browser.acceptNextAlert(String promptText)</code></td><td>Next <strong>prompt</strong> will be accepted with the given text.</td></tr>
-            <tr><td><code>browser.dismissNextAlert()</code></td><td>Next <strong>confirm</strong> or <strong>prompt</strong> will be dismissed (Cancel).</td></tr>
-            <tr><td><code>browser.getLastAlertMessage()</code></td><td>Message of the last dialog that opened (for assertions).</td></tr>
+            <tr><td><code>AcceptNextDialog()</code></td><td>Accept the next dialog (OK). For <strong>alert</strong> / <strong>confirm</strong>.</td></tr>
+            <tr><td><code>AcceptNextDialog(promptText)</code></td><td>Accept the next <strong>prompt</strong> with text.</td></tr>
+            <tr><td><code>DismissNextDialog()</code></td><td>Dismiss the next <strong>confirm</strong> / <strong>prompt</strong> (Cancel).</td></tr>
+            <tr><td><code>SetDialogHandler(accept, promptText)</code></td><td>Lower-level; sets accept/dismiss and optional prompt text.</td></tr>
           </tbody>
         </table>
 
         <p><strong>Example: accept then click</strong></p>
-        <pre><code>browser.acceptNextAlert();
-browser.locator("#btnAlert").click();   // triggers alert("Hello")
-String msg = browser.getLastAlertMessage();  // "Hello"
-assertEquals("Hello", msg);</code></pre>
+        <pre><code>browser.AcceptNextDialog();
+await browser.Locator("#btnAlert").ClickAsync();   // alert("Hello")</code></pre>
 
         <p><strong>Example: dismiss confirm</strong></p>
-        <pre><code>browser.dismissNextAlert();
-browser.locator("#btnConfirm").click();  // confirm("Sure?") -&gt; Cancel</code></pre>
+        <pre><code>browser.DismissNextDialog();
+await browser.Locator("#btnConfirm").ClickAsync();</code></pre>
 
         <p><strong>Example: accept prompt with text</strong></p>
-        <pre><code>browser.acceptNextAlert("my input");
-browser.locator("#btnPrompt").click();  // prompt("Name?") accepted with "my input"</code></pre>
+        <pre><code>browser.AcceptNextDialog("my input");
+await browser.Locator("#btnPrompt").ClickAsync();</code></pre>
 
-        <p><strong>Important:</strong> You must set the dialog response <strong>before</strong> the action that triggers the dialog. Otherwise the action can stall, because JavaScript dialogs are modal and block further page execution until they are handled.</p>
+        <p><strong>Important:</strong> Set the handler <strong>before</strong> the action that opens the dialog.</p>
 
         <p><strong>Wrong</strong> — the click can hang:</p>
-        <pre><code>browser.locator("#btnAlert").click();   // Dialog opens; execution blocks here
-browser.acceptNextAlert();             // Never runs until dialog is handled</code></pre>
+        <pre><code>await browser.Locator("#btnAlert").ClickAsync();
+browser.AcceptNextDialog();</code></pre>
 
-        <p><strong>Correct</strong> — set response first:</p>
-        <pre><code>browser.acceptNextAlert();
-browser.locator("#btnAlert").click();  // Dialog opens and is accepted
-String msg = browser.getLastAlertMessage();</code></pre>
+        <p><strong>Correct</strong>:</p>
+        <pre><code>browser.AcceptNextDialog();
+await browser.Locator("#btnAlert").ClickAsync();</code></pre>
 
-        <p>If you do not call <code>acceptNextAlert</code> or <code>dismissNextAlert</code> before a dialog appears, behavior is implementation-dependent (e.g. some backends may auto-dismiss). For reliable tests, always set the next dialog response before triggering it.</p>
+        <p>If no handler is set, the implementation defaults to accepting with an empty prompt string (see <code>CSTestingBrowser</code>). For predictable tests, set the next response explicitly before triggering the dialog.</p>
 
         <h2 id="beforeunload">beforeunload dialog</h2>
-        <p>When the page is closed or navigated away, the browser may show a <strong>beforeunload</strong> confirmation ("Leave site?"). CSTesting's <strong><code>browser.close()</code></strong> closes the page; whether <code>beforeunload</code> runs and how it is handled depends on the browser and backend.</p>
-        <p>To handle the beforeunload dialog explicitly, set the next dialog response before the action that would trigger it (e.g. closing the window or navigating away):</p>
-        <pre><code>browser.dismissNextAlert();   // or acceptNextAlert() to leave
-browser.close();              // or an action that triggers beforeunload</code></pre>
-        <p>If your test triggers navigation or close in a way that shows beforeunload, call <strong><code>acceptNextAlert()</code></strong> or <strong><code>dismissNextAlert()</code></strong> before that action so the dialog does not block the test.</p>
+        <p>When the page is closed or navigated away, the browser may show a <strong>beforeunload</strong> confirmation. Use <strong><code>AcceptNextDialog()</code></strong> / <strong><code>DismissNextDialog()</code></strong> before <strong><code>await browser.CloseAsync()</code></strong> or the action that triggers unload, same as other dialogs.</p>
+        <pre><code>browser.DismissNextDialog();
+await browser.CloseAsync();</code></pre>
 
         <h2 id="print-dialogs">Print dialogs</h2>
         <p>CSTesting does not provide a dedicated API for <strong>print dialogs</strong> (<code>window.print()</code>). The native print dialog is controlled by the OS/browser and is not a JavaScript <code>alert</code>/<code>confirm</code>/<code>prompt</code> dialog.</p>
@@ -147,11 +142,12 @@ browser.close();              // or an action that triggers beforeunload</code><
           <li>Rely on your app's own logic and assert on the state of the page before/after the "Print" action.</li>
         </ul>
         <p>Example of stubbing and asserting that print was requested:</p>
-        <pre><code>browser.gotoUrl("https://example.com/page-with-print");
-browser.evaluate("window.printRequested = false; window.print = function() { window.printRequested = true; };");
-browser.locator("//button[contains(.,'Print')]").first().click();  // or your print button selector
-Object requested = browser.evaluate("window.printRequested");
-assertTrue(Boolean.TRUE.equals(requested));</code></pre>
+        <pre><code>await browser.GotoAsync("https://example.com/page-with-print");
+await browser.EvaluateAsync&lt;object&gt;(
+    @"() => { window.printRequested = false; window.print = function() { window.printRequested = true; }; }");
+await browser.Locator("//button[contains(.,'Print')]").First().ClickAsync();
+var requested = await browser.EvaluateAsync&lt;bool&gt;("window.printRequested");
+Assert.That(requested, Is.True);</code></pre>
         <p>(Adjust the selector to match your page; use XPath if needed, e.g. <code>//button[contains(.,'Print')]</code>.)</p>
 
         <h2 id="summary">Summary</h2>
@@ -164,10 +160,10 @@ assertTrue(Boolean.TRUE.equals(requested));</code></pre>
             </tr>
           </thead>
           <tbody>
-            <tr><td><strong>alert</strong></td><td><code>acceptNextAlert()</code> before click</td><td>Use <code>getLastAlertMessage()</code> to assert text.</td></tr>
-            <tr><td><strong>confirm</strong></td><td><code>acceptNextAlert()</code> or <code>dismissNextAlert()</code> before click</td><td>Set before the action that triggers confirm.</td></tr>
-            <tr><td><strong>prompt</strong></td><td><code>acceptNextAlert(text)</code> or <code>dismissNextAlert()</code> before click</td><td>Set before the action that triggers prompt.</td></tr>
-            <tr><td><strong>beforeunload</strong></td><td><code>acceptNextAlert()</code> or <code>dismissNextAlert()</code> before close/navigate</td><td>Use when your flow triggers "Leave site?".</td></tr>
+            <tr><td><strong>alert</strong></td><td><code>AcceptNextDialog()</code> before click</td><td>No built-in "last message" API; assert on page state if needed.</td></tr>
+            <tr><td><strong>confirm</strong></td><td><code>AcceptNextDialog()</code> or <code>DismissNextDialog()</code> before click</td><td>Set before the action that triggers confirm.</td></tr>
+            <tr><td><strong>prompt</strong></td><td><code>AcceptNextDialog(text)</code> or <code>DismissNextDialog()</code> before click</td><td>Set before the action that triggers prompt.</td></tr>
+            <tr><td><strong>beforeunload</strong></td><td><code>AcceptNextDialog()</code> or <code>DismissNextDialog()</code> before close/navigate</td><td>Use when your flow triggers "Leave site?".</td></tr>
             <tr><td><strong>Print</strong></td><td>No built-in API</td><td>Stub <code>window.print</code> and assert it was called if needed.</td></tr>
           </tbody>
         </table>

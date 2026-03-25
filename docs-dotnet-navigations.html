@@ -88,36 +88,23 @@
         <p>CSTesting can navigate to URLs and work with navigations caused by page interactions (e.g. clicking a link or submitting a form). This page describes basic navigation, when the page is considered loaded, and how to wait for a specific URL after an action.</p>
 
         <h2 id="basic-navigation">Basic navigation</h2>
-        <p>The main way to open a URL is <strong><code>browser.gotoUrl(url)</code></strong>:</p>
-        <pre><code>browser.gotoUrl("https://example.com");</code></pre>
-        <p>This loads the page. With the CDP implementation, navigation completes when the browser has loaded the document. For more control, you can call <strong><code>waitForLoad()</code></strong> or <strong><code>waitForLoad(timeoutMs)</code></strong> after <strong><code>gotoUrl</code></strong> to wait until <code>document.readyState</code> is <strong>complete</strong> (all resources such as stylesheets, scripts, and images have loaded, and the <code>load</code> event has fired).</p>
-        <pre><code>browser.gotoUrl("https://example.com");
-browser.waitForLoad(10_000);</code></pre>
-        <p>If the page does a <strong>client-side redirect</strong> before load, <strong><code>gotoUrl</code></strong> (and any following <strong><code>waitForLoad</code></strong>) applies to the final loaded page.</p>
-        <p><strong>Other navigation commands:</strong></p>
-        <table class="docs-table">
-          <thead>
-            <tr><th>Method</th><th>Description</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><code>browser.back()</code></td><td>Navigate back in history.</td></tr>
-            <tr><td><code>browser.forward()</code></td><td>Navigate forward in history.</td></tr>
-            <tr><td><code>browser.refresh()</code></td><td>Reload the current page.</td></tr>
-            <tr><td><code>browser.url()</code></td><td>Return the current page URL.</td></tr>
-          </tbody>
-        </table>
+        <p>The main way to open a URL is <strong><code>await browser.GotoAsync(url)</code></strong> (<code>ICSTestingBrowser</code> in <code>C:\CSTesting-DotNet</code>):</p>
+        <pre><code>await browser.GotoAsync("https://example.com");</code></pre>
+        <p>Playwright waits for the default load state after navigation. For an extra wait until the load event, call <strong><code>await browser.WaitForLoadAsync()</code></strong> after <strong><code>GotoAsync</code></strong>.</p>
+        <pre><code>await browser.GotoAsync("https://example.com");
+await browser.WaitForLoadAsync();</code></pre>
+        <p><strong>Current URL:</strong> <strong><code>await browser.GetUrlAsync()</code></strong>. The CSTesting .NET API does not expose <code>Back</code>, <code>Forward</code>, or <code>Reload</code> on <code>ICSTestingBrowser</code>; use <strong><code>EvaluateAsync</code></strong> if you need <code>history.back()</code> for a special case.</p>
 
         <h2 id="when-loaded">When is the page loaded?</h2>
         <p>Modern pages often do more <strong>after</strong> the <code>load</code> event: they fetch data lazily, fill in the UI, or load extra scripts and styles. There is no single definition of "fully loaded"; it depends on the page and framework.</p>
-        <p>In CSTesting you can <strong>interact with the page at any time</strong>. Actions (click, type, etc.) use <strong>auto-waiting</strong>: CSTesting waits for the target element to be actionable (visible, enabled, etc.) before performing the action. So you usually don't need to wait for "everything" to load—only for the elements you use.</p>
+        <p>Playwright-backed actions <strong>auto-wait</strong> for elements to be actionable before <code>ClickAsync</code>, <code>TypeAsync</code>, etc.</p>
         <p><strong>Example – navigate and click:</strong></p>
-        <pre><code>browser.gotoUrl("https://example.com");
-browser.locator("//*[contains(.,'Example Domain')]").first().click();</code></pre>
-        <p>The <strong>click</strong> auto-waits for the element to become visible and pass actionability checks, then clicks. You can think of CSTesting as a fast user: as soon as the element is ready, it acts. In many cases you don't need to worry about whether all resources have finished loading.</p>
-        <p>If you prefer to wait for the document first, call <strong><code>waitForLoad()</code></strong> or <strong><code>waitForLoad(timeoutMs)</code></strong> after <strong><code>gotoUrl</code></strong>:</p>
-        <pre><code>browser.gotoUrl("https://example.com");
-browser.waitForLoad(5_000);
-browser.locator("h1").click();</code></pre>
+        <pre><code>await browser.GotoAsync("https://example.com");
+await browser.Locator("//*[contains(.,'Example Domain')]").First().ClickAsync();</code></pre>
+        <p>If you prefer to wait for the document first, call <strong><code>await browser.WaitForLoadAsync()</code></strong> after <strong><code>GotoAsync</code></strong>:</p>
+        <pre><code>await browser.GotoAsync("https://example.com");
+await browser.WaitForLoadAsync();
+await browser.Locator("h1").ClickAsync();</code></pre>
 
         <h2 id="hydration">Hydration</h2>
         <p>Sometimes you'll see a case where an action seems to do nothing—for example you click a button and nothing happens, or you type into an input and the text disappears. A common cause is <strong>poor hydration</strong> (e.g. in SPAs).</p>
@@ -125,32 +112,31 @@ browser.locator("h1").click();</code></pre>
         <p>To check for this, you can slow down the network (e.g. Chrome DevTools → Network → "Slow 3G"), reload the page, and try interacting as soon as the element appears. If clicks are ignored or text is cleared, the fix is on the app side: disable interactive controls until after hydration, when the page is fully functional.</p>
 
         <h2 id="waiting-for-navigation">Waiting for navigation</h2>
-        <p>Clicking a link or submitting a form can trigger a <strong>navigation</strong> to a new URL. In those cases it's a good idea to <strong>wait for the new URL</strong> before continuing the test.</p>
-        <p>Use <strong><code>waitForURL(urlOrPattern, timeoutMs)</code></strong> after the action that triggers the navigation. The URL can be an exact string, a substring (match when the current URL contains it), or a <strong>pattern</strong> with <code>*</code> as a wildcard.</p>
-        <pre><code>browser.locator("//*[contains(.,'Click me')]").first().click();
-browser.waitForURL("**/login", 10_000);
-browser.assertThat().hasTitle("Login");</code></pre>
+        <p>Clicking a link or submitting a form can trigger a <strong>navigation</strong> to a new URL. Use <strong><code>await browser.WaitForURLAsync(urlOrPattern, timeoutMs)</code></strong> after the action that triggers the navigation (Playwright URL match / glob semantics).</p>
+        <pre><code>await browser.Locator("//*[contains(.,'Click me')]").First().ClickAsync();
+await browser.WaitForURLAsync("**/login", 10_000);
+var title = await browser.EvaluateAsync&lt;string&gt;("document.title");
+Assert.That(title, Does.Contain("Login"));</code></pre>
         <p><strong>Examples:</strong></p>
-        <pre><code>browser.waitForURL("https://example.com/dashboard", 5_000);   // exact or contains
-browser.waitForURL("**/dashboard", 5_000);                     // * matches any segment
-browser.waitForURL("**/users/*/profile", 5_000);              // multiple wildcards</code></pre>
-        <p>If the URL doesn't match within <strong>timeoutMs</strong>, <strong><code>waitForURL</code></strong> throws. Omit <strong>timeoutMs</strong> (or pass <code>null</code>) to use the default timeout (e.g. 30 seconds, depending on implementation).</p>
+        <pre><code>await browser.WaitForURLAsync("https://example.com/dashboard", 5_000);
+await browser.WaitForURLAsync("**/dashboard", 5_000);
+await browser.WaitForURLAsync("**/users/*/profile", 5_000);</code></pre>
+        <p>If the URL doesn't match in time, <strong><code>WaitForURLAsync</code></strong> throws. Omit <strong>timeoutMs</strong> to use the default (30 seconds in the API).</p>
 
         <h2 id="navigation-loading-overview">Navigation and loading (overview)</h2>
         <p>Conceptually, showing a new document involves:</p>
         <ol>
-          <li><strong>Navigation</strong> – The URL changes (e.g. by <strong><code>gotoUrl</code></strong> or by clicking a link). The browser resolves the URL and may follow redirects.</li>
+          <li><strong>Navigation</strong> – The URL changes (e.g. by <strong><code>GotoAsync</code></strong> or by clicking a link). The browser resolves the URL and may follow redirects.</li>
           <li><strong>Loading</strong> – The response is received, the document is parsed, scripts run, and the <strong>load</strong> event fires when the document and its main resources are loaded.</li>
         </ol>
-        <p>CSTesting does not expose fine-grained navigation events (e.g. "navigation committed" or "DOMContentLoaded"). You can:</p>
+        <p>You can:</p>
         <ul>
-          <li>Use <strong><code>gotoUrl(url)</code></strong> to start a navigation.</li>
-          <li>Use <strong><code>waitForLoad()</code></strong> / <strong><code>waitForLoad(timeoutMs)</code></strong> to wait until <strong><code>document.readyState === 'complete'</code></strong> (and typically the <code>load</code> event).</li>
-          <li>Use <strong><code>waitForURL(urlOrPattern, timeoutMs)</code></strong> to wait until the current URL matches after an action (e.g. after a click that triggers navigation).</li>
-          <li>Use <strong><code>url()</code></strong> to read the current URL at any time.</li>
+          <li>Use <strong><code>GotoAsync(url)</code></strong> to navigate.</li>
+          <li>Use <strong><code>WaitForLoadAsync()</code></strong> after navigation when you need the full load event.</li>
+          <li>Use <strong><code>WaitForURLAsync(urlOrPattern, timeoutMs)</code></strong> after an action that changes the URL.</li>
+          <li>Use <strong><code>GetUrlAsync()</code></strong> to read the current URL.</li>
         </ul>
-        <p><strong>Optional: wait for network idle</strong></p>
-        <p>If you need to wait until the page has loaded and there are no pending network requests for a short period, you can use <strong><code>waitForNetworkLoad(timeoutMs)</code></strong> (when supported by the backend). This is stricter than <strong><code>waitForLoad</code></strong> and may not be necessary for most tests; prefer <strong><code>waitForLoad</code></strong> and auto-waiting on elements.</p>
+        <p>There is no <code>waitForNetworkIdle</code> helper in the CSTesting .NET surface; rely on <code>WaitForSelectorAsync</code> / element state or Playwright-specific code if you need stricter network idle behavior.</p>
 
         <h2 id="summary">Summary</h2>
         <table class="docs-table">
@@ -158,12 +144,12 @@ browser.waitForURL("**/users/*/profile", 5_000);              // multiple wildca
             <tr><th>Topic</th><th>CSTesting</th></tr>
           </thead>
           <tbody>
-            <tr><td><strong>Open URL</strong></td><td><code>browser.gotoUrl(url)</code></td></tr>
-            <tr><td><strong>Wait for document ready</strong></td><td><code>browser.waitForLoad()</code> or <code>browser.waitForLoad(timeoutMs)</code></td></tr>
-            <tr><td><strong>Back / forward / refresh</strong></td><td><code>browser.back()</code>, <code>browser.forward()</code>, <code>browser.refresh()</code></td></tr>
-            <tr><td><strong>Current URL</strong></td><td><code>browser.url()</code></td></tr>
-            <tr><td><strong>Wait for URL after action</strong></td><td><code>browser.waitForURL(urlOrPattern, timeoutMs)</code> (supports <code>*</code> wildcard)</td></tr>
-            <tr><td><strong>When to interact</strong></td><td>Anytime; actions auto-wait for elements. Use <code>waitForLoad</code> if you want document-ready first.</td></tr>
+            <tr><td><strong>Open URL</strong></td><td><code>await browser.GotoAsync(url)</code></td></tr>
+            <tr><td><strong>Wait for load event</strong></td><td><code>await browser.WaitForLoadAsync()</code></td></tr>
+            <tr><td><strong>Back / forward / refresh</strong></td><td>Not on <code>ICSTestingBrowser</code>; use <code>EvaluateAsync</code> for <code>history</code> if needed</td></tr>
+            <tr><td><strong>Current URL</strong></td><td><code>await browser.GetUrlAsync()</code></td></tr>
+            <tr><td><strong>Wait for URL after action</strong></td><td><code>await browser.WaitForURLAsync(urlOrPattern, timeoutMs)</code></td></tr>
+            <tr><td><strong>When to interact</strong></td><td>Playwright auto-waits on actions; add <code>WaitForSelectorAsync</code> / <code>WaitForURLAsync</code> when needed</td></tr>
             <tr><td><strong>Hydration issues</strong></td><td>Disable controls until the app is hydrated; use slow network to reproduce.</td></tr>
           </tbody>
         </table>

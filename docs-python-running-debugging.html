@@ -86,69 +86,56 @@
         <h1 id="introduction">Running and debugging tests</h1>
 
         <h3 id="intro">Introduction</h3>
-        <p>CSTesting tests are run using the built-in <strong>CSTestingRunner</strong> with <strong>annotations</strong> (<code>@CSTest</code>, <code>@BeforeMethod</code>, <code>@AfterMethod</code>, etc.). You pass the test class to the runner from code or from the command line. The runner creates a <strong>new browser for each test method</strong>, injects it into your test class, and closes it after each test.</p>
-        <p>By default, tests run <strong>headless</strong> (no browser window). To see the browser, run in <strong>headed mode</strong> by setting <strong><code>headless(false)</code></strong> in the browser options.</p>
+        <p>CSTesting for Python (<code>C:\CSTesting-Python</code>) discovers files named <strong><code>*.test.py</code></strong> or <strong><code>*.spec.py</code></strong> (or you pass a path to a single file). Each file is imported so your <code>describe</code> / <code>it</code> calls register suites; then <strong><code>python -m cstesting</code></strong> runs them via <code>cstesting.runner.run</code>. The CLI is implemented in <code>cstesting/cli.py</code>.</p>
+        <p>For <strong>Playwright</strong> tests you choose headless vs headed in <strong><code>create_browser(headless=...)</code></strong> in your own <code>before_all</code> or test code. Config-driven runs (<code>python -m cstesting run login.conf</code> or a <code>.conf</code> path) support <strong><code>--headed</code></strong> on the CLI.</p>
 
-        <h3 id="running-with-runner">Running with CSTestingRunner</h3>
-        <p>Use <strong><code>CSTestingRunner</code></strong> with a test class that extends <strong><code>CSTestingTestBase</code></strong> and uses <strong><code>@CSTest</code></strong>, <strong><code>@BeforeMethod</code></strong>, <strong><code>@AfterMethod</code></strong>, and optionally <strong><code>@BeforeSuite</code></strong>, <strong><code>@AfterSuite</code></strong>, <strong><code>@BeforeClass</code></strong>, <strong><code>@AfterClass</code></strong>. The runner discovers all <strong><code>@CSTest</code></strong> methods in the class and runs them one by one, with a fresh browser per test.</p>
-        <p><strong>Run all tests in a class from code:</strong></p>
-        <pre><code>public static void main(String[] args) {
-    CSTestingRunner.run(MyTest.class);
-}</code></pre>
-        <p><strong>Run with custom options (e.g. headed browser):</strong></p>
-        <pre><code>CSTestingRunner.run(MyTest.class, CSTestingOptions.builder().headless(false).build());</code></pre>
-        <p>Or override <strong><code>getBrowserOptions()</code></strong> in your test class so every run uses those options:</p>
-        <pre><code>@Override
-protected CSTestingOptions getBrowserOptions() {
-    return CSTestingOptions.builder().headless(false).build();
-}</code></pre>
-        <p><strong>Run from command line (Maven):</strong></p>
-        <pre><code>mvn exec:java -Dexec.mainClass="com.cstesting.runner.CSTestingRunner" -Dexec.args="com.example.MyTest"</code></pre>
-        <p>Replace <strong><code>com.example.MyTest</code></strong> with the <strong>fully qualified name</strong> of your test class. The runner executes <strong>every <code>@CSTest</code> method</strong> in that class.</p>
-        <p><strong>Run a single test class:</strong> Pass that class name as the first argument. To run only one test method, use a test class that has a single <strong><code>@CSTest</code></strong> method, or run the class and let the runner execute all its tests.</p>
-        <p><strong>Using the annotation-tests profile (if configured in your project):</strong></p>
-        <pre><code>mvn exec:java -Pannotation-tests</code></pre>
-        <p>This runs whatever test class is configured in the profile (e.g. <code>AnnotationTestExample</code>). Change the profile in <code>pom.xml</code> to point to your own test class if needed.</p>
-        <p>See <a href="docs-python-lifecycle.html">Lifecycle &amp; hooks</a> for the full lifecycle and all annotations.</p>
+        <h3 id="running-with-runner">Running from the CLI</h3>
+        <p>From your project root (with <code>cstesting</code> installed):</p>
+        <pre><code>python -m cstesting
+python -m cstesting example/math_test.py
+python -m cstesting tests/
+python -m cstesting "**/*.test.py"</code></pre>
+        <p>Filter by tags (see <code>docs/CLI.md</code> in the Python repo):</p>
+        <pre><code>python -m cstesting --tag smoke tests/
+python -m cstesting -t smoke,regression "**/*.test.py"</code></pre>
+        <p>Pause after a failure when stdin is a TTY:</p>
+        <pre><code>python -m cstesting tests/ --pause-on-failure</code></pre>
+        <p>See <a href="docs-python-lifecycle.html">Lifecycle &amp; hooks</a> for <code>describe</code>, <code>it</code>, and hooks.</p>
 
-        <h3 id="headed-mode">Run tests in headed mode</h3>
-        <p>By default, the browser runs <strong>headless</strong> (no window). To see the browser window while tests run, set <strong><code>headless(false)</code></strong>:</p>
-        <p><strong>When calling the runner from code:</strong></p>
-        <pre><code>CSTestingRunner.run(MyTest.class, CSTestingOptions.builder().headless(false).build());</code></pre>
-        <p><strong>When the test class is run by the runner:</strong> Override <strong><code>getBrowserOptions()</code></strong> in your test class:</p>
-        <pre><code>@Override
-protected CSTestingOptions getBrowserOptions() {
-    return CSTestingOptions.builder().headless(false).build();
-}</code></pre>
-        <p>Headed mode is useful for <strong>debugging</strong> and watching the test step through the page.</p>
+        <h3 id="headed-mode">Headed browser (Playwright)</h3>
+        <p>For code-first tests, pass <strong><code>headless=False</code></strong> to <code>create_browser</code>:</p>
+        <pre><code>browser = asyncio.get_event_loop().run_until_complete(
+    create_browser(headless=False)
+)</code></pre>
+        <p>For <strong>config</strong> files, use <code>python -m cstesting run my.conf --headed</code> or put <code>headed=true</code> in the <code>.conf</code> file (<code>README.md</code>).</p>
 
         <h3 id="running-from-ide">Running from the IDE</h3>
         <ol>
-          <li><strong>Run the test class's <code>main</code> method</strong> – If your test class has <strong><code>public static void main(String[] args)</code></strong> that calls <strong><code>CSTestingRunner.run(MyTest.class)</code></strong>, run that class as a Java application. All <strong><code>@CSTest</code></strong> methods in that class will run.</li>
-          <li><strong>Debug</strong> – Run the same <code>main</code> in debug mode and set breakpoints in your test methods or in CSTesting code. Execution will stop at breakpoints during the run.</li>
+          <li><strong>Run the module</strong> – Create a run configuration that executes <code>python -m cstesting</code> with working directory set to your project and optional parameters (file path or glob).</li>
+          <li><strong>Debug</strong> – Use the same configuration in debug mode and set breakpoints in your <code>it</code> bodies or in <code>cstesting</code> sources.</li>
         </ol>
 
         <h3 id="debugging-tips">Debugging tips</h3>
         <ol>
-          <li><strong>Headed mode</strong> – Use <strong><code>headless(false)</code></strong> to see what the browser is doing.</li>
-          <li><strong>Slow down</strong> – Add <strong><code>browser.waitForTime(2000)</code></strong> (or similar) before a failing step to watch the page state.</li>
-          <li><strong>Assertions</strong> – Use <strong><code>browser.assertThat(locator).isVisible()</code></strong> and other assertions to fail fast with a clear message.</li>
-          <li><strong>Breakpoints</strong> – Run from the IDE in debug mode and set breakpoints in your test or in CSTesting; step through as each <strong><code>@CSTest</code></strong> method runs.</li>
-          <li><strong>Console / network</strong> – In headed mode, you can use Chrome DevTools (if available) to inspect console logs and network.</li>
+          <li><strong>Headed mode</strong> – <code>create_browser(headless=False)</code> so you can watch the browser.</li>
+          <li><strong>Slow down</strong> – <strong><code>await browser.sleep(2000)</code></strong> or <code>await browser.sleep({"timeout": 2000})</code> before a failing step (see <code>browser.py</code>).</li>
+          <li><strong>Assertions</strong> – Use <strong><code>from cstesting import expect</code></strong> on values from <code>await browser...</code>; there is no <code>browser.assertThat</code>. See <a href="docs-python-assertions.html">Assertions</a>.</li>
+          <li><strong>HTML report</strong> – After a run, check <code>report/report.html</code> (<code>README.md</code>).</li>
+          <li><strong>Console / network</strong> – In headed mode, use Chromium DevTools on the automation window.</li>
         </ol>
 
         <h3 id="summary">Summary</h3>
         <table class="docs-table">
           <thead>
-            <tr><th>Topic</th><th>CSTesting</th></tr>
+            <tr><th>Topic</th><th>Python CSTesting</th></tr>
           </thead>
           <tbody>
-            <tr><td><strong>Run all tests in a class</strong></td><td><code>CSTestingRunner.run(MyTest.class)</code> or Maven: <code>mvn exec:java -Dexec.mainClass="com.cstesting.runner.CSTestingRunner" -Dexec.args="com.example.MyTest"</code>.</td></tr>
-            <tr><td><strong>Run single test class</strong></td><td>Pass that class name as the first argument to the runner. To run one test method only, use a class with a single <code>@CSTest</code> method.</td></tr>
-            <tr><td><strong>Headless (default)</strong></td><td>Default options or <code>CSTestingOptions.builder().headless(true).build()</code>.</td></tr>
-            <tr><td><strong>Headed (see browser)</strong></td><td><code>CSTestingOptions.builder().headless(false).build()</code> or override <code>getBrowserOptions()</code> in your test class.</td></tr>
-            <tr><td><strong>From IDE</strong></td><td>Run the test class's <code>main</code> (which calls <code>CSTestingRunner.run(MyTest.class)</code>). Use debug mode for breakpoints.</td></tr>
-            <tr><td><strong>Debugging</strong></td><td>Run in headed mode, add <code>waitForTime</code> if needed, use assertions and breakpoints in the IDE.</td></tr>
+            <tr><td><strong>Default discovery</strong></td><td><code>python -m cstesting</code> uses <code>**/*.test.py</code> under the current directory.</td></tr>
+            <tr><td><strong>Single file / folder</strong></td><td><code>python -m cstesting path/to/file.py</code> or <code>tests/</code></td></tr>
+            <tr><td><strong>Programmatic</strong></td><td>Import the test module (registers suites), then <code>from cstesting import run; result = run()</code></td></tr>
+            <tr><td><strong>Headless (browser tests)</strong></td><td><code>create_browser(headless=True)</code> (default)</td></tr>
+            <tr><td><strong>Headed</strong></td><td><code>create_browser(headless=False)</code> or config CLI <code>--headed</code></td></tr>
+            <tr><td><strong>From IDE</strong></td><td>Run/debug <code>python -m cstesting</code> with arguments</td></tr>
           </tbody>
         </table>
         <div class="docs-prev-next">

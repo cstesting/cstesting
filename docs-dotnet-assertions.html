@@ -84,107 +84,58 @@
         <div class="docs-main-content" id="docs-main-content">
         <h1 class="docs-section-heading">Assertions</h1>
 
-        <h2 id="list-of-assertions">List of assertions</h2>
-        <p>CSTesting provides <strong><code>browser.assertThat(locator)</code></strong> for element assertions and <strong><code>browser.assertThat()</code></strong> for page assertions. They evaluate <strong>once</strong> (no auto-retry). To wait then assert, use <strong><code>waitForSelector</code></strong> first.</p>
+        <h2 id="list-of-assertions">Assertions in .NET</h2>
+        <p>The C# API in <code>C:\CSTesting-DotNet</code> (<strong><code>ICSTestingBrowser</code></strong>, <strong><code>ICSTestingLocator</code></strong>) does <strong>not</strong> include <code>assertThat</code>. Use <strong>NUnit</strong> (or your test framework) with <strong><code>Assert.That(actual, constraint)</code></strong>, and pass values from the async browser API (<code>await ...</code>). Waits such as <strong><code>WaitForSelectorAsync</code></strong> / <strong><code>WaitForURLAsync</code></strong> run before you assert.</p>
 
-        <h3 id="element-assertions">Element assertions</h3>
+        <h3 id="element-assertions">Common checks (element)</h3>
         <table class="docs-table">
           <thead>
             <tr>
-              <th>Assertion</th>
-              <th>Description</th>
+              <th>Idea</th>
+              <th>Example</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td><code>assertThat(locator).isVisible()</code></td><td>Element is visible</td></tr>
-            <tr><td><code>assertThat(locator).isEditable()</code></td><td>Element is editable (not disabled, not readonly)</td></tr>
-            <tr><td><code>assertThat(locator).isEmpty()</code></td><td>Element value or text is empty</td></tr>
-            <tr><td><code>assertThat(locator).isEnabled()</code></td><td>Element is enabled</td></tr>
-            <tr><td><code>assertThat(locator).isDisabled()</code></td><td>Element is disabled</td></tr>
-            <tr><td><code>assertThat(locator).contains(expected)</code></td><td>Text or value contains the given string</td></tr>
-            <tr><td><code>assertThat(locator).hasText(expected)</code></td><td>Element text matches or contains the expected text</td></tr>
-            <tr><td><code>assertThat(locator).containText(expected)</code></td><td>Element text contains the given string</td></tr>
-            <tr><td><code>assertThat(locator).hasValue(expected)</code></td><td>Input/select value equals the expected string</td></tr>
-            <tr><td><code>assertThat(locator).containValue(expected)</code></td><td>Input/select value contains the given string</td></tr>
-            <tr><td><code>assertThat(locator).hasAttribute(name)</code></td><td>Element has the DOM attribute (any value)</td></tr>
-            <tr><td><code>assertThat(locator).hasAttribute(name, value)</code></td><td>Element attribute equals the expected value</td></tr>
-            <tr><td><code>assertThat(locator).count(n)</code></td><td>Number of matching elements equals n</td></tr>
-            <tr><td><code>assertThat(locator).hasCount(n)</code></td><td>Same as <code>count(n)</code> — list has exact number of matches</td></tr>
+            <tr><td>Visible</td><td><code>Assert.That(await Browser.IsVisibleAsync("h1"), Is.True);</code> or <code>await Browser.Locator("h1").IsVisibleAsync()</code></td></tr>
+            <tr><td>Text content</td><td><code>var t = await Browser.Locator("h1").GetTextContentAsync(); Assert.That(t, Does.Contain("Example"));</code></td></tr>
+            <tr><td>Attribute</td><td><code>var href = await Browser.Locator("a").First().GetAttributeAsync("href"); Assert.That(href, Is.Not.Empty);</code></td></tr>
+            <tr><td>Disabled / editable / selected</td><td><code>Assert.That(await Browser.IsDisabledAsync("#x"), Is.True);</code> — same pattern for <code>IsEditableAsync</code>, <code>IsSelectedAsync</code></td></tr>
           </tbody>
         </table>
 
-        <h3 id="page-assertions">Page assertions</h3>
+        <h3 id="page-assertions">Common checks (page)</h3>
         <table class="docs-table">
           <thead>
             <tr>
-              <th>Assertion</th>
-              <th>Description</th>
+              <th>Idea</th>
+              <th>Example</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td><code>assertThat().hasTitle(expected)</code></td><td>Page title equals or contains the expected string</td></tr>
-            <tr><td><code>assertThat().hasURL(pattern)</code></td><td>Page URL contains or matches pattern (<code>*</code> as wildcard)</td></tr>
+            <tr><td>URL</td><td><code>var url = await Browser.GetUrlAsync(); Assert.That(url, Does.Contain("example.com"));</code> or <code>await Browser.WaitForURLAsync("**/welcome", 10_000);</code></td></tr>
+            <tr><td>Title</td><td><code>var title = await Browser.EvaluateAsync&lt;string&gt;("document.title"); Assert.That(title, Does.Contain("Example"));</code></td></tr>
+            <tr><td>HTML snippet</td><td><code>var html = await Browser.ContentAsync(); Assert.That(html, Does.Contain("body"));</code></td></tr>
           </tbody>
         </table>
 
-        <h2 id="comparison-playwright">Comparison with Playwright</h2>
-        <p>Below is how CSTesting assertions map to a Playwright-style list. <strong>Supported</strong> = available in CSTesting; <strong>Not yet</strong> = not implemented.</p>
-
-        <table class="docs-table">
-          <thead>
-            <tr>
-              <th>Assertion</th>
-              <th>Description</th>
-              <th>CSTesting</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td><code>assertThat(locator).isAttached()</code></td><td>Element is attached to DOM</td><td><strong>Not yet</strong> — use <code>waitForSelector</code> then assert</td></tr>
-            <tr><td><code>assertThat(locator).isChecked()</code></td><td>Checkbox is checked</td><td><strong>Not yet</strong></td></tr>
-            <tr><td><code>assertThat(locator).isDisabled()</code></td><td>Element is disabled</td><td>✓ <code>isDisabled()</code></td></tr>
-            <tr><td><code>assertThat(locator).isEditable()</code></td><td>Element is editable</td><td>✓ <code>isEditable()</code></td></tr>
-            <tr><td><code>assertThat(locator).isEmpty()</code></td><td>Container is empty</td><td>✓ <code>isEmpty()</code> (value or text)</td></tr>
-            <tr><td><code>assertThat(locator).isEnabled()</code></td><td>Element is enabled</td><td>✓ <code>isEnabled()</code></td></tr>
-            <tr><td><code>assertThat(locator).isFocused()</code></td><td>Element is focused</td><td><strong>Not yet</strong></td></tr>
-            <tr><td><code>assertThat(locator).isHidden()</code></td><td>Element is not visible</td><td><strong>Not yet</strong> — use <code>!isVisible()</code> or assert after wait</td></tr>
-            <tr><td><code>assertThat(locator).isInViewport()</code></td><td>Element intersects viewport</td><td><strong>Not yet</strong></td></tr>
-            <tr><td><code>assertThat(locator).isVisible()</code></td><td>Element is visible</td><td>✓ <code>isVisible()</code></td></tr>
-            <tr><td><code>assertThat(locator).containsClass()</code></td><td>Element has specified CSS classes</td><td><strong>Not yet</strong> — use <code>hasAttribute("class", ...)</code></td></tr>
-            <tr><td><code>assertThat(locator).containsText()</code></td><td>Element contains text</td><td>✓ <code>containText(expected)</code></td></tr>
-            <tr><td><code>assertThat(locator).hasAccessibleDescription()</code></td><td>Accessible description</td><td><strong>Not yet</strong></td></tr>
-            <tr><td><code>assertThat(locator).hasAccessibleName()</code></td><td>Accessible name</td><td><strong>Not yet</strong></td></tr>
-            <tr><td><code>assertThat(locator).hasAttribute()</code></td><td>Element has a DOM attribute</td><td>✓ <code>hasAttribute(name)</code> / <code>hasAttribute(name, value)</code></td></tr>
-            <tr><td><code>assertThat(locator).hasClass()</code></td><td>Element has a class</td><td><strong>Not yet</strong> — use <code>hasAttribute("class", "foo")</code> or check attribute</td></tr>
-            <tr><td><code>assertThat(locator).hasCount()</code></td><td>List has exact number of children</td><td>✓ <code>hasCount(n)</code> / <code>count(n)</code></td></tr>
-            <tr><td><code>assertThat(locator).hasCSS()</code></td><td>Element has CSS property</td><td><strong>Not yet</strong></td></tr>
-            <tr><td><code>assertThat(locator).hasId()</code></td><td>Element has an ID</td><td><strong>Not yet</strong> — use <code>hasAttribute("id", "myId")</code></td></tr>
-            <tr><td><code>assertThat(locator).hasJSProperty()</code></td><td>Element has JS property</td><td><strong>Not yet</strong></td></tr>
-            <tr><td><code>assertThat(locator).hasRole()</code></td><td>Element has ARIA role</td><td><strong>Not yet</strong></td></tr>
-            <tr><td><code>assertThat(locator).hasText()</code></td><td>Element matches text</td><td>✓ <code>hasText(expected)</code></td></tr>
-            <tr><td><code>assertThat(locator).hasValue()</code></td><td>Input has a value</td><td>✓ <code>hasValue(expected)</code></td></tr>
-            <tr><td><code>assertThat(locator).hasValues()</code></td><td>Select has options selected</td><td><strong>Not yet</strong> — use <code>getSelectedValues()</code> and assert in code</td></tr>
-            <tr><td><code>assertThat(locator).matchesAriaSnapshot()</code></td><td>Matches ARIA snapshot</td><td><strong>Not yet</strong></td></tr>
-            <tr><td><code>assertThat(page).hasTitle()</code></td><td>Page has a title</td><td>✓ <code>assertThat().hasTitle(expected)</code></td></tr>
-            <tr><td><code>assertThat(page).hasURL()</code></td><td>Page has a URL</td><td>✓ <code>assertThat().hasURL(pattern)</code></td></tr>
-            <tr><td><code>assertThat(response).isOK()</code></td><td>Response has OK status</td><td><strong>Not yet</strong> — no response API in CSTesting</td></tr>
-          </tbody>
-        </table>
+        <h2 id="comparison-playwright">Matching many elements</h2>
+        <p><strong><code>ICSTestingLocator</code></strong> from <code>Browser.Locator(selector)</code> targets the <strong>first</strong> match (see <code>CSTestingBrowser.Locator</code>). To count matches, use JavaScript, for example:</p>
+        <pre><code>var n = await Browser.EvaluateAsync&lt;int&gt;(
+    "() => document.querySelectorAll('li').length");
+Assert.That(n, Is.EqualTo(5));</code></pre>
 
         <h2 id="usage">Usage</h2>
-        <pre><code>// Element assertions
-browser.assertThat(browser.locator("h1")).isVisible();
-browser.assertThat(browser.locator("#email")).isEditable();
-browser.assertThat(browser.locator("button[type=submit]")).isEnabled();
-browser.assertThat(browser.locator(".message")).containText("Success");
-browser.assertThat(browser.locator("input[name=user]")).hasValue("alice");
-browser.assertThat(browser.locator("li")).hasCount(5);
+        <pre><code>await Browser!.GotoAsync("https://example.com");
 
-// Page assertions
-browser.assertThat().hasTitle("Example Domain");
-browser.assertThat().hasURL("https://example.com");
-browser.assertThat().hasURL("**/dashboard");</code></pre>
+Assert.That(await Browser.Locator("h1").GetTextContentAsync(),
+    Does.Contain("Example"));
 
-        <p>All assertions throw <strong><code>AssertionError</code></strong> on failure.</p>
+Assert.That(await Browser.GetUrlAsync(), Does.Contain("example.com"));
+
+var title = await Browser.EvaluateAsync&lt;string&gt;("document.title");
+Assert.That(title, Is.Not.Empty);</code></pre>
+
+        <p>Failed NUnit assertions throw <strong><code>AssertionException</code></strong> (or reported failure), not CSTesting’s Java-style <code>AssertionError</code>.</p>
         <div class="docs-prev-next">
           <a href="docs-dotnet-waits.html" class="docs-prev">
             <span class="docs-prev-next-label">Previous</span>

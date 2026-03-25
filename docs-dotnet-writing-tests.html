@@ -85,102 +85,81 @@
         <h1 class="docs-section-heading">Writing tests</h1>
 
         <h2 id="writing-tests-intro">Introduction</h2>
-        <p>CSTesting assertions are designed for the dynamic web. Use <strong><code>assertThat()</code></strong> for page-level checks (title, URL) and <strong><code>assertThat(locator)</code></strong> for element-level checks (visible, attribute, text, value). Assertions throw <strong><code>AssertionError</code></strong> on failure. Use <strong><code>waitForSelector</code></strong>, <strong><code>waitForLoad</code></strong>, or <strong><code>waitForURL</code></strong> when you need to wait for conditions before asserting or acting.</p>
-        <p>The example below shows how to write a test using assertions, locators, and selectors.</p>
-        <pre><code>package org.example;
+        <p>CSTesting for .NET (<code>C:\CSTesting-DotNet</code>) uses <strong>async</strong> methods on <strong><code>ICSTestingBrowser</code></strong> and <strong><code>ICSTestingLocator</code></strong> (see <code>README.md</code>). Tests are ordinary <strong>NUnit</strong> tests: use <strong><code>Assert.That</code></strong> with values from <code>await Browser....</code>. There is no <code>assertThat</code> on the browser.</p>
+        <p>The snippet below matches the style of <code>tests/CSTesting.Tests/SampleRecordedTest.cs</code>.</p>
+        <pre><code>using System.Threading.Tasks;
+using CSTesting;
+using CSTesting.NUnit;
+using NUnit.Framework;
+using static CSTesting.CSTesting;
 
-import com.cstesting.CSTesting;
-import com.cstesting.CSTestingBrowser;
-import com.cstesting.CSTestingOptions;
+[TestFixture]
+public class ExampleTests : CSTestingNUnitBrowserFixtureBase
+{
+    [SetUp]
+    public async Task SetUp()
+    {
+        if (Browser == null)
+            Browser = await CreateBrowserAsync(new CSTestingOptions { Headless = true });
+    }
 
-public class App {
-    public static void main(String[] args) {
-        CSTestingBrowser browser = CSTesting.createBrowser(
-            CSTestingOptions.builder().headless(true).build()
-        );
-        try {
-            browser.gotoUrl("https://example.com");
+    [Test]
+    public async Task Example_Loads()
+    {
+        await Browser!.GotoAsync("https://example.com");
+        var title = await Browser.EvaluateAsync&lt;string&gt;("document.title");
+        Assert.That(title, Does.Contain("Example"));
 
-            // Expect the page title to contain a substring.
-            browser.assertThat().hasTitle("Example");
+        var href = await Browser.Locator("a").First().GetAttributeAsync("href");
+        Assert.That(href, Is.Not.Empty);
 
-            // Create a locator and expect an attribute to match.
-            var link = browser.locator("a").first();
-            browser.assertThat(link).hasAttribute("href");
-
-            // Click the link (e.g. "More information...").
-            link.click();
-
-            // Wait for navigation and expect a heading to be visible.
-            browser.waitForLoad(5_000);
-            browser.assertThat(browser.locator("h1")).isVisible();
-        } finally {
-            browser.close();
-        }
+        await Browser.ClickAsync("a");
+        await Browser.WaitForLoadAsync();
+        Assert.That(await Browser.Locator("h1").IsVisibleAsync(), Is.True);
     }
 }</code></pre>
 
         <h2 id="assertions">Assertions</h2>
-        <p>Use <strong><code>browser.assertThat()</code></strong> for the page and <strong><code>browser.assertThat(locator)</code></strong> for elements. Assertions are fluent and throw <code>AssertionError</code> if the condition is not met.</p>
-        <p><strong>Page assertions:</strong></p>
-        <pre><code>// Title contains or equals the expected string.
-browser.assertThat().hasTitle("Example Domain");
+        <p>Use NUnit constraints with data from the browser API.</p>
+        <p><strong>Page:</strong></p>
+        <pre><code>var url = await Browser!.GetUrlAsync();
+Assert.That(url, Does.Contain("example.com"));
 
-// URL contains the string or matches a pattern (use * as wildcard).
-browser.assertThat().hasURL("https://example.com");
-browser.assertThat().hasURL("**/example*");</code></pre>
+var title = await Browser.EvaluateAsync&lt;string&gt;("document.title");
+Assert.That(title, Does.Contain("Example Domain"));</code></pre>
 
-        <p><strong>Element assertions:</strong></p>
-        <pre><code>// Visibility and state.
-browser.assertThat(browser.locator("button")).isVisible();
-browser.assertThat(browser.locator("#name")).isEditable();
-browser.assertThat(browser.locator("input")).isEnabled();
-browser.assertThat(browser.locator("[disabled]")).isDisabled();
+        <p><strong>Element:</strong></p>
+        <pre><code>Assert.That(await Browser!.Locator("h1").GetTextContentAsync(),
+    Does.Contain("Welcome"));
 
-// Text and value.
-browser.assertThat(browser.locator("h1")).hasText("Example");
-browser.assertThat(browser.locator("h1")).containText("Example");
-browser.assertThat(browser.locator("#search")).hasValue("query");
-browser.assertThat(browser.locator("#search")).containValue("query");
+Assert.That(await Browser.IsVisibleAsync("button"), Is.True);
+Assert.That(await Browser.IsDisabledAsync("#submit"), Is.False);
 
-// Attributes.
-browser.assertThat(browser.locator("a").first()).hasAttribute("href");
-browser.assertThat(browser.locator("a").first()).hasAttribute("href", "https://example.com");
-
-// Count of matching elements.
-browser.assertThat(browser.locator("button")).count(3);
-browser.assertThat(browser.locator("li")).hasCount(5);</code></pre>
+var val = await Browser.Locator("#search").GetAttributeAsync("value");
+Assert.That(val, Is.EqualTo("query"));</code></pre>
+        <p>See <a href="docs-dotnet-assertions.html">Assertions</a> for more patterns.</p>
 
         <h2 id="locators">Locators</h2>
-        <p>Locators represent a way to find element(s) on the page. Create them with <strong><code>browser.locator(selector)</code></strong> and use them for actions (<code>.click()</code>, <code>.type()</code>, etc.) and assertions. If the selector matches <strong>multiple</strong> elements, use <strong><code>.first()</code></strong>, <strong><code>.last()</code></strong>, or <strong><code>.nth(index)</code></strong> before performing an action.</p>
-        <p><strong>Selector formats:</strong> CSS (default), XPath (<code>//button</code> or <code>xpath=//button</code>), <code>id=value</code>, <code>name=value</code>, or any <code>attr=value</code>.</p>
-        <pre><code>// By text (XPath).
-var getStarted = browser.locator("//a[contains(.,'Get Started')]").first();
-browser.assertThat(getStarted).hasAttribute("href", "/docs/intro");
-getStarted.click();
+        <p>Create locators with <strong><code>Browser.Locator(selector)</code></strong>. Actions are async: <strong><code>await loc.ClickAsync()</code></strong>, <strong><code>await loc.TypeAsync("text")</code></strong>. For multiple matches use <strong><code>.First()</code></strong>, <strong><code>.Last()</code></strong>, or <strong><code>.Nth(n)</code></strong> on <strong><code>ICSTestingLocator</code></strong>.</p>
+        <p><strong>Selector formats:</strong> Playwright-style — CSS, XPath (<code>//...</code>), <code>id=</code>, <code>name=</code>, etc. (see <a href="docs-dotnet-locators.html">Locators</a>).</p>
+        <pre><code>var link = Browser!.Locator("//a[contains(.,'More information')]").First();
+var href = await link.GetAttributeAsync("href");
+Assert.That(href, Does.Contain("iana"));
+await link.ClickAsync();
 
-// By CSS or id/name.
-browser.assertThat(browser.locator("h1")).isVisible();
-browser.assertThat(browser.locator("id=submit")).isEnabled();
-browser.locator("name=email").type("user@example.com");</code></pre>
-
-        <p>See <a href="#locators">Locators</a> for the full list of selector formats and locator methods.</p>
+await Browser.TypeAsync("name=email", "user@example.com");</code></pre>
 
         <h2 id="test-isolation">Test isolation</h2>
-        <p>Create a <strong>new browser</strong> for each test so that tests do not share state (cookies, storage, or tabs). Open the browser at the start of the test and close it in a <code>finally</code> block (or use try-with-resources if you wrap the API).</p>
-        <pre><code>public void testLogin() {
-    CSTestingBrowser browser = CSTesting.createBrowser(
-        CSTestingOptions.builder().headless(true).build()
-    );
-    try {
-        browser.gotoUrl("https://example.com/login");
-        browser.locator("name=user").type("alice");
-        browser.locator("name=pass").type("secret");
-        browser.locator("button[type=submit]").click();
-        browser.assertThat().hasURL("**/welcome");
-    } finally {
-        browser.close();
-    }
+        <p>Create a <strong>new browser per test</strong> in <code>[SetUp]</code> (or per fixture) so cookies and storage do not leak. With <strong><code>CSTestingNUnitBrowserFixtureBase</code></strong>, the base <code>[TearDown]</code> closes the browser after each test. Alternatively, use <code>await using</code> with <code>CreateBrowserAsync</code> inside a single test (<code>ICSTestingBrowser</code> implements <code>IAsyncDisposable</code>).</p>
+        <pre><code>[Test]
+public async Task Login_Redirects()
+{
+    await using var browser = await CreateBrowserAsync(new CSTestingOptions { Headless = true });
+    await browser.GotoAsync("https://example.com/login");
+    await browser.TypeAsync("name=user", "alice");
+    await browser.TypeAsync("name=pass", "secret");
+    await browser.ClickAsync("button[type=submit]");
+    await browser.WaitForURLAsync("**/welcome", 10_000);
 }</code></pre>
         <div class="docs-prev-next">
           <a href="docs-dotnet.html#installation" class="docs-prev">

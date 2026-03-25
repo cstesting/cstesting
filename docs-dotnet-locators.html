@@ -85,7 +85,7 @@
         <h1 class="docs-section-heading">Locators</h1>
 
         <h2 id="introduction">Introduction</h2>
-        <p>Locators are how you find element(s) on the page in CSTesting. They work with <strong>auto-waiting</strong>: before an action (click, type, etc.), CSTesting waits for the element to be actionable. You create a locator with <strong><code>browser.locator(selector)</code></strong> and then call actions or assertions on it.</p>
+        <p>Locators are how you find element(s) on the page. <strong><code>ICSTestingLocator</code></strong> (<code>C:\CSTesting-DotNet</code>) uses Playwright auto-waiting before <code>ClickAsync</code>, <code>TypeAsync</code>, etc. Create one with <strong><code>browser.Locator(selector)</code></strong> (PascalCase methods in C#). Short snippets below omit <code>await</code>; in tests write <code>await browser.Locator(...).ClickAsync()</code>. Use <strong>NUnit <code>Assert.That</code></strong> instead of any <code>assertThat</code> API.</p>
         <p>Each time a locator is used for an action, the element is resolved at that moment. If the DOM changes between calls (e.g. re-render), the next action uses the current matching element.</p>
 
         <h2 id="quick-guide">Quick guide</h2>
@@ -107,13 +107,13 @@
         </table>
 
         <p><strong>Example (login-style flow):</strong></p>
-        <pre><code>browser.locator("name=user").type("John");
-browser.locator("name=password").type("secret-password");
-browser.locator("//button[contains(.,'Sign in')]").first().click();
-browser.assertThat(browser.locator("//*[contains(.,'Welcome, John!')]")).isVisible();</code></pre>
+        <pre><code>browser.Locator("name=user").type("John");
+browser.Locator("name=password").type("secret-password");
+browser.Locator("//button[contains(.,'Sign in')]").First().click();
+Assert.That(await browser.Locator("//*[contains(.,'Welcome, John!')]").IsVisibleAsync(), Is.True);</code></pre>
 
         <h2 id="selector-formats">Selector formats</h2>
-        <p>Create a locator with <strong><code>browser.locator(selector)</code></strong>. The selector can be:</p>
+        <p>Create a locator with <strong><code>browser.Locator(selector)</code></strong>. The selector can be:</p>
 
         <table class="docs-table">
           <thead>
@@ -128,11 +128,11 @@ browser.assertThat(browser.locator("//*[contains(.,'Welcome, John!')]")).isVisib
           </tbody>
         </table>
 
-        <p>When <strong>multiple elements</strong> match, use <strong><code>.first()</code></strong>, <strong><code>.last()</code></strong>, or <strong><code>.nth(index)</code></strong> before an action; otherwise the action throws.</p>
-        <pre><code>browser.locator("button").click();                    // OK if exactly one button
-browser.locator("button").first().click();            // first match
-browser.locator("li").nth(2).click();                 // third item
-browser.locator("a").last().click();                  // last link</code></pre>
+        <p>When <strong>multiple elements</strong> match, use <strong><code>.First()</code></strong>, <strong><code>.Last()</code></strong>, or <strong><code>.Nth(index)</code></strong> before an action; otherwise the action throws.</p>
+        <pre><code>browser.Locator("button").click();                    // OK if exactly one button
+browser.Locator("button").First().click();            // first match
+browser.Locator("li").Nth(2).click();                 // third item
+browser.Locator("a").Last().click();                  // last link</code></pre>
 
         <h2 id="locating-elements">Locating elements</h2>
 
@@ -145,11 +145,11 @@ browser.locator("a").last().click();                  // last link</code></pre>
           <li><strong>Link:</strong> <code>"a"</code>, <code>"a[href='/login']"</code></li>
         </ul>
         <p><strong>Example – button with text "Sign in":</strong></p>
-        <pre><code>browser.locator("//button[contains(.,'Sign in')]").first().click();</code></pre>
+        <pre><code>browser.Locator("//button[contains(.,'Sign in')]").First().click();</code></pre>
         <p><strong>Example – heading "Sign up", checkbox "Subscribe", button "Submit":</strong></p>
-        <pre><code>browser.assertThat(browser.locator("//h3[.='Sign up']")).isVisible();
-browser.locator("//label[contains(.,'Subscribe')]//input").check();
-browser.locator("//button[contains(.,'Submit')]").first().click();</code></pre>
+        <pre><code>Assert.That(await browser.Locator("//h3[.='Sign up']").IsVisibleAsync(), Is.True);
+await browser.Locator("//label[contains(.,'Subscribe')]//input").CheckAsync();
+await browser.Locator("//button[contains(.,'Submit')]").First().ClickAsync();</code></pre>
         <p><strong>When to use:</strong> Prefer role/tag-based selectors (e.g. <code>button</code>, <code>input[type=checkbox]</code>) plus text or attributes so tests align with how users see the page.</p>
 
         <h3 id="locate-by-label">Locate by label</h3>
@@ -160,105 +160,108 @@ browser.locator("//button[contains(.,'Submit')]").first().click();</code></pre>
           <li>Use <strong>XPath</strong> to find the input by its label text: <code>"//label[contains(.,'Password')]//input"</code> or <code>"//input[@id=//label[contains(.,'Password')]/@for]"</code> if you have <code>for</code>/<code>id</code> association.</li>
         </ul>
         <p><strong>Example:</strong></p>
-        <pre><code>browser.locator("name=password").type("secret");
+        <pre><code>browser.Locator("name=password").type("secret");
 // or by label text
-browser.locator("//label[contains(.,'Password')]//input").type("secret");</code></pre>
+browser.Locator("//label[contains(.,'Password')]//input").type("secret");</code></pre>
         <p><strong>When to use:</strong> Use when locating form fields; prefer <code>name=</code> or <code>id=</code> when possible.</p>
 
         <h3 id="locate-by-placeholder">Locate by placeholder</h3>
         <p>Use the <strong>placeholder</strong> attribute (CSS or attribute shortcut):</p>
-        <pre><code>browser.locator("[placeholder='name@example.com']").type("playwright@microsoft.com");
-browser.locator("placeholder=name@example.com").type("user@example.com");</code></pre>
+        <pre><code>browser.Locator("[placeholder='name@example.com']").type("playwright@microsoft.com");
+browser.Locator("placeholder=name@example.com").type("user@example.com");</code></pre>
         <p><strong>When to use:</strong> When the field has no (reliable) label but has a placeholder.</p>
 
         <h3 id="locate-by-text">Locate by text</h3>
         <p>Use <strong>XPath</strong> and <strong><code>contains(., 'text')</code></strong> or exact match <strong><code>.='text'</code></strong>:</p>
-        <pre><code>browser.assertThat(browser.locator("//*[contains(.,'Welcome, John')]")).isVisible();
-browser.assertThat(browser.locator("//span[.='Welcome, John']")).isVisible();</code></pre>
+        <pre><code>Assert.That(await browser.Locator("//*[contains(.,'Welcome, John')]").IsVisibleAsync(), Is.True);
+Assert.That(await browser.Locator("//span[.='Welcome, John']").IsVisibleAsync(), Is.True);</code></pre>
         <p>For a <strong>button</strong> or <strong>link</strong> with text, narrow the tag to avoid matching random divs:</p>
-        <pre><code>browser.locator("//button[contains(.,'Sign in')]").first().click();
-browser.locator("//a[contains(.,'Get Started')]").first().click();</code></pre>
+        <pre><code>browser.Locator("//button[contains(.,'Sign in')]").First().click();
+browser.Locator("//a[contains(.,'Get Started')]").First().click();</code></pre>
         <p><strong>When to use:</strong> For non-interactive elements (div, span, p) use text locators. For buttons/links, combine tag + text (e.g. <code>//button[contains(.,'...')]</code>).</p>
 
         <h3 id="locate-by-alt">Locate by alt text</h3>
         <p>Use <strong>CSS</strong> or attribute shortcut for images:</p>
-        <pre><code>browser.locator("img[alt='playwright logo']").click();
-browser.locator("alt=playwright logo").click();</code></pre>
+        <pre><code>browser.Locator("img[alt='playwright logo']").click();
+browser.Locator("alt=playwright logo").click();</code></pre>
         <p><strong>When to use:</strong> For <code>img</code> or <code>area</code> elements with <code>alt</code> text.</p>
 
         <h3 id="locate-by-title">Locate by title</h3>
         <p>Use the <strong>title</strong> attribute:</p>
-        <pre><code>browser.assertThat(browser.locator("[title='Issues count']")).hasText("25 issues");
-browser.locator("title=Issues count").getTextContent();</code></pre>
+        <pre><code>var issues = await browser.Locator("[title='Issues count']").GetTextContentAsync();
+Assert.That(issues, Does.Contain("25 issues"));
+await browser.Locator("title=Issues count").GetTextContentAsync();</code></pre>
 
         <h3 id="locate-by-test-id">Locate by test id</h3>
         <p>Use <strong><code>data-testid=</code></strong> (or any <code>attr=value</code> for a custom attribute):</p>
-        <pre><code>browser.locator("data-testid=directions").click();
-browser.locator("[data-testid='directions']").click();</code></pre>
+        <pre><code>browser.Locator("data-testid=directions").click();
+browser.Locator("[data-testid='directions']").click();</code></pre>
         <p><strong>When to use:</strong> For a stable testing contract. Less user-facing than role/text; combine with role or text when the visible behavior matters.</p>
         <p><strong>Custom test id attribute:</strong> If your app uses e.g. <code>data-pw</code> instead of <code>data-testid</code>, use the attribute shortcut: <code>"data-pw=directions"</code> → <code>[data-pw="directions"]</code>.</p>
 
         <h3 id="locate-by-css-xpath">Locate by CSS or XPath</h3>
-        <p>Use <strong><code>browser.locator(selector)</code></strong> with a CSS selector or XPath. CSS is default; XPath is used when the string starts with <code>//</code> or <code>xpath=</code>.</p>
-        <pre><code>browser.locator("button").click();
-browser.locator("//button").click();
-browser.locator("css=button").click();
-browser.locator("xpath=//button").click();</code></pre>
+        <p>Use <strong><code>browser.Locator(selector)</code></strong> with a CSS selector or XPath. CSS is default; XPath is used when the string starts with <code>//</code> or <code>xpath=</code>.</p>
+        <pre><code>browser.Locator("button").click();
+browser.Locator("//button").click();
+browser.Locator("css=button").click();
+browser.Locator("xpath=//button").click();</code></pre>
         <p><strong>When to use:</strong> Prefer <strong>user-facing</strong> selectors (role/tag + text, label, placeholder, test id). Avoid long CSS/XPath chains tied to layout (e.g. <code>#tsf > div:nth-child(2) > ...</code>); they break when the DOM changes.</p>
 
         <h2 id="locators-inside-frames">Locators inside frames</h2>
-        <p>To interact with elements inside an <strong>iframe</strong>, get a browser scoped to the frame, then use <strong><code>locator</code></strong> on it:</p>
-        <pre><code>CSTestingBrowser frame = browser.frame("iframe#my-frame");
-frame.locator("button").click();
-frame.locator("name=user").type("John");</code></pre>
+        <p>Get an <strong><code>ICSTestingFrame</code></strong> with <strong><code>await browser.FrameAsync(...)</code></strong>, then use <strong><code>frame.Locator(...)</code></strong>:</p>
+        <pre><code>var frame = await browser.FrameAsync("iframe#my-frame");
+await frame.Locator("button").ClickAsync();
+await frame.TypeAsync("name=user", "John");</code></pre>
         <p>See <a href="docs-dotnet-frames.html">Frames</a> for nested frames and more examples.</p>
 
         <h2 id="multiple-matches">Multiple matches and strictness</h2>
-        <p>Locators are <strong>strict</strong>: if an <strong>action</strong> (click, type, check, etc.) is performed and the selector matches <strong>more than one</strong> element, CSTesting throws. Use <strong><code>.first()</code></strong>, <strong><code>.last()</code></strong>, or <strong><code>.nth(index)</code></strong> to pick one.</p>
+        <p>Locators are <strong>strict</strong>: if an <strong>action</strong> (click, type, check, etc.) is performed and the selector matches <strong>more than one</strong> element, CSTesting throws. Use <strong><code>.First()</code></strong>, <strong><code>.Last()</code></strong>, or <strong><code>.Nth(index)</code></strong> to pick one.</p>
         <p><strong>Throws if more than one button:</strong></p>
-        <pre><code>browser.locator("button").click();  // error if multiple buttons</code></pre>
+        <pre><code>browser.Locator("button").click();  // error if multiple buttons</code></pre>
         <p><strong>OK – explicitly pick one:</strong></p>
-        <pre><code>browser.locator("button").first().click();
-browser.locator("button").nth(1).click();
-browser.locator("button").last().click();</code></pre>
-        <p><strong>Count is OK with multiple matches:</strong></p>
-        <pre><code>int n = browser.locatorCount(browser.locator("button"));
-browser.assertThat(browser.locator("button")).hasCount(3);</code></pre>
-        <p>Use <strong><code>.first()</code> / <code>.last()</code> / <code>.nth()</code></strong> only when necessary; prefer a selector that uniquely identifies the element (e.g. text, test id, or more specific CSS/XPath).</p>
+        <pre><code>browser.Locator("button").First().click();
+browser.Locator("button").Nth(1).click();
+browser.Locator("button").Last().click();</code></pre>
+        <p><strong>Count matches:</strong> use <strong><code>EvaluateAsync</code></strong> (there is no <code>LocatorCount</code> on the browser API):</p>
+        <pre><code>var n = await browser.EvaluateAsync&lt;int&gt;(
+    "() => document.querySelectorAll('button').length");
+Assert.That(n, Is.EqualTo(3));</code></pre>
+        <p>Use <strong><code>.First()</code> / <code>.Last()</code> / <code>.Nth()</code></strong> only when necessary; prefer a selector that uniquely identifies the element (e.g. text, test id, or more specific CSS/XPath).</p>
 
         <h2 id="lists">Lists</h2>
 
         <h3 id="count-items">Count items</h3>
-        <p>Use <strong><code>assertThat(locator).hasCount(n)</code></strong> or <strong><code>browser.locatorCount(locator)</code></strong>:</p>
-        <pre><code>browser.assertThat(browser.locator("li")).hasCount(3);
-int count = browser.locatorCount(browser.locator("li"));</code></pre>
+        <p>Use <strong><code>EvaluateAsync</code></strong> to count nodes, then <strong><code>Assert.That</code></strong>:</p>
+        <pre><code>var count = await browser.EvaluateAsync&lt;int&gt;(
+    "() => document.querySelectorAll('li').length");
+Assert.That(count, Is.EqualTo(3));</code></pre>
 
         <h3 id="get-item-by-text">Get a specific item by text</h3>
         <p>Use <strong>XPath</strong> to find the list item that contains the text, then act on it:</p>
-        <pre><code>browser.locator("//li[contains(.,'orange')]").click();</code></pre>
+        <pre><code>browser.Locator("//li[contains(.,'orange')]").click();</code></pre>
 
         <h3 id="get-by-index">Get by index (nth)</h3>
         <p>When order is the only way to distinguish items:</p>
-        <pre><code>Locator secondItem = browser.locator("li").nth(1);
-secondItem.click();</code></pre>
-        <p>Use <strong><code>.nth()</code></strong> with care: if the list order changes, the wrong element may be targeted. Prefer text or test id when possible.</p>
+        <pre><code>var secondItem = browser.Locator("li").Nth(1);
+await secondItem.ClickAsync();</code></pre>
+        <p>Use <strong><code>.Nth()</code></strong> with care: if the list order changes, the wrong element may be targeted. Prefer text or test id when possible.</p>
 
         <h3 id="assert-text-in-list">Assert text in a list</h3>
         <p>Assert that a locator's text matches:</p>
-        <pre><code>browser.assertThat(browser.locator("//li[contains(.,'apple')]")).isVisible();
-browser.assertThat(browser.locator("li").first()).containText("apple");</code></pre>
+        <pre><code>Assert.That(await browser.Locator("//li[contains(.,'apple')]").IsVisibleAsync(), Is.True);
+Assert.That(await browser.Locator("li").First().GetTextContentAsync(), Does.Contain("apple"));</code></pre>
 
         <h2 id="filtering">Filtering (workarounds)</h2>
         <p>CSTesting does not have <strong><code>filter(hasText)</code></strong> or <strong><code>filter(has(locator))</code></strong>. Use instead:</p>
         <ul>
           <li><strong>By text:</strong> XPath <code>//element[contains(.,'text')]</code> or a more specific selector.</li>
           <li><strong>By child/descendant:</strong> XPath e.g. <code>//li[.//h3[.='Product 2']]//button[contains(.,'Add to cart')]</code>.</li>
-          <li><strong>By index:</strong> <strong><code>.nth(index)</code></strong> when you must rely on position.</li>
+          <li><strong>By index:</strong> <strong><code>.Nth(index)</code></strong> when you must rely on position.</li>
         </ul>
         <p><strong>Example – "Product 2" "Add to cart" button:</strong></p>
-        <pre><code>browser.locator("//li[contains(.,'Product 2')]//button[contains(.,'Add to cart')]").click();</code></pre>
+        <pre><code>browser.Locator("//li[contains(.,'Product 2')]//button[contains(.,'Add to cart')]").click();</code></pre>
         <p><strong>Example – row with "Mary" and "Say goodbye" button (chaining conditions in XPath):</strong></p>
-        <pre><code>browser.locator("//li[contains(.,'Mary') and .//button[contains(.,'Say goodbye')]]").click();</code></pre>
+        <pre><code>browser.Locator("//li[contains(.,'Mary') and .//button[contains(.,'Say goodbye')]]").click();</code></pre>
 
         <h2 id="summary">Summary</h2>
         <table class="docs-table">
@@ -266,16 +269,16 @@ browser.assertThat(browser.locator("li").first()).containText("apple");</code></
             <tr><th>Topic</th><th>CSTesting</th></tr>
           </thead>
           <tbody>
-            <tr><td><strong>Create locator</strong></td><td><code>browser.locator(selector)</code></td></tr>
+            <tr><td><strong>Create locator</strong></td><td><code>browser.Locator(selector)</code></td></tr>
             <tr><td><strong>Selector types</strong></td><td>CSS (default), XPath (<code>//...</code> or <code>xpath=...</code>), <code>id=</code>, <code>name=</code>, any <code>attr=value</code></td></tr>
-            <tr><td><strong>Multiple matches</strong></td><td>Use <code>.first()</code>, <code>.last()</code>, or <code>.nth(index)</code> before actions</td></tr>
+            <tr><td><strong>Multiple matches</strong></td><td>Use <code>.First()</code>, <code>.Last()</code>, or <code>.Nth(index)</code> before actions</td></tr>
             <tr><td><strong>By role</strong></td><td>CSS/XPath: <code>"button"</code>, <code>"input[type=checkbox]"</code>, <code>"//h3[.='Sign up']"</code></td></tr>
             <tr><td><strong>By text</strong></td><td>XPath: <code>"//*[contains(.,'text')]"</code>, <code>"//button[contains(.,'Sign in')]"</code></td></tr>
             <tr><td><strong>By label</strong></td><td><code>name=</code>, <code>id=</code>, or XPath <code>//label[contains(.,'Label')]//input</code></td></tr>
             <tr><td><strong>By placeholder / alt / title / test id</strong></td><td><code>[attr="value"]</code> or <code>attr=value</code></td></tr>
-            <tr><td><strong>In frame</strong></td><td><code>browser.frame(iframeSelector)</code> then <code>frame.locator(...)</code></td></tr>
-            <tr><td><strong>Count</strong></td><td><code>assertThat(locator).hasCount(n)</code> or <code>locatorCount(locator)</code></td></tr>
-            <tr><td><strong>Strictness</strong></td><td>Action on multiple matches throws; use <code>.first()</code> / <code>.last()</code> / <code>.nth()</code> or a unique selector</td></tr>
+            <tr><td><strong>In frame</strong></td><td><code>await browser.FrameAsync(iframeSelector)</code> then <code>frame.Locator(...)</code></td></tr>
+            <tr><td><strong>Count</strong></td><td><code>EvaluateAsync</code> with <code>querySelectorAll</code>, or assert text on one locator</td></tr>
+            <tr><td><strong>Strictness</strong></td><td>Action on multiple matches throws; use <code>.First()</code> / <code>.Last()</code> / <code>.Nth()</code> or a unique selector</td></tr>
           </tbody>
         </table>
         <div class="docs-prev-next">

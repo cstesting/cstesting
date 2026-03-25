@@ -85,39 +85,26 @@
         <h1 class="docs-section-heading">Navigations</h1>
 
         <h2 id="introduction">Introduction</h2>
-        <p>CSTesting can navigate to URLs and work with navigations caused by page interactions (e.g. clicking a link or submitting a form). This page describes basic navigation, when the page is considered loaded, and how to wait for a specific URL after an action.</p>
+        <p>CSTesting for Python (<code>C:\CSTesting-Python</code>) uses Playwright. Navigation APIs are <strong>async</strong> and live on <code>BrowserApi</code> in <code>cstesting/browser.py</code>.</p>
 
         <h2 id="basic-navigation">Basic navigation</h2>
-        <p>The main way to open a URL is <strong><code>browser.gotoUrl(url)</code></strong>:</p>
-        <pre><code>browser.gotoUrl("https://example.com");</code></pre>
-        <p>This loads the page. With the CDP implementation, navigation completes when the browser has loaded the document. For more control, you can call <strong><code>waitForLoad()</code></strong> or <strong><code>waitForLoad(timeoutMs)</code></strong> after <strong><code>gotoUrl</code></strong> to wait until <code>document.readyState</code> is <strong>complete</strong> (all resources such as stylesheets, scripts, and images have loaded, and the <code>load</code> event has fired).</p>
-        <pre><code>browser.gotoUrl("https://example.com");
-browser.waitForLoad(10_000);</code></pre>
-        <p>If the page does a <strong>client-side redirect</strong> before load, <strong><code>gotoUrl</code></strong> (and any following <strong><code>waitForLoad</code></strong>) applies to the final loaded page.</p>
-        <p><strong>Other navigation commands:</strong></p>
-        <table class="docs-table">
-          <thead>
-            <tr><th>Method</th><th>Description</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><code>browser.back()</code></td><td>Navigate back in history.</td></tr>
-            <tr><td><code>browser.forward()</code></td><td>Navigate forward in history.</td></tr>
-            <tr><td><code>browser.refresh()</code></td><td>Reload the current page.</td></tr>
-            <tr><td><code>browser.url()</code></td><td>Return the current page URL.</td></tr>
-          </tbody>
-        </table>
+        <p>Open a URL with <strong><code>await browser.goto(url)</code></strong> (not <code>gotoUrl</code>).</p>
+        <pre><code>await browser.goto("https://example.com")</code></pre>
+        <p>After navigation, optionally wait for the load event with <strong><code>await browser.wait_for_load()</code></strong> (maps to Playwright <code>wait_for_load_state("load")</code>).</p>
+        <pre><code>await browser.goto("https://example.com")
+await browser.wait_for_load()</code></pre>
+        <p><strong>Current URL:</strong> <code>current = await browser.url()</code> (async method).</p>
+        <p><strong>Back / forward / reload</strong> are not wrapped on <code>BrowserApi</code> in the current Python package; use <code>await browser.evaluate("history.back()")</code> or extend the wrapper if you need them.</p>
 
         <h2 id="when-loaded">When is the page loaded?</h2>
-        <p>Modern pages often do more <strong>after</strong> the <code>load</code> event: they fetch data lazily, fill in the UI, or load extra scripts and styles. There is no single definition of "fully loaded"; it depends on the page and framework.</p>
-        <p>In CSTesting you can <strong>interact with the page at any time</strong>. Actions (click, type, etc.) use <strong>auto-waiting</strong>: CSTesting waits for the target element to be actionable (visible, enabled, etc.) before performing the action. So you usually don't need to wait for "everything" to load—only for the elements you use.</p>
+        <p>Playwright actions auto-wait for elements to be actionable. You usually only need <code>wait_for_load</code> when you explicitly want document <code>load</code> before the next step.</p>
         <p><strong>Example – navigate and click:</strong></p>
-        <pre><code>browser.gotoUrl("https://example.com");
-browser.locator("//*[contains(.,'Example Domain')]").first().click();</code></pre>
-        <p>The <strong>click</strong> auto-waits for the element to become visible and pass actionability checks, then clicks. You can think of CSTesting as a fast user: as soon as the element is ready, it acts. In many cases you don't need to worry about whether all resources have finished loading.</p>
-        <p>If you prefer to wait for the document first, call <strong><code>waitForLoad()</code></strong> or <strong><code>waitForLoad(timeoutMs)</code></strong> after <strong><code>gotoUrl</code></strong>:</p>
-        <pre><code>browser.gotoUrl("https://example.com");
-browser.waitForLoad(5_000);
-browser.locator("h1").click();</code></pre>
+        <pre><code>await browser.goto("https://example.com")
+await browser.locator("h1").first().click()</code></pre>
+        <p>With <code>wait_for_load</code>:</p>
+        <pre><code>await browser.goto("https://example.com")
+await browser.wait_for_load()
+await browser.locator("h1").first().click()</code></pre>
 
         <h2 id="hydration">Hydration</h2>
         <p>Sometimes you'll see a case where an action seems to do nothing—for example you click a button and nothing happens, or you type into an input and the text disappears. A common cause is <strong>poor hydration</strong> (e.g. in SPAs).</p>
@@ -125,48 +112,42 @@ browser.locator("h1").click();</code></pre>
         <p>To check for this, you can slow down the network (e.g. Chrome DevTools → Network → "Slow 3G"), reload the page, and try interacting as soon as the element appears. If clicks are ignored or text is cleared, the fix is on the app side: disable interactive controls until after hydration, when the page is fully functional.</p>
 
         <h2 id="waiting-for-navigation">Waiting for navigation</h2>
-        <p>Clicking a link or submitting a form can trigger a <strong>navigation</strong> to a new URL. In those cases it's a good idea to <strong>wait for the new URL</strong> before continuing the test.</p>
-        <p>Use <strong><code>waitForURL(urlOrPattern, timeoutMs)</code></strong> after the action that triggers the navigation. The URL can be an exact string, a substring (match when the current URL contains it), or a <strong>pattern</strong> with <code>*</code> as a wildcard.</p>
-        <pre><code>browser.locator("//*[contains(.,'Click me')]").first().click();
-browser.waitForURL("**/login", 10_000);
-browser.assertThat().hasTitle("Login");</code></pre>
-        <p><strong>Examples:</strong></p>
-        <pre><code>browser.waitForURL("https://example.com/dashboard", 5_000);   // exact or contains
-browser.waitForURL("**/dashboard", 5_000);                     // * matches any segment
-browser.waitForURL("**/users/*/profile", 5_000);              // multiple wildcards</code></pre>
-        <p>If the URL doesn't match within <strong>timeoutMs</strong>, <strong><code>waitForURL</code></strong> throws. Omit <strong>timeoutMs</strong> (or pass <code>null</code>) to use the default timeout (e.g. 30 seconds, depending on implementation).</p>
+        <p>After a click or submit that changes the URL, use <strong><code>await browser.wait_for_url(pattern, options)</code></strong>. Pass a string (glob with <code>*</code>) or a compiled <code>re.Pattern</code>. Timeout is in the options dict in milliseconds (default 30000).</p>
+        <pre><code>from cstesting import expect
+
+await browser.locator("a.login").first().click()
+await browser.wait_for_url("**/login", {"timeout": 10000})
+title = await browser.evaluate("document.title")
+expect(title).to_contain("Login")</code></pre>
+        <p><strong>More examples:</strong></p>
+        <pre><code>await browser.wait_for_url("https://example.com/dashboard", {"timeout": 5000})
+await browser.wait_for_url("**/users/*/profile", {"timeout": 5000})</code></pre>
 
         <h2 id="navigation-loading-overview">Navigation and loading (overview)</h2>
-        <p>Conceptually, showing a new document involves:</p>
-        <ol>
-          <li><strong>Navigation</strong> – The URL changes (e.g. by <strong><code>gotoUrl</code></strong> or by clicking a link). The browser resolves the URL and may follow redirects.</li>
-          <li><strong>Loading</strong> – The response is received, the document is parsed, scripts run, and the <strong>load</strong> event fires when the document and its main resources are loaded.</li>
-        </ol>
-        <p>CSTesting does not expose fine-grained navigation events (e.g. "navigation committed" or "DOMContentLoaded"). You can:</p>
         <ul>
-          <li>Use <strong><code>gotoUrl(url)</code></strong> to start a navigation.</li>
-          <li>Use <strong><code>waitForLoad()</code></strong> / <strong><code>waitForLoad(timeoutMs)</code></strong> to wait until <strong><code>document.readyState === 'complete'</code></strong> (and typically the <code>load</code> event).</li>
-          <li>Use <strong><code>waitForURL(urlOrPattern, timeoutMs)</code></strong> to wait until the current URL matches after an action (e.g. after a click that triggers navigation).</li>
-          <li>Use <strong><code>url()</code></strong> to read the current URL at any time.</li>
+          <li><strong><code>await browser.goto(url)</code></strong> — navigate.</li>
+          <li><strong><code>await browser.wait_for_load()</code></strong> — after <code>goto</code>, wait for load state.</li>
+          <li><strong><code>await browser.wait_for_url(...)</code></strong> — after an action, wait until URL matches.</li>
+          <li><strong><code>await browser.url()</code></strong> — read current URL.</li>
+          <li><strong><code>await browser.wait_for_selector(sel, {"timeout": 5000})</code></strong> — wait for an element.</li>
         </ul>
-        <p><strong>Optional: wait for network idle</strong></p>
-        <p>If you need to wait until the page has loaded and there are no pending network requests for a short period, you can use <strong><code>waitForNetworkLoad(timeoutMs)</code></strong> (when supported by the backend). This is stricter than <strong><code>waitForLoad</code></strong> and may not be necessary for most tests; prefer <strong><code>waitForLoad</code></strong> and auto-waiting on elements.</p>
 
         <h2 id="summary">Summary</h2>
+        <div class="docs-table-wrap">
         <table class="docs-table">
           <thead>
-            <tr><th>Topic</th><th>CSTesting</th></tr>
+            <tr><th>Topic</th><th>Python (<code>BrowserApi</code>)</th></tr>
           </thead>
           <tbody>
-            <tr><td><strong>Open URL</strong></td><td><code>browser.gotoUrl(url)</code></td></tr>
-            <tr><td><strong>Wait for document ready</strong></td><td><code>browser.waitForLoad()</code> or <code>browser.waitForLoad(timeoutMs)</code></td></tr>
-            <tr><td><strong>Back / forward / refresh</strong></td><td><code>browser.back()</code>, <code>browser.forward()</code>, <code>browser.refresh()</code></td></tr>
-            <tr><td><strong>Current URL</strong></td><td><code>browser.url()</code></td></tr>
-            <tr><td><strong>Wait for URL after action</strong></td><td><code>browser.waitForURL(urlOrPattern, timeoutMs)</code> (supports <code>*</code> wildcard)</td></tr>
-            <tr><td><strong>When to interact</strong></td><td>Anytime; actions auto-wait for elements. Use <code>waitForLoad</code> if you want document-ready first.</td></tr>
-            <tr><td><strong>Hydration issues</strong></td><td>Disable controls until the app is hydrated; use slow network to reproduce.</td></tr>
+            <tr><td><strong>Open URL</strong></td><td><code>await browser.goto(url)</code></td></tr>
+            <tr><td><strong>Wait for document load</strong></td><td><code>await browser.wait_for_load()</code></td></tr>
+            <tr><td><strong>Current URL</strong></td><td><code>await browser.url()</code></td></tr>
+            <tr><td><strong>Wait for URL after action</strong></td><td><code>await browser.wait_for_url(pattern, {"timeout": ms})</code></td></tr>
+            <tr><td><strong>When to interact</strong></td><td>Playwright auto-waits on actions; add <code>wait_for_load</code> / <code>wait_for_url</code> when needed.</td></tr>
+            <tr><td><strong>Hydration</strong></td><td>Same guidance as other stacks—ensure UI is ready before acting.</td></tr>
           </tbody>
         </table>
+        </div>
         <div class="docs-prev-next">
           <a href="docs-python-locators.html" class="docs-prev">
             <span class="docs-prev-next-label">Previous</span>
@@ -174,7 +155,7 @@ browser.waitForURL("**/users/*/profile", 5_000);              // multiple wildca
           </a>
           <a href="docs-python-lifecycle.html" class="docs-next-block">
             <span class="docs-prev-next-label">Next</span>
-            <span class="docs-prev-next-title">Annotations »</span>
+            <span class="docs-prev-next-title">Lifecycle &amp; hooks »</span>
           </a>
         </div>
         </div>

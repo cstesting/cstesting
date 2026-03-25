@@ -88,56 +88,34 @@
         <p>CSTesting can interact with JavaScript dialogs: <strong>alert</strong>, <strong>confirm</strong>, and <strong>prompt</strong>, as well as the <strong>beforeunload</strong> confirmation when closing the page. You set how the <em>next</em> dialog will be handled <strong>before</strong> the action that triggers it (e.g. before <code>click()</code>). If you do not set a response, the action that opens the dialog can block until the dialog is handled (behavior depends on the browser/backend).</p>
 
         <h2 id="alert-confirm-prompt">alert(), confirm(), prompt() dialogs</h2>
-        <p>You register how to handle the next dialog by calling <strong><code>acceptNextAlert()</code></strong>, <strong><code>acceptNextAlert(String promptText)</code></strong>, or <strong><code>dismissNextAlert()</code></strong> before the action that opens the dialog.</p>
+        <p>In <code>C:\CSTesting-Python</code>, register a <strong>dialog handler</strong> on <code>BrowserApi</code> with <strong><code>browser.set_dialog_handler(fn)</code></strong>. The handler receives <code>{"type": "alert"|"confirm"|"prompt"|..., "message": "..."}</code> and returns a dict:</p>
+        <ul>
+          <li><strong>Accept:</strong> <code>{"accept": True}</code> — optional <code>"prompt_text"</code> for prompts.</li>
+          <li><strong>Dismiss:</strong> <code>{"accept": False}</code> — confirm/prompt Cancel.</li>
+        </ul>
+        <p>Set the handler <strong>before</strong> the action that opens the dialog. Call <code>browser.set_dialog_handler(None)</code> to clear.</p>
 
-        <table class="docs-table">
-          <thead>
-            <tr>
-              <th>Method</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td><code>browser.acceptNextAlert()</code></td><td>Next dialog will be accepted (OK). Use for <strong>alert</strong> or <strong>confirm</strong>.</td></tr>
-            <tr><td><code>browser.acceptNextAlert(String promptText)</code></td><td>Next <strong>prompt</strong> will be accepted with the given text.</td></tr>
-            <tr><td><code>browser.dismissNextAlert()</code></td><td>Next <strong>confirm</strong> or <strong>prompt</strong> will be dismissed (Cancel).</td></tr>
-            <tr><td><code>browser.getLastAlertMessage()</code></td><td>Message of the last dialog that opened (for assertions).</td></tr>
-          </tbody>
-        </table>
+        <p><strong>Example: accept alert</strong></p>
+        <pre><code>def on_dialog(evt):
+    return {"accept": True}
 
-        <p><strong>Example: accept then click</strong></p>
-        <pre><code>browser.acceptNextAlert();
-browser.locator("#btnAlert").click();   // triggers alert("Hello")
-String msg = browser.getLastAlertMessage();  // "Hello"
-assertEquals("Hello", msg);</code></pre>
+browser.set_dialog_handler(on_dialog)
+await browser.locator("#btnAlert").click()  # alert("Hello")
+browser.set_dialog_handler(None)</code></pre>
 
         <p><strong>Example: dismiss confirm</strong></p>
-        <pre><code>browser.dismissNextAlert();
-browser.locator("#btnConfirm").click();  // confirm("Sure?") -&gt; Cancel</code></pre>
+        <pre><code>browser.set_dialog_handler(lambda e: {"accept": False})
+await browser.locator("#btnConfirm").click()</code></pre>
 
-        <p><strong>Example: accept prompt with text</strong></p>
-        <pre><code>browser.acceptNextAlert("my input");
-browser.locator("#btnPrompt").click();  // prompt("Name?") accepted with "my input"</code></pre>
-
-        <p><strong>Important:</strong> You must set the dialog response <strong>before</strong> the action that triggers the dialog. Otherwise the action can stall, because JavaScript dialogs are modal and block further page execution until they are handled.</p>
-
-        <p><strong>Wrong</strong> — the click can hang:</p>
-        <pre><code>browser.locator("#btnAlert").click();   // Dialog opens; execution blocks here
-browser.acceptNextAlert();             // Never runs until dialog is handled</code></pre>
-
-        <p><strong>Correct</strong> — set response first:</p>
-        <pre><code>browser.acceptNextAlert();
-browser.locator("#btnAlert").click();  // Dialog opens and is accepted
-String msg = browser.getLastAlertMessage();</code></pre>
-
-        <p>If you do not call <code>acceptNextAlert</code> or <code>dismissNextAlert</code> before a dialog appears, behavior is implementation-dependent (e.g. some backends may auto-dismiss). For reliable tests, always set the next dialog response before triggering it.</p>
+        <p><strong>Example: prompt with text</strong></p>
+        <pre><code>browser.set_dialog_handler(lambda e: {"accept": True, "prompt_text": "my input"})
+await browser.locator("#btnPrompt").click()</code></pre>
 
         <h2 id="beforeunload">beforeunload dialog</h2>
-        <p>When the page is closed or navigated away, the browser may show a <strong>beforeunload</strong> confirmation ("Leave site?"). CSTesting's <strong><code>browser.close()</code></strong> closes the page; whether <code>beforeunload</code> runs and how it is handled depends on the browser and backend.</p>
-        <p>To handle the beforeunload dialog explicitly, set the next dialog response before the action that would trigger it (e.g. closing the window or navigating away):</p>
-        <pre><code>browser.dismissNextAlert();   // or acceptNextAlert() to leave
-browser.close();              // or an action that triggers beforeunload</code></pre>
-        <p>If your test triggers navigation or close in a way that shows beforeunload, call <strong><code>acceptNextAlert()</code></strong> or <strong><code>dismissNextAlert()</code></strong> before that action so the dialog does not block the test.</p>
+        <p>Playwright may show a beforeunload prompt when leaving the page. Use the same <code>set_dialog_handler</code> pattern before <code>await browser.close()</code> or navigation if your app uses <code>beforeunload</code>.</p>
+        <pre><code>browser.set_dialog_handler(lambda e: {"accept": True})
+await browser.close()
+browser.set_dialog_handler(None)</code></pre>
 
         <h2 id="print-dialogs">Print dialogs</h2>
         <p>CSTesting does not provide a dedicated API for <strong>print dialogs</strong> (<code>window.print()</code>). The native print dialog is controlled by the OS/browser and is not a JavaScript <code>alert</code>/<code>confirm</code>/<code>prompt</code> dialog.</p>
@@ -147,11 +125,15 @@ browser.close();              // or an action that triggers beforeunload</code><
           <li>Rely on your app's own logic and assert on the state of the page before/after the "Print" action.</li>
         </ul>
         <p>Example of stubbing and asserting that print was requested:</p>
-        <pre><code>browser.gotoUrl("https://example.com/page-with-print");
-browser.evaluate("window.printRequested = false; window.print = function() { window.printRequested = true; };");
-browser.locator("//button[contains(.,'Print')]").first().click();  // or your print button selector
-Object requested = browser.evaluate("window.printRequested");
-assertTrue(Boolean.TRUE.equals(requested));</code></pre>
+        <pre><code>from cstesting import expect
+
+await browser.goto("https://example.com/page-with-print")
+await browser.evaluate(
+    "window.printRequested = false; window.print = function() { window.printRequested = true; };"
+)
+await browser.locator("//button[contains(.,'Print')]").first().click()
+requested = await browser.evaluate("window.printRequested")
+expect(requested).to_be_truthy()</code></pre>
         <p>(Adjust the selector to match your page; use XPath if needed, e.g. <code>//button[contains(.,'Print')]</code>.)</p>
 
         <h2 id="summary">Summary</h2>
@@ -164,10 +146,8 @@ assertTrue(Boolean.TRUE.equals(requested));</code></pre>
             </tr>
           </thead>
           <tbody>
-            <tr><td><strong>alert</strong></td><td><code>acceptNextAlert()</code> before click</td><td>Use <code>getLastAlertMessage()</code> to assert text.</td></tr>
-            <tr><td><strong>confirm</strong></td><td><code>acceptNextAlert()</code> or <code>dismissNextAlert()</code> before click</td><td>Set before the action that triggers confirm.</td></tr>
-            <tr><td><strong>prompt</strong></td><td><code>acceptNextAlert(text)</code> or <code>dismissNextAlert()</code> before click</td><td>Set before the action that triggers prompt.</td></tr>
-            <tr><td><strong>beforeunload</strong></td><td><code>acceptNextAlert()</code> or <code>dismissNextAlert()</code> before close/navigate</td><td>Use when your flow triggers "Leave site?".</td></tr>
+            <tr><td><strong>alert / confirm / prompt</strong></td><td><code>browser.set_dialog_handler(fn)</code> then action</td><td>Return <code>{"accept": True/False, "prompt_text": "..."}</code>.</td></tr>
+            <tr><td><strong>beforeunload</strong></td><td>Handler before <code>close()</code> / navigate</td><td>Same handler API.</td></tr>
             <tr><td><strong>Print</strong></td><td>No built-in API</td><td>Stub <code>window.print</code> and assert it was called if needed.</td></tr>
           </tbody>
         </table>

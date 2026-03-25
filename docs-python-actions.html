@@ -86,96 +86,62 @@
         <h1 id="actions">Actions</h1>
 
         <h3 id="introduction">Introduction</h3>
-        <p>CSTesting can interact with HTML elements such as text inputs, checkboxes, radio buttons, select options, mouse clicks (click, double-click, right-click), typing text, hover, and drag-and-drop. Use <strong>locators</strong> (e.g. <code>browser.locator("selector")</code>) to target elements; all actions accept either a selector string or a <code>Locator</code>. When multiple elements match, use <code>.first()</code>, <code>.last()</code>, or <code>.nth(index)</code> before performing an action.</p>
+        <p>CSTesting for Python (<code>C:\CSTesting-Python</code>) drives the page with <strong>Playwright</strong>. All browser and locator actions are <strong>async</strong>—use <code>await</code> inside <code>async def</code> tests. Methods use <strong>snake_case</strong> (<code>double_click</code>, <code>right_click</code>, <code>drag_and_drop</code>). See <code>cstesting/browser.py</code> for the full API.</p>
 
         <h3 id="text-input">Text input</h3>
-        <p><strong><code>type(selector, text)</code></strong> or <strong><code>locator.type(text)</code></strong> is the main way to fill form fields. It focuses the element, clears any existing value, and types the given text. It works for <code>&lt;input&gt;</code>, <code>&lt;textarea&gt;</code>, and similar elements.</p>
-        <pre><code>// By selector
-browser.type("id=username", "Peter");
-browser.type("name=email", "user@example.com");
+        <p><strong><code>await browser.type(selector, text)</code></strong> or <strong><code>await locator.type(text)</code></strong> fills inputs and textareas (Playwright <code>fill</code>).</p>
+        <pre><code>await browser.type("id=username", "Peter")
+await browser.type("name=email", "user@example.com")
 
-// By locator (chain with first() if multiple match)
-browser.locator("id=username").type("Peter");
-browser.locator("[name='Birth date']").type("2020-02-02");
-browser.locator("textarea").first().type("Hello");</code></pre>
+loc = browser.locator("id=username")
+await loc.type("Peter")
+await browser.locator("textarea").first().type("Hello")</code></pre>
 
         <h3 id="checkboxes-radio">Checkboxes and radio buttons</h3>
-        <p>Use <strong><code>check(selector)</code></strong> / <strong><code>check(Locator)</code></strong> to check a checkbox or select a radio button, and <strong><code>uncheck(selector)</code></strong> / <strong><code>uncheck(Locator)</code></strong> to uncheck. Works with <code>input[type=checkbox]</code> and <code>input[type=radio]</code>. No-op if the element is already in the desired state.</p>
-        <pre><code>// Check the checkbox
-browser.locator("id=agree").check();
-browser.check("name=subscribe");
+        <p><strong><code>await browser.check(selector)</code></strong> / <strong><code>await locator.check()</code></strong> and <strong><code>uncheck</code></strong> for the opposite.</p>
+        <pre><code>await browser.locator("id=agree").check()
+await browser.check("name=subscribe")
 
-// Assert the checked state
-browser.assertThat(browser.locator("name=subscribe")).isVisible();  // or use isSelected via getValue/evaluate if needed
-
-// Select a radio button
-browser.locator("id=size-xl").check();
-browser.check("name=size");  // if only one with name=size; otherwise use locator("name=size").nth(1).check()</code></pre>
+await browser.locator("id=size-xl").check()
+await browser.locator("name=size").nth(1).check()</code></pre>
+        <p>Assert state with <code>await browser.is_selected(selector)</code> or <code>await locator.is_selected()</code> plus <code>expect(...).to_be_truthy()</code>.</p>
 
         <h3 id="select-options">Select options</h3>
-        <p>Use <strong><code>select(selector, option)</code></strong> for a single-select dropdown and <strong><code>selectOptions(selector, options...)</code></strong> for one or more options (single or multi-select). Option can be a <strong>value</strong>, <strong>visible label</strong>, or <strong>0-based index</strong> (Integer). Use <strong><code>deselectOptions</code></strong> to clear options in a multi-select.</p>
-        <pre><code>// Single selection by value or label
-browser.locator("#color").select("blue");
-browser.locator("#color").select("Blue");   // label
+        <p>Pass a <strong>dict</strong> with <code>value</code>, <code>label</code>, or <code>index</code>, or a <strong>list</strong> of dicts for multi-select.</p>
+        <pre><code>await browser.select("#color", {"value": "blue"})
+await browser.select("#color", {"label": "Blue"})
+await browser.select("#color", {"index": 2})
 
-// Single selection by index
-browser.locator("#color").select(2);
-
-// Multi-select
-browser.locator("#colors").selectOptions("red", "green", "blue");
-browser.locator("#colors").selectOptions(0, 2, 4);
-
-// Deselect
-browser.locator("#colors").deselectOptions("blue");
-
-// Read selected
-List&lt;String&gt; values = browser.getSelectedValues(browser.locator("#colors"));
-List&lt;String&gt; labels = browser.getSelectedLabels(browser.locator("#colors"));</code></pre>
+await browser.locator("#color").select({"value": "red"})</code></pre>
 
         <h3 id="mouse-click">Mouse click</h3>
-        <p><strong><code>click(selector)</code></strong> / <strong><code>click(Locator)</code></strong> performs a left click. <strong><code>doubleClick</code></strong> and <strong><code>rightClick</code></strong> are also available. <strong><code>hover(selector)</code></strong> / <strong><code>hover(Locator)</code></strong> moves the mouse to the element. Actions use the <strong>center</strong> of the element.</p>
-        <pre><code>// Generic click
-browser.locator("button").click();
-browser.click("id=submit");
+        <p><strong><code>click</code></strong>, <strong><code>double_click</code></strong>, <strong><code>right_click</code></strong>, <strong><code>hover</code></strong> on page or locator.</p>
+        <pre><code>await browser.locator("button").first().click()
+await browser.click("id=submit")
 
-// Double click
-browser.locator("text=Item").doubleClick();
-browser.doubleClick("#item");
+await browser.locator(".item").first().double_click()
+await browser.double_click("#item")
 
-// Right click (context menu)
-browser.locator("text=Item").rightClick();
-browser.rightClick("#row");
+await browser.locator(".row").first().right_click()
+await browser.right_click("#row")
 
-// Hover
-browser.locator("#menu").hover();</code></pre>
+await browser.locator("#menu").hover()</code></pre>
 
-        <p>Under the hood, actions (when using the CDP implementation) scroll the element into view and wait for it to be visible before performing the click or other action.</p>
+        <p>Playwright auto-scrolls elements into view before actions when needed.</p>
 
         <h3 id="type-characters">Type characters</h3>
-        <p>Use <strong><code>type(selector, text)</code></strong> or <strong><code>locator.type(text)</code></strong> to enter text. This replaces the current value (like a "fill"). For character-by-character input or special key events, use <strong><code>evaluate()</code></strong> to run JavaScript (e.g. dispatch <code>KeyboardEvent</code>) if your app relies on key-level handling.</p>
-        <pre><code>browser.locator("#area").type("Hello World!");</code></pre>
+        <p><code>type</code>/<code>fill</code> sets the whole value. For individual keys use <strong><code>await locator.press_key("Enter")</code></strong> or <strong><code>await browser.press_key("Tab")</code></strong>.</p>
+        <pre><code>await browser.locator("#area").type("Hello World!")
+await browser.locator("#area").press_key("Enter")</code></pre>
 
         <h3 id="drag-drop">Drag and drop</h3>
-        <p>Use <strong><code>dragAndDrop(fromSelector, toSelector)</code></strong> or <strong><code>fromLocator.dragAndDrop(toLocator)</code></strong> to drag one element to another. The action moves the mouse to the source, presses the button, moves to the target, and releases.</p>
-        <pre><code>browser.dragAndDrop("#source", "#target");
-browser.locator(".card").first().dragAndDrop(browser.locator(".drop-zone"));</code></pre>
+        <pre><code>await browser.drag_and_drop("#source", "#target")</code></pre>
+        <p>Locator-level drag between two locators is not exposed as a chain on <code>LocatorApi</code>; use the page-level <code>drag_and_drop</code> with selectors.</p>
 
         <h3 id="scrolling">Scrolling</h3>
-        <p>CSTesting scrolls the target element into view before actions like click when needed. For explicit scrolling, use:</p>
-        <ul>
-          <li><strong><code>scrollToPageTop()</code></strong> / <strong><code>scrollToPageBottom()</code></strong> – scroll to top or bottom of the page.</li>
-          <li><strong><code>scrollUp()</code></strong> / <strong><code>scrollDown()</code></strong> – scroll by one viewport height.</li>
-          <li><strong><code>scrollBy(dx, dy)</code></strong> – scroll by a pixel offset (e.g. <code>scrollBy(0, 300)</code> to scroll down 300px).</li>
-          <li><strong><code>scrollToSelector(selector)</code></strong> / <strong><code>locator.scrollToSelector()</code></strong> – scroll until the element is in view (centered).</li>
-        </ul>
-        <pre><code>// Scroll so the button is visible, then click
-browser.scrollToSelector("#submit");
-browser.locator("#submit").click();
-
-// Scroll the page
-browser.scrollToPageBottom();
-browser.scrollBy(0, 300);
-browser.locator("#footer").scrollToSelector();   // scroll element into view</code></pre>
+        <p>The Python API does not expose dedicated <code>scroll_to_*</code> helpers. Rely on Playwright scrolling elements into view before clicks, or run JS:</p>
+        <pre><code>await browser.evaluate("window.scrollBy(0, 300)")
+await browser.evaluate("document.querySelector('#footer').scrollIntoView()")</code></pre>
         <div class="docs-prev-next">
           <a href="docs-python-test-runners.html" class="docs-prev">
             <span class="docs-prev-next-label">Previous</span>

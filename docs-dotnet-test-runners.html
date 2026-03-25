@@ -86,108 +86,36 @@
         <h1 id="introduction">Test runners</h1>
 
         <h3 id="intro">Introduction</h3>
-        <p>CSTesting does <strong>not</strong> integrate with JUnit or TestNG. It provides its <strong>own test runner</strong> (<strong>CSTestingRunner</strong>) and <strong>annotations</strong> (<code>@CSTest</code>, <code>@BeforeMethod</code>, <code>@AfterMethod</code>, <code>@BeforeClass</code>, <code>@AfterClass</code>, <code>@BeforeSuite</code>, <code>@AfterSuite</code>). You run tests by passing your test class to the runner from code or from the command line (Maven or Gradle). Each test method runs in a <strong>new browser</strong> for isolation; the runner creates and closes the browser for you.</p>
+        <p>CSTesting.DotNet targets <strong>NUnit</strong> and the standard <strong><code>dotnet test</code></strong> workflow (<code>Microsoft.NET.Test.Sdk</code> + NUnit3TestAdapter). The CSTesting packages add <strong><code>ICSTestingBrowser</code></strong> and helpers; they do not replace the .NET test host.</p>
 
-        <h3 id="supported-runner">Supported: CSTestingRunner (built-in)</h3>
-        <p>CSTesting's <strong>only</strong> supported way to run annotated tests is <strong>CSTestingRunner</strong>.</p>
+        <h3 id="supported-runner">Supported: NUnit + <code>dotnet test</code></h3>
         <ul>
-          <li>Your test class extends <strong>CSTestingTestBase</strong> and uses <strong><code>@CSTest</code></strong>, <strong><code>@BeforeMethod</code></strong>, <strong><code>@AfterMethod</code></strong>, etc.</li>
-          <li>The runner creates one <strong>CSTestingBrowser</strong> per test method, injects it, runs the test, then closes the browser.</li>
-          <li>There is no <strong>BrowserContext</strong> or <strong>Page</strong> abstraction; <strong>CSTestingBrowser</strong> is the single object you use (like a "page" that can navigate and interact).</li>
+          <li>Add project references to <strong><code>CSTesting.csproj</code></strong> and <strong><code>CSTesting.NUnit.csproj</code></strong> (or NuGet packages <code>CSTesting</code> and <code>CSTesting.NUnit</code> per <code>README.md</code>).</li>
+          <li>Write <strong><code>[TestFixture]</code></strong> classes with <strong><code>[Test]</code></strong> methods; use <strong><code>static CSTesting.CSTesting.CreateBrowserAsync</code></strong> or <code>using static CSTesting.CSTesting</code>.</li>
+          <li>Optional: inherit <strong><code>CSTestingNUnitBrowserFixtureBase</code></strong> for automatic <code>CloseAsync</code> after each test and optional pause-on-failure.</li>
         </ul>
-        <p><strong>From code:</strong></p>
-        <pre><code>public static void main(String[] args) {
-    CSTestingRunner.run(MyTest.class);
-}</code></pre>
-        <p><strong>From command line (Maven):</strong></p>
-        <pre><code>mvn exec:java -Dexec.mainClass="com.cstesting.runner.CSTestingRunner" -Dexec.args="com.example.MyTest"</code></pre>
-        <p>See <a href="docs-dotnet-annotations.html">NUnit &amp; lifecycle</a> and <a href="docs-dotnet-running-debugging.html">Running and debugging tests</a> for details.</p>
+        <pre><code>dotnet test
+dotnet test --filter "FullyQualifiedName~MyNamespace.MyFixture"</code></pre>
+        <p>See <a href="docs-dotnet-annotations.html">NUnit &amp; lifecycle</a> and <a href="docs-dotnet-running-debugging.html">Running and debugging tests</a>.</p>
 
-        <h3 id="not-junit">Not supported: JUnit</h3>
-        <p>CSTesting <strong>does not</strong> integrate with JUnit. There is no JUnit dependency, no JUnit-specific APIs, and no "run with JUnit" setup.</p>
-        <p>Use <strong>CSTestingRunner</strong> and CSTesting annotations instead. The annotation names (<code>@BeforeMethod</code>, <code>@AfterMethod</code>, <code>@BeforeClass</code>, <code>@AfterClass</code>) are similar to TestNG; the lifecycle is implemented by <strong>CSTestingRunner</strong>, not by JUnit or TestNG.</p>
+        <h3 id="not-junit">xUnit / MSTest</h3>
+        <p>The repository samples use <strong>NUnit</strong>. You could call <code>CreateBrowserAsync</code> from other frameworks, but the provided fixture base and <code>CSTesting.NUnit</code> attributes are NUnit-specific.</p>
 
-        <h3 id="not-testng">Not supported: TestNG</h3>
-        <p>CSTesting <strong>does not</strong> integrate with TestNG. There is no TestNG dependency and no TestNG-specific setup.</p>
-        <p>CSTesting's annotations are <strong>inspired by</strong> TestNG (e.g. <code>@BeforeMethod</code>, <code>@AfterMethod</code>, <code>@BeforeClass</code>, <code>@AfterClass</code>), but tests are run by <strong>CSTestingRunner</strong>, not by the TestNG engine. You cannot run CSTesting tests with <code>@Test</code> from TestNG; use <strong><code>@CSTest</code></strong> and <strong>CSTestingRunner.run(MyTest.class)</strong>.</p>
+        <h3 id="not-testng">Project file</h3>
+        <p>Reference CSTesting from your test <code>.csproj</code>:</p>
+        <pre><code>&lt;ItemGroup&gt;
+  &lt;ProjectReference Include="..\\src\\CSTesting\\CSTesting.csproj" /&gt;
+  &lt;ProjectReference Include="..\\src\\CSTesting.NUnit\\CSTesting.NUnit.csproj" /&gt;
+&lt;/ItemGroup&gt;</code></pre>
 
-        <h3 id="supported-maven">Supported: Maven</h3>
-        <p>You can run CSTesting tests with <strong>Maven</strong> using the <strong>exec-maven-plugin</strong>:</p>
-        <pre><code>mvn exec:java -Dexec.mainClass="com.cstesting.runner.CSTestingRunner" -Dexec.args="com.example.MyTest"</code></pre>
-        <p>Or add a profile in your <strong>pom.xml</strong> and run:</p>
-        <pre><code>mvn exec:java -Pannotation-tests</code></pre>
-        <p><strong>Dependency:</strong></p>
-        <pre><code>&lt;dependency&gt;
-  &lt;groupId&gt;io.github.cstesttool&lt;/groupId&gt;
-  &lt;artifactId&gt;cstesting-java&lt;/artifactId&gt;
-  &lt;version&gt;0.1.5&lt;/version&gt;
-&lt;/dependency&gt;</code></pre>
+        <h3 id="supported-maven">CI (GitHub Actions, Azure DevOps, etc.)</h3>
+        <p>Use the official <strong>.NET SDK</strong> action or hosted agent, then <code>dotnet build</code>, <code>playwright install chromium</code>, and <code>dotnet test</code>. Publish TRX or test logs as needed.</p>
 
-        <h3 id="supported-gradle">Supported: Gradle</h3>
-        <p>CSTesting works with <strong>Gradle</strong> as the build tool. Add the dependency and run the runner with a <strong>JavaExec</strong> task.</p>
-        <p><strong>build.gradle (Kotlin):</strong></p>
-        <pre><code>plugins {
-    java
-    application
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation("io.github.cstesttool:cstesting-java:0.1.5")
-}
-
-application {
-    mainClass.set("com.cstesting.runner.CSTestingRunner")
-}
-
-// Run one test class: ./gradlew run --args="com.example.MyTest"
-tasks.named&lt;JavaExec&gt;("run") {
-    if (project.hasProperty("testClass")) {
-        args(project.property("testClass"))
-    }
-}</code></pre>
-        <p><strong>Run:</strong></p>
-        <pre><code>./gradlew run --args="com.example.MyTest"</code></pre>
-        <p>Or define a dedicated task:</p>
-        <pre><code>tasks.register&lt;JavaExec&gt;("cstesting") {
-    group = "verification"
-    classpath = sourceSets["main"].runtimeClasspath
-    mainClass.set("com.cstesting.runner.CSTestingRunner")
-    if (project.hasProperty("testClass")) {
-        args(project.property("testClass"))
-    }
-}</code></pre>
-        <pre><code>./gradlew cstesting -PtestClass=com.example.MyTest</code></pre>
-        <p><strong>build.gradle (Groovy):</strong></p>
-        <pre><code>plugins {
-    id 'java'
-    id 'application'
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation 'io.github.cstesttool:cstesting-java:0.1.5'
-}
-
-application {
-    mainClass = 'com.cstesting.runner.CSTestingRunner'
-}
-
-run {
-    if (project.hasProperty('testClass')) {
-        args project.testClass
-    }
-}</code></pre>
+        <h3 id="supported-gradle">Recorded tests from EasyTesting</h3>
+        <p>Export C# from the Node recorder (<code>npx cstesting record ... --format cs</code>), add the file to your test project, and run <code>dotnet test</code> as in <code>README.md</code>.</p>
 
         <h3 id="parallel">Parallel execution</h3>
-        <p>CSTestingRunner runs all <strong><code>@CSTest</code></strong> methods in a class <strong>sequentially</strong> on a single thread. There is <strong>no built-in parallel execution</strong> (no parallel test methods or parallel classes within the same JVM).</p>
-        <p>If you need parallelism, you can run <strong>multiple test classes in separate processes</strong> (e.g. multiple Maven/Gradle invocations with different class names), each using CSTestingRunner. That is not an official integration; it is a usage pattern you can implement in your build or scripts.</p>
+        <p>Parallelism is governed by <strong>NUnit</strong> and your <code>.runsettings</code> / assembly attributes—not by CSTesting. Use separate processes or NUnit parallelism settings if you need isolation between heavy browser tests.</p>
 
         <h3 id="summary">Summary</h3>
         <table class="docs-table">
@@ -195,12 +123,10 @@ run {
             <tr><th>Runner / build</th><th>Supported?</th><th>Notes</th></tr>
           </thead>
           <tbody>
-            <tr><td><strong>CSTestingRunner</strong></td><td>Yes</td><td>Built-in; only supported way to run <code>@CSTest</code> methods.</td></tr>
-            <tr><td><strong>JUnit</strong></td><td>No</td><td>Not integrated; use CSTestingRunner.</td></tr>
-            <tr><td><strong>TestNG</strong></td><td>No</td><td>Not integrated; use CSTestingRunner (annotations are TestNG-style only).</td></tr>
-            <tr><td><strong>Maven</strong></td><td>Yes</td><td>Use <code>exec:java</code> with <code>CSTestingRunner</code> and test class name.</td></tr>
-            <tr><td><strong>Gradle</strong></td><td>Yes</td><td>Use JavaExec with main class <code>CSTestingRunner</code> and args = test class name.</td></tr>
-            <tr><td><strong>Parallel (in-process)</strong></td><td>No</td><td>Runner is single-threaded; tests run one after another.</td></tr>
+            <tr><td><strong><code>dotnet test</code></strong></td><td>Yes</td><td>Primary way to run NUnit tests.</td></tr>
+            <tr><td><strong>NUnit</strong></td><td>Yes</td><td>Expected framework for samples and <code>CSTesting.NUnit</code>.</td></tr>
+            <tr><td><strong>CSTestingRunner (Java)</strong></td><td>N/A</td><td>Not used in .NET docs.</td></tr>
+            <tr><td><strong>Maven / Gradle (Java)</strong></td><td>N/A</td><td>Use <code>dotnet</code> CLI instead.</td></tr>
           </tbody>
         </table>
         <div class="docs-prev-next">

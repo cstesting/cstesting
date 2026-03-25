@@ -84,107 +84,78 @@
         <div class="docs-main-content" id="docs-main-content">
         <h1 class="docs-section-heading">Assertions</h1>
 
-        <h2 id="list-of-assertions">List of assertions</h2>
-        <p>CSTesting provides <strong><code>browser.assertThat(locator)</code></strong> for element assertions and <strong><code>browser.assertThat()</code></strong> for page assertions. They evaluate <strong>once</strong> (no auto-retry). To wait then assert, use <strong><code>waitForSelector</code></strong> first.</p>
+        <h2 id="list-of-assertions">Assertions in Python</h2>
+        <p>CSTesting for Python (<code>C:\CSTesting-Python</code>) exposes <strong><code>from cstesting import expect</code></strong> (<code>cstesting/assertions.py</code>). There is <strong>no</strong> <code>browser.assertThat()</code>—combine <code>await</code> on the browser/locator with <code>expect(...)</code> on plain values.</p>
 
-        <h3 id="element-assertions">Element assertions</h3>
+        <h3 id="expect-matchers"><code>expect(actual)</code> matchers</h3>
         <table class="docs-table">
-          <thead>
-            <tr>
-              <th>Assertion</th>
-              <th>Description</th>
-            </tr>
-          </thead>
+          <thead><tr><th>Matcher</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>assertThat(locator).isVisible()</code></td><td>Element is visible</td></tr>
-            <tr><td><code>assertThat(locator).isEditable()</code></td><td>Element is editable (not disabled, not readonly)</td></tr>
-            <tr><td><code>assertThat(locator).isEmpty()</code></td><td>Element value or text is empty</td></tr>
-            <tr><td><code>assertThat(locator).isEnabled()</code></td><td>Element is enabled</td></tr>
-            <tr><td><code>assertThat(locator).isDisabled()</code></td><td>Element is disabled</td></tr>
-            <tr><td><code>assertThat(locator).contains(expected)</code></td><td>Text or value contains the given string</td></tr>
-            <tr><td><code>assertThat(locator).hasText(expected)</code></td><td>Element text matches or contains the expected text</td></tr>
-            <tr><td><code>assertThat(locator).containText(expected)</code></td><td>Element text contains the given string</td></tr>
-            <tr><td><code>assertThat(locator).hasValue(expected)</code></td><td>Input/select value equals the expected string</td></tr>
-            <tr><td><code>assertThat(locator).containValue(expected)</code></td><td>Input/select value contains the given string</td></tr>
-            <tr><td><code>assertThat(locator).hasAttribute(name)</code></td><td>Element has the DOM attribute (any value)</td></tr>
-            <tr><td><code>assertThat(locator).hasAttribute(name, value)</code></td><td>Element attribute equals the expected value</td></tr>
-            <tr><td><code>assertThat(locator).count(n)</code></td><td>Number of matching elements equals n</td></tr>
-            <tr><td><code>assertThat(locator).hasCount(n)</code></td><td>Same as <code>count(n)</code> — list has exact number of matches</td></tr>
+            <tr><td><code>to_be(expected)</code></td><td>Identity (<code>is</code>)</td></tr>
+            <tr><td><code>to_equal(expected)</code></td><td>Deep / JSON-stable equality</td></tr>
+            <tr><td><code>to_be_truthy()</code> / <code>to_be_falsy()</code></td><td>Boolean coercion</td></tr>
+            <tr><td><code>to_be_null()</code> / <code>to_be_defined()</code> / <code>to_be_undefined()</code></td><td>None checks (undefined maps to None)</td></tr>
+            <tr><td><code>to_throw(message?)</code></td><td><code>expect(fn).to_throw()</code> — sync or async callable</td></tr>
+            <tr><td><code>to_be_greater_than(n)</code> / <code>to_be_less_than(n)</code></td><td>Numeric</td></tr>
+            <tr><td><code>to_contain(item)</code></td><td>Substring or list membership</td></tr>
+            <tr><td><code>to_have_length(n)</code></td><td>Length</td></tr>
+            <tr><td><code>expect(x).not_.to_be(y)</code></td><td>Negation (use <code>not_</code> — <code>not</code> is reserved)</td></tr>
           </tbody>
         </table>
 
-        <h3 id="page-assertions">Page assertions</h3>
-        <table class="docs-table">
-          <thead>
-            <tr>
-              <th>Assertion</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td><code>assertThat().hasTitle(expected)</code></td><td>Page title equals or contains the expected string</td></tr>
-            <tr><td><code>assertThat().hasURL(pattern)</code></td><td>Page URL contains or matches pattern (<code>*</code> as wildcard)</td></tr>
-          </tbody>
-        </table>
+        <h3 id="browser-state">Page and element state</h3>
+        <p>Use <code>BrowserApi</code> / <code>LocatorApi</code> async queries, then assert:</p>
+        <pre><code>from cstesting import expect
 
-        <h2 id="comparison-playwright">Comparison with Playwright</h2>
-        <p>Below is how CSTesting assertions map to a Playwright-style list. <strong>Supported</strong> = available in CSTesting; <strong>Not yet</strong> = not implemented.</p>
+visible = await browser.is_visible("h1")
+expect(visible).to_be_truthy()
 
-        <table class="docs-table">
-          <thead>
-            <tr>
-              <th>Assertion</th>
-              <th>Description</th>
-              <th>CSTesting</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td><code>assertThat(locator).isAttached()</code></td><td>Element is attached to DOM</td><td><strong>Not yet</strong> — use <code>waitForSelector</code> then assert</td></tr>
-            <tr><td><code>assertThat(locator).isChecked()</code></td><td>Checkbox is checked</td><td><strong>Not yet</strong></td></tr>
-            <tr><td><code>assertThat(locator).isDisabled()</code></td><td>Element is disabled</td><td>✓ <code>isDisabled()</code></td></tr>
-            <tr><td><code>assertThat(locator).isEditable()</code></td><td>Element is editable</td><td>✓ <code>isEditable()</code></td></tr>
-            <tr><td><code>assertThat(locator).isEmpty()</code></td><td>Container is empty</td><td>✓ <code>isEmpty()</code> (value or text)</td></tr>
-            <tr><td><code>assertThat(locator).isEnabled()</code></td><td>Element is enabled</td><td>✓ <code>isEnabled()</code></td></tr>
-            <tr><td><code>assertThat(locator).isFocused()</code></td><td>Element is focused</td><td><strong>Not yet</strong></td></tr>
-            <tr><td><code>assertThat(locator).isHidden()</code></td><td>Element is not visible</td><td><strong>Not yet</strong> — use <code>!isVisible()</code> or assert after wait</td></tr>
-            <tr><td><code>assertThat(locator).isInViewport()</code></td><td>Element intersects viewport</td><td><strong>Not yet</strong></td></tr>
-            <tr><td><code>assertThat(locator).isVisible()</code></td><td>Element is visible</td><td>✓ <code>isVisible()</code></td></tr>
-            <tr><td><code>assertThat(locator).containsClass()</code></td><td>Element has specified CSS classes</td><td><strong>Not yet</strong> — use <code>hasAttribute("class", ...)</code></td></tr>
-            <tr><td><code>assertThat(locator).containsText()</code></td><td>Element contains text</td><td>✓ <code>containText(expected)</code></td></tr>
-            <tr><td><code>assertThat(locator).hasAccessibleDescription()</code></td><td>Accessible description</td><td><strong>Not yet</strong></td></tr>
-            <tr><td><code>assertThat(locator).hasAccessibleName()</code></td><td>Accessible name</td><td><strong>Not yet</strong></td></tr>
-            <tr><td><code>assertThat(locator).hasAttribute()</code></td><td>Element has a DOM attribute</td><td>✓ <code>hasAttribute(name)</code> / <code>hasAttribute(name, value)</code></td></tr>
-            <tr><td><code>assertThat(locator).hasClass()</code></td><td>Element has a class</td><td><strong>Not yet</strong> — use <code>hasAttribute("class", "foo")</code> or check attribute</td></tr>
-            <tr><td><code>assertThat(locator).hasCount()</code></td><td>List has exact number of children</td><td>✓ <code>hasCount(n)</code> / <code>count(n)</code></td></tr>
-            <tr><td><code>assertThat(locator).hasCSS()</code></td><td>Element has CSS property</td><td><strong>Not yet</strong></td></tr>
-            <tr><td><code>assertThat(locator).hasId()</code></td><td>Element has an ID</td><td><strong>Not yet</strong> — use <code>hasAttribute("id", "myId")</code></td></tr>
-            <tr><td><code>assertThat(locator).hasJSProperty()</code></td><td>Element has JS property</td><td><strong>Not yet</strong></td></tr>
-            <tr><td><code>assertThat(locator).hasRole()</code></td><td>Element has ARIA role</td><td><strong>Not yet</strong></td></tr>
-            <tr><td><code>assertThat(locator).hasText()</code></td><td>Element matches text</td><td>✓ <code>hasText(expected)</code></td></tr>
-            <tr><td><code>assertThat(locator).hasValue()</code></td><td>Input has a value</td><td>✓ <code>hasValue(expected)</code></td></tr>
-            <tr><td><code>assertThat(locator).hasValues()</code></td><td>Select has options selected</td><td><strong>Not yet</strong> — use <code>getSelectedValues()</code> and assert in code</td></tr>
-            <tr><td><code>assertThat(locator).matchesAriaSnapshot()</code></td><td>Matches ARIA snapshot</td><td><strong>Not yet</strong></td></tr>
-            <tr><td><code>assertThat(page).hasTitle()</code></td><td>Page has a title</td><td>✓ <code>assertThat().hasTitle(expected)</code></td></tr>
-            <tr><td><code>assertThat(page).hasURL()</code></td><td>Page has a URL</td><td>✓ <code>assertThat().hasURL(pattern)</code></td></tr>
-            <tr><td><code>assertThat(response).isOK()</code></td><td>Response has OK status</td><td><strong>Not yet</strong> — no response API in CSTesting</td></tr>
-          </tbody>
-        </table>
+editable = await browser.locator("#email").is_editable()
+expect(editable).to_be_truthy()
+
+text = await browser.locator("h1").first().text_content()
+expect(text).to_contain("Example")
+
+title = await browser.evaluate("document.title")
+expect(title).to_contain("Domain")
+
+current = await browser.url()
+expect("example.com" in current).to_be_truthy()
+
+attr = await browser.locator("a").first().get_attribute("href")
+expect(attr).to_be_defined()</code></pre>
+
+        <h3 id="api-response">API responses</h3>
+        <p>For HTTP tests, assert on the chained response or on <code>get_response()</code> (see <code>example/apitesting_test.py</code>):</p>
+        <pre><code>from cstesting import describe, it, expect, request
+
+def _suite():
+    it("status", lambda: (
+        request.get("https://api.example.com/health")
+        .expect_status(200)
+    ))
+    def raw():
+        res = request.get("https://api.example.com/users/1")
+        res.expect_status(200)
+        r = res.get_response()
+        expect(r.status).to_be(200)
+    it("raw body", raw)
+
+describe("API", _suite)</code></pre>
+
+        <h2 id="comparison-playwright">Playwright-style <code>expect(locator)</code></h2>
+        <p>Python CSTesting does not re-export Playwright’s auto-retrying <code>expect</code>. Use Playwright’s action timeouts and <code>await browser.wait_for_selector(...)</code> before reading state, then plain <code>expect(...)</code>.</p>
 
         <h2 id="usage">Usage</h2>
-        <pre><code>// Element assertions
-browser.assertThat(browser.locator("h1")).isVisible();
-browser.assertThat(browser.locator("#email")).isEditable();
-browser.assertThat(browser.locator("button[type=submit]")).isEnabled();
-browser.assertThat(browser.locator(".message")).containText("Success");
-browser.assertThat(browser.locator("input[name=user]")).hasValue("alice");
-browser.assertThat(browser.locator("li")).hasCount(5);
+        <pre><code>from cstesting import describe, it, expect
 
-// Page assertions
-browser.assertThat().hasTitle("Example Domain");
-browser.assertThat().hasURL("https://example.com");
-browser.assertThat().hasURL("**/dashboard");</code></pre>
+def _suite():
+    it("math", lambda: expect(1 + 1).to_be(2))
+    it("list", lambda: expect([1, 2]).to_contain(2))
 
-        <p>All assertions throw <strong><code>AssertionError</code></strong> on failure.</p>
+describe("Unit", _suite)</code></pre>
+
+        <p>Failures raise <strong><code>cstesting.AssertionError</code></strong>.</p>
         <div class="docs-prev-next">
           <a href="docs-python-waits.html" class="docs-prev">
             <span class="docs-prev-next-label">Previous</span>

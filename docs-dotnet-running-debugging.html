@@ -86,69 +86,50 @@
         <h1 id="introduction">Running and debugging tests</h1>
 
         <h3 id="intro">Introduction</h3>
-        <p>CSTesting tests are run using the built-in <strong>CSTestingRunner</strong> with <strong>annotations</strong> (<code>@CSTest</code>, <code>@BeforeMethod</code>, <code>@AfterMethod</code>, etc.). You pass the test class to the runner from code or from the command line. The runner creates a <strong>new browser for each test method</strong>, injects it into your test class, and closes it after each test.</p>
-        <p>By default, tests run <strong>headless</strong> (no browser window). To see the browser, run in <strong>headed mode</strong> by setting <strong><code>headless(false)</code></strong> in the browser options.</p>
+        <p>CSTesting for .NET (<code>C:\CSTesting-DotNet</code>) is a <strong>library</strong> used from <strong>NUnit</strong> tests. You run tests with the normal .NET CLI: <strong><code>dotnet test</code></strong>. There is no separate Java-style <code>CSTestingRunner</code>. Create the browser in <code>[SetUp]</code> (or inside each test), and optionally inherit <strong><code>CSTestingNUnitBrowserFixtureBase</code></strong> so the browser is closed after each test and pause-on-failure works.</p>
+        <p>By default, use <strong><code>new CSTestingOptions { Headless = true }</code></strong> with <strong><code>CreateBrowserAsync</code></strong>. Set <strong><code>Headless = false</code></strong> to see the Chromium window while debugging.</p>
 
-        <h3 id="running-with-runner">Running with CSTestingRunner</h3>
-        <p>Use <strong><code>CSTestingRunner</code></strong> with a test class that extends <strong><code>CSTestingTestBase</code></strong> and uses <strong><code>@CSTest</code></strong>, <strong><code>@BeforeMethod</code></strong>, <strong><code>@AfterMethod</code></strong>, and optionally <strong><code>@BeforeSuite</code></strong>, <strong><code>@AfterSuite</code></strong>, <strong><code>@BeforeClass</code></strong>, <strong><code>@AfterClass</code></strong>. The runner discovers all <strong><code>@CSTest</code></strong> methods in the class and runs them one by one, with a fresh browser per test.</p>
-        <p><strong>Run all tests in a class from code:</strong></p>
-        <pre><code>public static void main(String[] args) {
-    CSTestingRunner.run(MyTest.class);
-}</code></pre>
-        <p><strong>Run with custom options (e.g. headed browser):</strong></p>
-        <pre><code>CSTestingRunner.run(MyTest.class, CSTestingOptions.builder().headless(false).build());</code></pre>
-        <p>Or override <strong><code>getBrowserOptions()</code></strong> in your test class so every run uses those options:</p>
-        <pre><code>@Override
-protected CSTestingOptions getBrowserOptions() {
-    return CSTestingOptions.builder().headless(false).build();
-}</code></pre>
-        <p><strong>Run from command line (Maven):</strong></p>
-        <pre><code>mvn exec:java -Dexec.mainClass="com.cstesting.runner.CSTestingRunner" -Dexec.args="com.example.MyTest"</code></pre>
-        <p>Replace <strong><code>com.example.MyTest</code></strong> with the <strong>fully qualified name</strong> of your test class. The runner executes <strong>every <code>@CSTest</code> method</strong> in that class.</p>
-        <p><strong>Run a single test class:</strong> Pass that class name as the first argument. To run only one test method, use a test class that has a single <strong><code>@CSTest</code></strong> method, or run the class and let the runner execute all its tests.</p>
-        <p><strong>Using the annotation-tests profile (if configured in your project):</strong></p>
-        <pre><code>mvn exec:java -Pannotation-tests</code></pre>
-        <p>This runs whatever test class is configured in the profile (e.g. <code>AnnotationTestExample</code>). Change the profile in <code>pom.xml</code> to point to your own test class if needed.</p>
-        <p>See <a href="docs-dotnet-annotations.html">NUnit &amp; lifecycle</a> for the full lifecycle and all annotations.</p>
+        <h3 id="running-with-runner">Running with <code>dotnet test</code></h3>
+        <p>From the solution or test project folder (see <code>README.md</code> in <code>C:\CSTesting-DotNet</code>):</p>
+        <pre><code>dotnet build
+playwright install chromium
+dotnet test</code></pre>
+        <p>Filter by NUnit categories / CSTesting tags (same ideas as Node):</p>
+        <pre><code>dotnet test --filter "TestCategory=smoke"</code></pre>
+        <p>Run one test fixture or method using NUnit filter expressions as usual.</p>
+        <p>See <a href="docs-dotnet-annotations.html">NUnit &amp; lifecycle</a> for <code>[TestFixture]</code>, <code>[SetUp]</code>, <code>CSTestingTag</code>, and environment variables for pause-on-failure.</p>
 
-        <h3 id="headed-mode">Run tests in headed mode</h3>
-        <p>By default, the browser runs <strong>headless</strong> (no window). To see the browser window while tests run, set <strong><code>headless(false)</code></strong>:</p>
-        <p><strong>When calling the runner from code:</strong></p>
-        <pre><code>CSTestingRunner.run(MyTest.class, CSTestingOptions.builder().headless(false).build());</code></pre>
-        <p><strong>When the test class is run by the runner:</strong> Override <strong><code>getBrowserOptions()</code></strong> in your test class:</p>
-        <pre><code>@Override
-protected CSTestingOptions getBrowserOptions() {
-    return CSTestingOptions.builder().headless(false).build();
-}</code></pre>
-        <p>Headed mode is useful for <strong>debugging</strong> and watching the test step through the page.</p>
+        <h3 id="headed-mode">Headed browser</h3>
+        <p>Pass options when creating the browser:</p>
+        <pre><code>Browser = await CreateBrowserAsync(new CSTestingOptions { Headless = false });</code></pre>
+        <p>Or toggle per debug session via your own helper or launchSettings.</p>
 
         <h3 id="running-from-ide">Running from the IDE</h3>
         <ol>
-          <li><strong>Run the test class's <code>main</code> method</strong> – If your test class has <strong><code>public static void main(String[] args)</code></strong> that calls <strong><code>CSTestingRunner.run(MyTest.class)</code></strong>, run that class as a Java application. All <strong><code>@CSTest</code></strong> methods in that class will run.</li>
-          <li><strong>Debug</strong> – Run the same <code>main</code> in debug mode and set breakpoints in your test methods or in CSTesting code. Execution will stop at breakpoints during the run.</li>
+          <li><strong>Visual Studio / Rider / VS Code</strong> – Use Test Explorer to run or debug NUnit tests; breakpoints in <code>[Test]</code> methods and in CSTesting sources work as with any async test.</li>
+          <li><strong>CLI</strong> – <code>dotnet test</code> from the repository root after <code>dotnet build</code>.</li>
         </ol>
 
         <h3 id="debugging-tips">Debugging tips</h3>
         <ol>
-          <li><strong>Headed mode</strong> – Use <strong><code>headless(false)</code></strong> to see what the browser is doing.</li>
-          <li><strong>Slow down</strong> – Add <strong><code>browser.waitForTime(2000)</code></strong> (or similar) before a failing step to watch the page state.</li>
-          <li><strong>Assertions</strong> – Use <strong><code>browser.assertThat(locator).isVisible()</code></strong> and other assertions to fail fast with a clear message.</li>
-          <li><strong>Breakpoints</strong> – Run from the IDE in debug mode and set breakpoints in your test or in CSTesting; step through as each <strong><code>@CSTest</code></strong> method runs.</li>
-          <li><strong>Console / network</strong> – In headed mode, you can use Chrome DevTools (if available) to inspect console logs and network.</li>
+          <li><strong>Headed mode</strong> – <code>Headless = false</code> in <code>CSTestingOptions</code>.</li>
+          <li><strong>Slow down</strong> – <strong><code>await Browser!.SleepAsync(2000)</code></strong> before a failing step.</li>
+          <li><strong>Assertions</strong> – Use NUnit <strong><code>Assert.That(...)</code></strong> with values from <code>await Browser.Locator(...).GetTextContentAsync()</code>, <code>await Browser.IsVisibleAsync(selector)</code>, etc. The browser API does not expose <code>assertThat</code>. See <a href="docs-dotnet-assertions.html">Assertions</a>.</li>
+          <li><strong>Pause on failure</strong> – Inherit <code>CSTestingNUnitBrowserFixtureBase</code> and set <code>CSTESTING_DEBUG=1</code> or <code>CSTESTING_PAUSE_ON_FAILURE=1</code> (see repo <code>docs/TAGS_AND_DEBUG.md</code>).</li>
+          <li><strong>DevTools</strong> – In headed mode, attach to the Chromium window.</li>
         </ol>
 
         <h3 id="summary">Summary</h3>
         <table class="docs-table">
           <thead>
-            <tr><th>Topic</th><th>CSTesting</th></tr>
+            <tr><th>Topic</th><th>CSTesting .NET</th></tr>
           </thead>
           <tbody>
-            <tr><td><strong>Run all tests in a class</strong></td><td><code>CSTestingRunner.run(MyTest.class)</code> or Maven: <code>mvn exec:java -Dexec.mainClass="com.cstesting.runner.CSTestingRunner" -Dexec.args="com.example.MyTest"</code>.</td></tr>
-            <tr><td><strong>Run single test class</strong></td><td>Pass that class name as the first argument to the runner. To run one test method only, use a class with a single <code>@CSTest</code> method.</td></tr>
-            <tr><td><strong>Headless (default)</strong></td><td>Default options or <code>CSTestingOptions.builder().headless(true).build()</code>.</td></tr>
-            <tr><td><strong>Headed (see browser)</strong></td><td><code>CSTestingOptions.builder().headless(false).build()</code> or override <code>getBrowserOptions()</code> in your test class.</td></tr>
-            <tr><td><strong>From IDE</strong></td><td>Run the test class's <code>main</code> (which calls <code>CSTestingRunner.run(MyTest.class)</code>). Use debug mode for breakpoints.</td></tr>
-            <tr><td><strong>Debugging</strong></td><td>Run in headed mode, add <code>waitForTime</code> if needed, use assertions and breakpoints in the IDE.</td></tr>
+            <tr><td><strong>Run tests</strong></td><td><code>dotnet test</code></td></tr>
+            <tr><td><strong>Filter by tag</strong></td><td><code>dotnet test --filter "TestCategory=smoke"</code> with <code>[CSTestingTag("smoke")]</code> or <code>[Category("smoke")]</code></td></tr>
+            <tr><td><strong>Headless</strong></td><td><code>new CSTestingOptions { Headless = true }</code> (typical default)</td></tr>
+            <tr><td><strong>Headed</strong></td><td><code>Headless = false</code></td></tr>
+            <tr><td><strong>From IDE</strong></td><td>NUnit Test Explorer, debug as usual</td></tr>
           </tbody>
         </table>
         <div class="docs-prev-next">
