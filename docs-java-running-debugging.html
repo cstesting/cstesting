@@ -83,7 +83,7 @@
       <div class="docs-content-inner">
         <div class="docs-main-content" id="docs-main-content">
 
-        <h2 id="introduction">Running and debugging tests</h2>
+        <h1 id="introduction">Running and debugging tests</h1>
 
         <h3 id="intro">Introduction</h3>
         <p>CSTesting tests are run using the built-in <strong>CSTestingRunner</strong> with <strong>annotations</strong> (<code>@CSTest</code>, <code>@BeforeMethod</code>, <code>@AfterMethod</code>, etc.). You pass the test class to the runner from code or from the command line. The runner creates a <strong>new browser for each test method</strong>, injects it into your test class, and closes it after each test.</p>
@@ -138,19 +138,21 @@ protected CSTestingOptions getBrowserOptions() {
         </ol>
 
         <h3 id="summary">Summary</h3>
-        <table class="docs-table">
-          <thead>
-            <tr><th>Topic</th><th>CSTesting</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><strong>Run all tests in a class</strong></td><td><code>CSTestingRunner.run(MyTest.class)</code> or Maven: <code>mvn exec:java -Dexec.mainClass="com.cstesting.runner.CSTestingRunner" -Dexec.args="com.example.MyTest"</code>.</td></tr>
-            <tr><td><strong>Run single test class</strong></td><td>Pass that class name as the first argument to the runner. To run one test method only, use a class with a single <code>@CSTest</code> method.</td></tr>
-            <tr><td><strong>Headless (default)</strong></td><td>Default options or <code>CSTestingOptions.builder().headless(true).build()</code>.</td></tr>
-            <tr><td><strong>Headed (see browser)</strong></td><td><code>CSTestingOptions.builder().headless(false).build()</code> or override <code>getBrowserOptions()</code> in your test class.</td></tr>
-            <tr><td><strong>From IDE</strong></td><td>Run the test class's <code>main</code> (which calls <code>CSTestingRunner.run(MyTest.class)</code>). Use debug mode for breakpoints.</td></tr>
-            <tr><td><strong>Debugging</strong></td><td>Run in headed mode, add <code>waitForTime</code> if needed, use assertions and breakpoints in the IDE.</td></tr>
-          </tbody>
-        </table>
+        <div class="docs-table-wrap">
+          <table class="docs-table">
+            <thead>
+              <tr><th>Topic</th><th>CSTesting</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Run all tests in a class</strong></td><td><code>CSTestingRunner.run(MyTest.class)</code> or Maven: <code>mvn exec:java -Dexec.mainClass="com.cstesting.runner.CSTestingRunner" -Dexec.args="com.example.MyTest"</code>.</td></tr>
+              <tr><td><strong>Run single test class</strong></td><td>Pass that class name as the first argument to the runner. To run one test method only, use a class with a single <code>@CSTest</code> method.</td></tr>
+              <tr><td><strong>Headless (default)</strong></td><td>Default options or <code>CSTestingOptions.builder().headless(true).build()</code>.</td></tr>
+              <tr><td><strong>Headed (see browser)</strong></td><td><code>CSTestingOptions.builder().headless(false).build()</code> or override <code>getBrowserOptions()</code> in your test class.</td></tr>
+              <tr><td><strong>From IDE</strong></td><td>Run the test class's <code>main</code> (which calls <code>CSTestingRunner.run(MyTest.class)</code>). Use debug mode for breakpoints.</td></tr>
+              <tr><td><strong>Debugging</strong></td><td>Run in headed mode, add <code>waitForTime</code> if needed, use assertions and breakpoints in the IDE.</td></tr>
+            </tbody>
+          </table>
+        </div>
         <div class="docs-prev-next">
           <a href="docs-java-writing-tests.html" class="docs-prev">
             <span class="docs-prev-next-label">Previous</span>

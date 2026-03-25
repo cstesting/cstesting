@@ -296,8 +296,25 @@
   margin: 24px 0;
 }
 
+/* Avoid double line when h2 immediately follows hr (hr already drew the separator) */
+.docs-content hr + h2 {
+  border-top: none;
+  padding-top: 0;
+}
+
+/* Wrapper for wide tables: horizontal scroll when content overflows */
+.docs-content .docs-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 16px 0 24px;
+}
+.docs-content .docs-table-wrap .docs-table {
+  margin: 0;
+}
+
 .docs-content .docs-table {
   width: 100%;
+  min-width: 480px;
   margin: 16px 0 24px;
   border-collapse: collapse;
   font-size: 0.9375rem;
@@ -368,7 +385,8 @@
 }
 
 .docs-prev,
-.docs-next-block {
+.docs-next-block,
+.docs-next {
   padding: 16px 20px;
   border-radius: 8px;
   text-decoration: none !important;
@@ -387,15 +405,17 @@
   border-color: var(--accent, #2dd4bf);
 }
 
-.docs-next-block {
-  border: 1px solid #e5e5e5;
+.docs-next-block,
+.docs-next {
+  border: 2px solid var(--accent, #2dd4bf);
   background: #fff;
   text-align: right;
 }
 
-.docs-next-block:hover {
-  background: #fafafa;
-  border-color: #d4d4d4;
+.docs-next-block:hover,
+.docs-next:hover {
+  background: rgba(45, 212, 191, 0.06);
+  border-color: var(--accent, #2dd4bf);
 }
 
 .docs-prev-next-label {
@@ -413,7 +433,8 @@
 }
 
 .docs-prev .docs-prev-next-title:hover,
-.docs-next-block .docs-prev-next-title:hover {
+.docs-next-block .docs-prev-next-title:hover,
+.docs-next .docs-prev-next-title:hover {
   text-decoration: underline !important;
 }
 
@@ -423,7 +444,8 @@
   justify-items: end;
 }
 
-.docs-prev-next--next-only .docs-next-block {
+.docs-prev-next--next-only .docs-next-block,
+.docs-prev-next--next-only .docs-next {
   max-width: 280px;
 }
 
@@ -446,7 +468,8 @@
     justify-items: stretch;
   }
 
-  .docs-prev-next--next-only .docs-next-block {
+  .docs-prev-next--next-only .docs-next-block,
+  .docs-prev-next--next-only .docs-next {
     max-width: none;
   }
 

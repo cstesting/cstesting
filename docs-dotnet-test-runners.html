@@ -82,9 +82,8 @@
     <main id="main" class="docs-content">
       <div class="docs-content-inner">
         <div class="docs-main-content" id="docs-main-content">
-        <h1 class="docs-section-heading">Getting Started</h1>
-
-        <h2 id="introduction">Test runners</h2>
+        
+        <h1 id="introduction">Test runners</h1>
 
         <h3 id="intro">Introduction</h3>
         <p>CSTesting does <strong>not</strong> integrate with JUnit or TestNG. It provides its <strong>own test runner</strong> (<strong>CSTestingRunner</strong>) and <strong>annotations</strong> (<code>@CSTest</code>, <code>@BeforeMethod</code>, <code>@AfterMethod</code>, <code>@BeforeClass</code>, <code>@AfterClass</code>, <code>@BeforeSuite</code>, <code>@AfterSuite</code>). You run tests by passing your test class to the runner from code or from the command line (Maven or Gradle). Each test method runs in a <strong>new browser</strong> for isolation; the runner creates and closes the browser for you.</p>

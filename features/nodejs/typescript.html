@@ -24,7 +24,7 @@
       </a>
       <nav class="nav" aria-label="Main">
         <a href="../../index.html#features">Features</a>
-        <a href="getting-started.html" class="nav-active">Docs</a>
+        <a href="getting-started.html" class="nav-active" id="docs-link">Docs</a>
         <a href="../../index.html#community">Community</a>
         <div class="nav-dropdown">
           <button type="button" class="nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="youtube-menu" id="youtube-trigger">YouTube</button>
@@ -84,7 +84,7 @@
     <main id="main" class="docs-content">
       <div class="docs-content-inner">
         <div class="docs-main-content" id="docs-main-content">
-        <h1 class="docs-section-heading">CSTesting — TypeScript</h1>
+        <h1 class="docs-section-heading">TypeScript</h1>
 
         <h2 id="introduction">Introduction</h2>
         <p>CSTesting supports <strong>TypeScript</strong> in two ways: the package ships with <strong>type definitions</strong> so you get type checking and editor support when writing tests or using the API in TypeScript, and the CLI can <strong>run TypeScript test files</strong> (<code>.test.ts</code>, <code>.spec.ts</code>) when <code>ts-node</code> is installed in your project.</p>
@@ -292,17 +292,16 @@ describe('Home page', () => {
             <li><a href="config-driven-tests.html">Config-driven tests</a></li>
             <li><a href="typescript.html">TypeScript</a></li>
             <li><a href="actions.html">Actions</a></li>
-            <li><a href="../../docs.html#locators">Locators</a></li>
-            <li><a href="../../docs.html#dialogs">Dialogs</a></li>
-            <li><a href="../../docs.html#navigations">Navigations</a></li>
+            <li><a href="annotations-and-test-control.html">Annotations and test control</a></li>
             <li><a href="assertions.html">Assertions</a></li>
             <li><a href="dialogs.html">Dialogs</a></li>
             <li><a href="command-line.html">Command line</a></li>
             <li><a href="frames.html">Frames</a></li>
             <li><a href="locators.html">Locators</a></li>
             <li><a href="navigations.html">Navigations</a></li>
-            <li><a href="annotations-and-test-control.html">Annotations and test control</a></li>
             <li><a href="../../docs-java.html">Java docs</a></li>
+            <li><a href="../../docs-python.html">Python docs</a></li>
+            <li><a href="../../docs-dotnet.html">C# docs</a></li>
           </ul>
         </div>
         <div class="footer-col">
@@ -322,6 +321,14 @@ describe('Home page', () => {
       try { sessionStorage.setItem('cstesting-platform', 'NodeJS'); } catch (e) {}
       var logoText = document.getElementById('logo-text');
       if (logoText) logoText.textContent = 'CSTesting for Node.js';
+      var logoLink = document.querySelector('header .logo');
+      if (logoLink) {
+        logoLink.setAttribute('href', '../../index.html');
+        logoLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = '../../index.html';
+        });
+      }
       var toggle = document.querySelector('.docs-sidebar-toggle');
       var sidebar = document.getElementById('docs-sidebar');
       if (toggle && sidebar) {

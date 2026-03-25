@@ -24,7 +24,7 @@
       </a>
       <nav class="nav" aria-label="Main">
         <a href="../../index.html#features">Features</a>
-        <a href="getting-started.html" class="nav-active">Docs</a>
+        <a href="getting-started.html" class="nav-active" id="docs-link">Docs</a>
         <a href="../../index.html#community">Community</a>
         <div class="nav-dropdown">
           <button type="button" class="nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="youtube-menu" id="youtube-trigger">YouTube</button>
@@ -87,94 +87,130 @@
         <h1 class="docs-section-heading">Installation</h1>
 
         <h2 id="installation">Introduction</h2>
-        <p><strong>CSTesting</strong> is a Node.js testing framework that includes:</p>
-        <ul>
-          <li><strong>Test runner</strong> — <code>describe</code> / <code>it</code>, hooks, assertions (Jest-style)</li>
-          <li><strong>Browser automation</strong> — CDP-based (Chrome/Chromium), no extra browser download</li>
-          <li><strong>API testing</strong> — Rest-Assured style HTTP requests and status/body assertions</li>
-          <li><strong>Config-driven tests</strong> — Run full flows from a simple config file (no code)</li>
-        </ul>
-        <p>You can run unit tests, API tests, and browser tests in one runner, and use config files for quick flows or non-developers.</p>
+        <p>CSTesting is a simple, extensible <strong>Node.js testing framework</strong>. You get a test runner and assertions (like a minimal Jest/Mocha), CDP-based browser automation (Chrome/Chromium), and <strong>config-driven tests</strong>—define and run full flows from a single config file and get one test case with an HTML report. No Playwright or Cypress required for core usage.</p>
 
-        <hr />
-        <h2 id="you-will-learn">You will learn</h2>
+        <p><strong>You will learn</strong></p>
         <ul>
           <li>How to install CSTesting</li>
-          <li>What gets created when you scaffold</li>
-          <li>How to run tests</li>
+          <li>What gets installed and scaffolded</li>
+          <li>How to run the example test</li>
           <li>How to open the HTML test report</li>
-          <li>How to update CSTesting</li>
-          <li>System requirements</li>
         </ul>
 
         <hr />
-        <h2 id="installing">Installing CSTesting</h2>
-        <h3>Using npm</h3>
-        <p>Add CSTesting to a new or existing Node.js project:</p>
-        <pre><code>npm install cstesting</code></pre>
-        <p>No global install needed. Use the CLI via <code>npx</code>:</p>
-        <pre><code>npx cstesting
-npx cst</code></pre>
+        <h2 id="installing-cstesting">Installing CSTesting</h2>
+        <p>Get started by installing CSTesting using one of the following methods.</p>
 
-        <h3>Scaffold (optional)</h3>
-        <p>Scaffold a Page Object Model structure (pages + tests with sample code):</p>
+        <h3 id="using-npm">Using npm</h3>
+        <p>The steps below either initialize a new project or add CSTesting to an existing one.</p>
+
+        <p><strong>1. Create a project (if needed)</strong></p>
+        <pre><code>mkdir my-tests
+cd my-tests
+npm init -y</code></pre>
+
+        <p><strong>2. Install CSTesting</strong></p>
+        <pre><code>npm install cstesting</code></pre>
+        <p>When the install finishes, the <strong>setup</strong> runs and prompts you to choose:</p>
+        <ul>
+          <li><strong>Language:</strong> TypeScript or JavaScript (choose <code>1</code> or <code>2</code>)</li>
+          <li><strong>Page Object Model:</strong> Create pages + tests scaffold? (<code>yes</code> / <code>no</code>)</li>
+        </ul>
+        <p>Your answers determine what is created: a <strong>tests/</strong> folder only (simple sample) or <strong>pages/</strong> and <strong>tests/</strong> with a Page Object example. You can run the setup again later with <code>npx cstesting init</code>; it will prompt again and create files based on your choices.</p>
+
+        <p><strong>Using yarn or pnpm</strong></p>
+        <pre><code>yarn init -y    # or pnpm init -y
+yarn add cstesting   # or pnpm add cstesting</code></pre>
+        <p>The same prompts appear after install.</p>
+
+        <hr />
+        <h2 id="whats-installed">What's Installed</h2>
+        <p>CSTesting adds the package to your project and, from your setup choices, creates a scaffold like one of these.</p>
+
+        <p><strong>If you chose Page Object Model (yes):</strong></p>
+        <pre><code>package.json
+package-lock.json       # or yarn.lock / pnpm-lock.yaml
+pages/
+  HomePage.js           # or HomePage.ts (TypeScript)
+tests/
+  home.test.js          # or home.test.ts (TypeScript)</code></pre>
+
+        <p><strong>If you chose no Page Object Model:</strong></p>
+        <pre><code>package.json
+package-lock.json
+tests/
+  sample.test.js        # or sample.test.ts (TypeScript)</code></pre>
+
+        <ul>
+          <li><strong>pages/</strong> (when POM is yes) — Page objects that wrap selectors and actions.</li>
+          <li><strong>tests/</strong> — Test files (<code>*.test.js</code>, <code>*.test.ts</code>, <code>*.spec.js</code>, <code>*.spec.ts</code>).</li>
+        </ul>
+        <p>For <strong>TypeScript</strong>, install dev dependencies after setup:</p>
+        <pre><code>npm install -D typescript ts-node</code></pre>
+
+        <hr />
+        <h2 id="running-example-test">Running the Example Test</h2>
+        <p>By default, tests run <strong>headless</strong> in your project directory. The CLI discovers all matching test files and prints results in the terminal.</p>
+        <pre><code>npx cstesting
+# or
+npx cstesting tests/
+# or use the short alias
+npx cst tests/</code></pre>
+        <p><strong>Tips:</strong></p>
+        <ul>
+          <li>Run a single file: <code>npx cstesting tests/home.test.js</code></li>
+          <li>Run with a pattern: <code>npx cstesting "**/*.test.js"</code></li>
+          <li>Run config-driven tests: <code>npx cstesting run login.conf</code> or <code>npx cstesting login.conf</code></li>
+        </ul>
+        <p>See the main <a href="config-driven-tests.html">Config-driven tests</a> guide for filtering by tags, headed mode, and config files.</p>
+
+        <hr />
+        <h2 id="html-test-report">HTML Test Report</h2>
+        <p>After a test run, an <strong>HTML report</strong> is written to the <code>report/</code> folder. The CLI prints the path (e.g. <code>report/report.html</code>). Open that file in your browser to see:</p>
+        <ul>
+          <li>Summary (passed / failed / skipped)</li>
+          <li>Tests grouped by file</li>
+          <li>Expandable steps and errors per test</li>
+        </ul>
+        <pre><code># After running tests, open the report (path is shown in the terminal)
+# Example: report/report.html</code></pre>
+        <p>No separate "show report" command is required—just open the printed path in your browser.</p>
+
+        <hr />
+        <h2 id="re-running-setup">Re-running Setup (init)</h2>
+        <p>If you skipped the install prompts (e.g. non-interactive install or CI), or want to scaffold again:</p>
         <pre><code>npx cstesting init
 # or
 npx cst init</code></pre>
-        <p>The command does not overwrite existing files; it only creates missing folders and sample files. No prompts.</p>
-        <p>CSTesting uses the <strong>system Chrome or Chromium</strong> (via chrome-launcher). There is no separate browser download step.</p>
-
-        <hr />
-        <h2 id="whats-installed">What's installed</h2>
-        <p>After <code>npm install cstesting</code> and (optionally) <code>npx cstesting init</code>:</p>
-        <ul>
-          <li><strong>package.json</strong> — Your project and dependencies (plus cstesting).</li>
-          <li><strong>pages/</strong> — Created by <code>init</code>. Page objects (e.g. <code>HomePage.js</code>) that wrap selectors and actions.</li>
-          <li><strong>tests/</strong> — Created by <code>init</code>. Sample test file <code>home.test.js</code>. You can add any <code>*.test.js</code>, <code>*.spec.js</code>, or (with ts-node) <code>*.test.ts</code> / <code>*.spec.ts</code>.</li>
-        </ul>
-        <p>There is no single config file for the test run. Browser options are set per call in code (e.g. <code>createBrowser({ headless: true })</code>) or in config-driven <code>.conf</code> files.</p>
-        <p><strong>Config-driven flows:</strong> You can create <code>.conf</code> files (e.g. <code>login.conf</code>) with steps like <code>goto:url</code>, <code>click=selector</code>, and run them with <code>npx cstesting run login.conf</code> — no test code required.</p>
-
-        <hr />
-        <h2 id="running-tests">Running tests</h2>
-        <ul>
-          <li><strong>Default:</strong> Tests run <strong>headless</strong> (no visible browser window).</li>
-          <li><strong>See the browser:</strong> In code use <code>createBrowser({ headless: false })</code>. In a <code>.conf</code> file set <code>headed=true</code> or <code>headless=false</code>.</li>
-        </ul>
-        <pre><code>npx cstesting
-npx cstesting tests/
-npx cstesting "**/*.test.js"
-npx cstesting path/to/file.test.js</code></pre>
-        <p>Test files run in sequence. Filter by path or pattern: pass a folder, a file path, or a glob.</p>
-
-        <hr />
-        <h2 id="html-report">HTML test report</h2>
-        <p>After each run, CSTesting writes an <strong>HTML report</strong> to <code>report/report.html</code> (the <code>report/</code> folder is created if missing). The report lists all tests with pass/fail/skip, duration, and expandable steps (if you use <code>step('name')</code> in tests). Failed tests show the error message and stack.</p>
-        <p>The report path is printed in the terminal after each run. Open it in your browser:</p>
-        <pre><code># Windows
-start report\report.html
-
-# macOS
-open report/report.html
-
-# Linux
-xdg-open report/report.html</code></pre>
+        <p>You will be asked again for <strong>language</strong> and <strong>Page Object Model</strong>; files are created based on your answers. Existing files are not overwritten by the current templates; you may need to adjust or merge manually if you re-run on an existing project.</p>
 
         <hr />
         <h2 id="updating">Updating CSTesting</h2>
         <p>Update to the latest version:</p>
-        <pre><code>npm install cstesting@latest</code></pre>
-        <p>No separate browser install; CSTesting uses the system Chrome/Chromium.</p>
+        <pre><code>npm install cstesting@latest
+# or
+yarn add cstesting@latest
+# or
+pnpm add cstesting@latest</code></pre>
         <p>Check the installed version:</p>
-        <pre><code>npm list cstesting</code></pre>
+        <pre><code>npx cstesting --version
+# or
+npx cst --version</code></pre>
 
         <hr />
         <h2 id="system-requirements">System requirements</h2>
         <ul>
-          <li><strong>Node.js:</strong> 16.0.0 or later (see <code>engines</code> in package.json).</li>
-          <li><strong>OS:</strong> Any OS where Node.js and Chrome or Chromium run (Windows, macOS, Linux).</li>
-          <li><strong>Browser:</strong> Chrome or Chromium must be installed on the machine. CSTesting launches it via chrome-launcher.</li>
-          <li><strong>Mobile emulation:</strong> Not supported.</li>
+          <li><strong>Node.js:</strong> 16.x or later (see <code>engines</code> in package.json).</li>
+          <li><strong>Browsers:</strong> Chrome or Chromium for CDP-based automation (used by the built-in browser support). Optional Playwright can be used if installed in the project.</li>
+          <li><strong>OS:</strong> Windows, macOS, or Linux.</li>
+        </ul>
+
+        <hr />
+        <h2 id="next-steps">Next steps</h2>
+        <ul>
+          <li>Add more tests under <strong>tests/</strong> or use <strong>pages/</strong> for the Page Object Model.</li>
+          <li>Run <strong>config-driven tests</strong> from a <code>.conf</code> file: see <a href="config-driven-tests.html">Config-driven tests</a>.</li>
+          <li>Use <strong>recording</strong> to generate tests: <code>npx cstesting record --output tests/flow.test.js</code>.</li>
         </ul>
 
         <div class="docs-prev-next docs-prev-next--next-only">
@@ -201,17 +237,16 @@ xdg-open report/report.html</code></pre>
             <li><a href="config-driven-tests.html">Config-driven tests</a></li>
             <li><a href="typescript.html">TypeScript</a></li>
             <li><a href="actions.html">Actions</a></li>
-            <li><a href="../../docs.html#locators">Locators</a></li>
-            <li><a href="../../docs.html#dialogs">Dialogs</a></li>
-            <li><a href="../../docs.html#navigations">Navigations</a></li>
+            <li><a href="annotations-and-test-control.html">Annotations and test control</a></li>
             <li><a href="assertions.html">Assertions</a></li>
             <li><a href="dialogs.html">Dialogs</a></li>
             <li><a href="command-line.html">Command line</a></li>
             <li><a href="frames.html">Frames</a></li>
             <li><a href="locators.html">Locators</a></li>
             <li><a href="navigations.html">Navigations</a></li>
-            <li><a href="annotations-and-test-control.html">Annotations and test control</a></li>
             <li><a href="../../docs-java.html">Java docs</a></li>
+            <li><a href="../../docs-python.html">Python docs</a></li>
+            <li><a href="../../docs-dotnet.html">C# docs</a></li>
           </ul>
         </div>
         <div class="footer-col">
@@ -231,6 +266,14 @@ xdg-open report/report.html</code></pre>
       try { sessionStorage.setItem('cstesting-platform', 'NodeJS'); } catch (e) {}
       var logoText = document.getElementById('logo-text');
       if (logoText) logoText.textContent = 'CSTesting for Node.js';
+      var logoLink = document.querySelector('header .logo');
+      if (logoLink) {
+        logoLink.setAttribute('href', '../../index.html');
+        logoLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = '../../index.html';
+        });
+      }
       var toggle = document.querySelector('.docs-sidebar-toggle');
       var sidebar = document.getElementById('docs-sidebar');
       if (toggle && sidebar) {

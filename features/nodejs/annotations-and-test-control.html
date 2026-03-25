@@ -24,7 +24,7 @@
       </a>
       <nav class="nav" aria-label="Main">
         <a href="../../index.html#features">Features</a>
-        <a href="getting-started.html" class="nav-active">Docs</a>
+        <a href="getting-started.html" class="nav-active" id="docs-link">Docs</a>
         <a href="../../index.html#community">Community</a>
         <div class="nav-dropdown">
           <button type="button" class="nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="youtube-menu" id="youtube-trigger">YouTube</button>
@@ -88,13 +88,13 @@
 
         <h2 id="introduction">Introduction</h2>
         <p>CSTesting lets you <strong>focus</strong> or <strong>skip</strong> tests and suites so you can run a subset of tests or temporarily disable some. Skipped tests are counted and shown in the HTML report.</p>
-        <p>This page describes what is supported. Features like custom annotations, conditional skip, or "expected to fail" are <strong>not implemented</strong> in the current version; the table at the end summarizes supported vs not supported. Tag-based running is supported; see <a href="tags.html">Tags</a>.</p>
+        <p>This page describes what is supported. Features like custom annotations, conditional skip, or "expected to fail" are <strong>not implemented</strong> in the current version; the table at the end summarizes supported vs not supported. Tag-based running is supported; see <a href="#tag-based-test-runs">Tags</a>.</p>
 
         <h2 id="you-will-learn">You will learn</h2>
         <ul>
           <li>How to focus tests (run only certain tests)</li>
           <li>How to skip tests or suites</li>
-          <li>How to run by tag (see <a href="tags.html">Tags</a>)</li>
+          <li>How to run by tag (see <a href="#tag-based-test-runs">Tags</a>)</li>
           <li>What is not yet supported (custom annotations, conditional skip, etc.)</li>
         </ul>
 
@@ -162,6 +162,117 @@ describe('this suite is skipped', () => {
         <p>The HTML report has a "Skipped" section listing all skipped tests (both from <code>only</code> and from <code>skip</code>). The terminal output shows: <code>Passed: X  Failed: Y  Skipped: Z  Total: N</code>.</p>
 
         <hr />
+        <h2 id="tag-based-test-runs">Tag-based test runs</h2>
+        <p>CSTesting can <strong>include</strong> or <strong>exclude</strong> tests by <strong>tags</strong>. Tag filters apply to normal script tests (<code>*.test.js</code>, <code>*.spec.ts</code>, etc.), not to <code>.conf</code> config runs.</p>
+
+        <h3 id="how-tags-attached">How tags are attached to a test</h3>
+        <p>Effective tags for each test are the <strong>union</strong> of:</p>
+        <ol>
+          <li>Tags on <strong><code>describe</code></strong> blocks from the root down to the test (suite tags apply to every nested test).</li>
+          <li>Tags on the <strong><code>it</code></strong> itself, from:
+            <ul>
+              <li><strong><code>@words</code> in the test title</strong> (only tokens that look like <code>@tag</code> after the start of the string or whitespace), and/or</li>
+              <li>The <strong><code>tags</code> option</strong> on <code>it</code> / <code>it.only</code> / <code>it.skip</code>.</li>
+            </ul>
+          </li>
+        </ol>
+        <p>Tag names use letters, digits, hyphen, and underscore (<code>[a-zA-Z][\w-]*</code> after <code>@</code>). Tokens such as <code>user@domain.com</code> are <strong>not</strong> treated as tags (the <code>@</code> must follow start or whitespace).</p>
+
+        <h4>Examples in code</h4>
+        <pre><code>const { describe, it, expect } = require('cstesting');
+
+describe('Checkout', { tags: ['e2e', 'regression'] }, () => {
+  // Inherits e2e, regression
+
+  it('@sanity @smoke completes purchase', async () => {
+    // Also has sanity, smoke (from title)
+  });
+
+  it('named only in options', { tags: ['flaky', 'slow'] }, async () => {
+    // Effective: e2e, regression, flaky, slow
+  });
+});</code></pre>
+        <pre><code>import { describe, it, expect } from 'cstesting';
+
+describe('API', { tags: ['api'] }, () => {
+  it('@smoke health check', async () => {
+    expect(1).toBe(1);
+  });
+});</code></pre>
+
+        <h3 id="normalization">Normalization</h3>
+        <ul>
+          <li>Leading <code>@</code> is optional in filters and is stripped when matching.</li>
+          <li>Comparison is <strong>case-insensitive</strong> (<code>Smoke</code>, <code>smoke</code>, <code>@SMOKE</code> match the same tag).</li>
+          <li>Whitespace around names is trimmed.</li>
+        </ul>
+
+        <h3 id="cli-include-tags">CLI: run only tests that have certain tags (include, OR)</h3>
+        <p>If you pass any include tag(s), <strong>only</strong> tests whose effective tags <strong>intersect</strong> that list are executed. Multiple values mean <strong>any of</strong> (OR), not all (AND).</p>
+        <div class="docs-table-wrap">
+          <table class="docs-table">
+            <thead>
+              <tr><th>Form</th><th>Example</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>--tag &lt;names&gt;</code></td><td><code>npx cstesting --tag smoke</code></td></tr>
+              <tr><td><code>--tags &lt;names&gt;</code></td><td><code>npx cstesting --tags smoke,sanity</code></td></tr>
+              <tr><td><code>-t &lt;names&gt;</code></td><td><code>npx cstesting -t smoke,sanity</code></td></tr>
+              <tr><td><code>--tag=a,b</code></td><td><code>npx cstesting tests/ --tag=smoke,sanity</code></td></tr>
+              <tr><td><code>-t=a,b</code></td><td><code>npx cstesting -t=@smoke,sanity</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>You can combine with a path or glob as usual:</p>
+        <pre><code>npx cstesting tests/ --tag smoke
+npx cstesting "**/*.test.js" -t sanity,regression</code></pre>
+        <p>Tests <strong>without</strong> any of the requested tags are <strong>skipped</strong> (counted as skipped in the report), not failed.</p>
+
+        <h3 id="cli-exclude-tags">CLI: skip tests that have certain tags (exclude)</h3>
+        <p>Exclude is applied <strong>after</strong> the include filter is considered: if a test would run, but any of its effective tags matches an excluded tag, it is <strong>skipped</strong>.</p>
+        <div class="docs-table-wrap">
+          <table class="docs-table">
+            <thead>
+              <tr><th>Form</th><th>Example</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>--skip-tag &lt;names&gt;</code></td><td><code>npx cstesting --skip-tag slow</code></td></tr>
+              <tr><td><code>--skip-tags a,b</code></td><td><code>npx cstesting --skip-tags slow,flaky</code></td></tr>
+              <tr><td><code>--exclude-tag</code> / <code>--exclude-tags</code></td><td>Same behavior as <code>--skip-tag</code> / <code>--skip-tags</code></td></tr>
+              <tr><td><code>--skip-tag=a,b</code></td><td><code>npx cstesting --skip-tag=slow,flaky</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="include-and-exclude-together">Include and exclude together</h3>
+        <p>Run tests that have <strong>smoke</strong>, but <strong>not</strong> if they are also tagged <strong>slow</strong>:</p>
+        <pre><code>npx cstesting tests/ --tag smoke --skip-tag slow</code></pre>
+        <p>Order of rules:</p>
+        <ol>
+          <li>If the test has <strong>any</strong> excluded tag → <strong>skip</strong>.</li>
+          <li>Else, if you passed <strong>no</strong> include tags → <strong>run</strong> (subject to <code>it.skip</code>, <code>describe.skip</code>, <code>.only</code>, etc.).</li>
+          <li>Else, if the test has <strong>any</strong> included tag → <strong>run</strong>; otherwise → <strong>skip</strong>.</li>
+        </ol>
+
+        <h3 id="programmatic-api-tags">Programmatic API</h3>
+        <pre><code>const { run } = require('cstesting');
+
+await run({
+  file: 'tests/e2e.test.js',
+  tags: ['smoke', 'sanity'],       // optional: same as CLI include (OR)
+  excludeTags: ['slow', 'flaky'],  // optional: same as --skip-tag
+});</code></pre>
+        <p>Options match <code>RunOptions</code> in the package types (<code>tags</code>, <code>excludeTags</code>, <code>file</code>, <code>pauseOnFailure</code>, …).</p>
+
+        <h3 id="html-report-tags">HTML report</h3>
+        <p>Passed/failed/skipped entries can carry <strong>tags</strong> for search and display in <code>report/report.html</code>.</p>
+
+        <h3 id="what-tag-filters-not-apply">What tag filters do <em>not</em> apply to</h3>
+        <ul>
+          <li><strong><code>cstesting run flow.conf</code></strong> / <strong><code>cstesting flow.conf</code></strong> — config-driven runs are separate flows; use different config files or sections if you need to split them.</li>
+        </ul>
+
+        <hr />
         <h2 id="not-supported">What is not supported (current version)</h2>
         <p>The following are <strong>not implemented</strong> in CSTesting. Use the workarounds below if you need similar behavior.</p>
         <table class="docs-table">
@@ -174,11 +285,11 @@ describe('this suite is skipped', () => {
             <tr><td><strong>Expected to fail</strong> (run test and expect it to fail)</td><td>No</td><td>Run the test normally; if it fails, that's the outcome. No "must fail" annotation.</td></tr>
             <tr><td><strong>Fixme</strong> (skip because broken/slow, with message)</td><td>No</td><td>Use <code>it.skip('message')</code> to skip; the message is in the test name only.</td></tr>
             <tr><td><strong>Slow</strong> (e.g. triple timeout)</td><td>No</td><td>No per-test timeout or "slow" annotation. Use a longer global timeout or split slow tests.</td></tr>
-            <tr><td><strong>Tags</strong> (e.g. <code>@fast</code>, <code>@slow</code> in title or options)</td><td>No</td><td>Tag-based running is supported; see <a href="tags.html">Tags</a>. For annotation-style tags in title, put keywords in the test/suite name and run by file or folder (e.g. <code>npx cstesting tests/fast/</code>). No <code>--grep</code> by tag.</td></tr>
+            <tr><td><strong>Tags</strong> (e.g. <code>@fast</code>, <code>@slow</code> in title or options)</td><td>Yes</td><td>See <a href="#tag-based-test-runs">Tag-based test runs</a>: <code>describe</code>/<code>it</code> options, <code>@words</code> in titles, CLI <code>--tag</code> / <code>--skip-tag</code>.</td></tr>
             <tr><td><strong>Custom annotations</strong> (type + description, e.g. issue URL)</td><td>No</td><td>No annotation API; report does not show custom annotations. Add context in the test name or in <code>step()</code> text.</td></tr>
             <tr><td><strong>Conditional skip</strong> (e.g. skip if browser is Firefox)</td><td>No</td><td>CSTesting runs one browser (Chrome). Use a normal <code>if</code> and return early, or skip the whole suite with <code>describe.skip</code> if needed.</td></tr>
             <tr><td><strong>Runtime annotations</strong> (add annotation during test)</td><td>No</td><td>No <code>test.info()</code> or similar. Use <code>step('description')</code> to add steps that appear in the report.</td></tr>
-            <tr><td><strong>Filter by tag from CLI</strong> (<code>--grep</code>, <code>--grep-invert</code>)</td><td>No</td><td>Filter by path/pattern only: <code>npx cstesting path/to/file.test.js</code> or <code>npx cstesting tests/smoke/</code>.</td></tr>
+            <tr><td><strong>Filter by tag from CLI</strong> (<code>--tag</code>, <code>--skip-tag</code>, etc.)</td><td>Yes</td><td>See <a href="#tag-based-test-runs">Tag-based test runs</a>. Jest-style <code>--grep</code> is not used; use tag flags instead.</td></tr>
           </tbody>
         </table>
 
@@ -195,7 +306,7 @@ describe('this suite is skipped', () => {
             <tr><td>Skip one suite</td><td><code>describe.skip('name', fn)</code></td><td>No tests in this suite run (all reported as skipped).</td></tr>
           </tbody>
         </table>
-        <p>Skipped tests (from <strong>only</strong> or <strong>skip</strong>) are included in the total count and listed in the HTML report under "Skipped". Tags, custom annotations, conditional skip, and grep by tag are not available in the current version.</p>
+        <p>Skipped tests (from <strong>only</strong> or <strong>skip</strong>) are included in the total count and listed in the HTML report under "Skipped". Tag-based runs use <a href="#tag-based-test-runs">include/exclude tags</a>. Custom annotations, conditional skip, and Jest-style <code>--grep</code> are not available in the current version.</p>
 
         <div class="docs-prev-next">
           <a href="actions.html" class="docs-prev">
@@ -232,10 +343,9 @@ describe('this suite is skipped', () => {
             <li><a href="locators.html">Locators</a></li>
             <li><a href="navigations.html">Navigations</a></li>
             <li><a href="annotations-and-test-control.html">Annotations and test control</a></li>
-            <li><a href="../../docs.html#locators">Locators</a></li>
-            <li><a href="../../docs.html#dialogs">Dialogs</a></li>
-            <li><a href="../../docs.html#navigations">Navigations</a></li>
             <li><a href="../../docs-java.html">Java docs</a></li>
+            <li><a href="../../docs-python.html">Python docs</a></li>
+            <li><a href="../../docs-dotnet.html">C# docs</a></li>
           </ul>
         </div>
         <div class="footer-col">
@@ -255,6 +365,14 @@ describe('this suite is skipped', () => {
       try { sessionStorage.setItem('cstesting-platform', 'NodeJS'); } catch (e) {}
       var logoText = document.getElementById('logo-text');
       if (logoText) logoText.textContent = 'CSTesting for Node.js';
+      var logoLink = document.querySelector('header .logo');
+      if (logoLink) {
+        logoLink.setAttribute('href', '../../index.html');
+        logoLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = '../../index.html';
+        });
+      }
       var toggle = document.querySelector('.docs-sidebar-toggle');
       var sidebar = document.getElementById('docs-sidebar');
       if (toggle && sidebar) {
