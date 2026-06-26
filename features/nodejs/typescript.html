@@ -113,13 +113,20 @@
 
         <hr />
         <h2 id="using-typescript">Using CSTesting in a TypeScript project</h2>
-        <h3>Install dependencies</h3>
+        <h3>New project (wizard)</h3>
+        <p>When you run <code>npm init cstesting@latest</code> (or <code>npx cstesting init</code>) and choose <strong>TypeScript</strong>, the wizard adds <code>typescript</code>, <code>ts-node</code>, and <code>@types/node</code> to <code>package.json</code>, writes <code>tsconfig.json</code>, and scaffolds <code>tests/sample.test.ts</code>. Then run:</p>
+        <pre><code>npm test
+# or
+npx cstesting tests/</code></pre>
+
+        <h3>Add TypeScript to an existing project</h3>
         <pre><code>npm install cstesting
-npm install -D typescript ts-node</code></pre>
+npm install -D typescript ts-node @types/node</code></pre>
         <ul>
           <li><strong>typescript</strong> — For compiling or type checking.</li>
           <li><strong>ts-node</strong> — So the CLI can run <code>.test.ts</code> / <code>.spec.ts</code> files on the fly (see <a href="#running-typescript-test-files">Running TypeScript test files</a>).</li>
         </ul>
+        <p>Add a <code>tsconfig.json</code> (see <a href="#tsconfig">TypeScript config</a>) and name your test files <code>*.test.ts</code> or <code>*.spec.ts</code>.</p>
 
         <h3>Import and use</h3>
         <p>Use <strong>ES module</strong> <code>import</code> syntax in your test files:</p>

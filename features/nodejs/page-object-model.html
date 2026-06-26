@@ -88,17 +88,12 @@
 
         <h2 id="introduction">Introduction</h2>
         <p>The <strong>Page Object Model (POM)</strong> is a pattern where you put selectors and page actions in separate classes (page objects) and use them in tests. This keeps tests readable and makes it easier to update selectors in one place when the UI changes.</p>
-        <p>CSTesting supports POM by:</p>
-        <ul>
-          <li><strong>Scaffolding</strong> a <code>pages/</code> and <code>tests/</code> structure with sample code via <code>npx cstesting init</code></li>
-          <li>Letting you <strong>pass the browser</strong> into page object classes so they call <code>browser.goto()</code>, <code>browser.click()</code>, <code>browser.locator()</code>, etc.</li>
-        </ul>
-        <p>This guide describes how to use POM with CSTesting.</p>
+        <p>CSTesting supports POM by letting you <strong>pass the browser</strong> into page object classes so they call <code>browser.goto()</code>, <code>browser.click()</code>, <code>browser.locator()</code>, etc. You create a <code>pages/</code> folder and page classes yourself — the install wizard only scaffolds a sample test file.</p>
 
         <h2 id="you-will-learn">You will learn</h2>
         <ul>
           <li>What the Page Object Model is and why to use it</li>
-          <li>How to scaffold the structure with <code>cstesting init</code></li>
+          <li>How to set up a <code>pages/</code> folder and write page object classes</li>
           <li>How to write a page object and use it in tests</li>
           <li>How to add more page objects (e.g. login, dashboard)</li>
         </ul>
@@ -113,20 +108,16 @@
         </ul>
 
         <hr />
-        <h2 id="scaffold">Scaffold the structure</h2>
-        <p>From your project root, run:</p>
-        <pre><code>npx cstesting init
-# or
-npx cst init</code></pre>
-        <p>This creates:</p>
+        <h2 id="scaffold">Set up the structure</h2>
+        <p>Create a <code>pages/</code> folder for page object classes alongside your existing <code>tests/</code> folder (created by <code>npm init cstesting@latest</code> or <code>npx cstesting init</code>):</p>
+        <pre><code>mkdir pages
+# add pages/HomePage.js (or HomePage.ts) and tests/home.test.js</code></pre>
+        <p>A typical layout:</p>
         <ul>
           <li><strong><code>pages/</code></strong> — folder for page object classes</li>
           <li><strong><code>tests/</code></strong> — folder for test files</li>
-          <li><strong><code>pages/HomePage.js</code></strong> — sample page object for example.com</li>
-          <li><strong><code>tests/home.test.js</code></strong> — sample test that uses <code>HomePage</code></li>
         </ul>
-        <p>Existing files are not overwritten. You can add more page objects and tests as needed.</p>
-        <p>Run the sample tests:</p>
+        <p>The examples below use <strong>pages/HomePage.js</strong> and <strong>tests/home.test.js</strong> — add these files yourself. Run the sample tests:</p>
         <pre><code>npx cstesting tests/
 # or
 npx cstesting tests/home.test.js</code></pre>
@@ -148,8 +139,8 @@ npx cstesting tests/home.test.js</code></pre>
         </ul>
 
         <hr />
-        <h2 id="example-homepage">Example: HomePage (scaffolded)</h2>
-        <p>The scaffolded <strong>pages/HomePage.js</strong> looks like this:</p>
+        <h2 id="example-homepage">Example: HomePage</h2>
+        <p>Here is a sample <strong>pages/HomePage.js</strong> you can create:</p>
         <pre><code>/**
  * Page Object: Home page (example.com).
  * Centralizes selectors and page actions — use in tests for maintainability.
@@ -334,7 +325,7 @@ describe('Login (POM)', () => {
             <tr><th>Step</th><th>Action</th></tr>
           </thead>
           <tbody>
-            <tr><td>Scaffold</td><td>Run <code>npx cstesting init</code> to create <code>pages/</code> and <code>tests/</code> with sample <code>HomePage</code> and <code>home.test.js</code>.</td></tr>
+            <tr><td>Set up</td><td>Create a <code>pages/</code> folder and add page object classes (e.g. <code>HomePage.js</code>). Use the <code>tests/</code> folder from <code>npm init cstesting@latest</code> for test files.</td></tr>
             <tr><td>Page object</td><td>Create a class that takes <code>browser</code> in the constructor and uses <code>this.browser</code> for actions. Export the class.</td></tr>
             <tr><td>Test</td><td>In <code>beforeAll</code>, create the browser and the page object (<code>new HomePage(browser)</code>). In tests, call page object methods and use <code>expect()</code>.</td></tr>
             <tr><td>Run</td><td><code>npx cstesting tests/</code> or <code>npx cstesting tests/home.test.js</code>.</td></tr>

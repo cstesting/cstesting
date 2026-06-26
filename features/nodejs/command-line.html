@@ -142,13 +142,14 @@ npx cstesting -t login example/browser1.test.js</code></pre>
         </table>
 
         <h3>Scaffold (init)</h3>
-        <p>Create the Page Object Model structure: <code>pages/</code> and <code>tests/</code> folders with sample <code>HomePage.js</code> and <code>home.test.js</code>. Does not overwrite existing files.</p>
+        <p>Run the Playwright-style project wizard: creates a tests folder with a sample test, updates <code>package.json</code> (including a <code>test</code> script), and optionally adds <code>tsconfig.json</code> and a GitHub Actions workflow. Does not overwrite existing files.</p>
         <p><strong>Syntax</strong></p>
-        <pre><code>npx cstesting init
+        <pre><code>npm init cstesting@latest
+npx cstesting init
 npx cst init</code></pre>
         <p><strong>Example</strong></p>
         <pre><code>npx cstesting init</code></pre>
-        <p>Output: lists created files and reminds you to run <code>npx cstesting tests/</code>.</p>
+        <p>Output: lists created files (e.g. <code>tests/sample.test.ts</code>) and reminds you to run <code>npm test</code> or <code>npx cstesting tests/</code>.</p>
 
         <h3>Run config file</h3>
         <p>Run a config-driven flow from a <code>.conf</code> or <code>.config</code> file (no test code). See <a href="config-driven-tests.html">Config-driven tests</a>.</p>
@@ -215,7 +216,7 @@ npx cstesting login.conf</code></pre>
           <tbody>
             <tr><td><code>npx cstesting</code></td><td>Run all tests (default pattern <code>**/*.test.js</code>).</td></tr>
             <tr><td><code>npx cstesting &lt;path&gt;</code></td><td>Run tests: path can be a file, directory, or glob (e.g. <code>tests/</code>, <code>tests/a.test.js</code>, <code>**/*.test.js</code>).</td></tr>
-            <tr><td><code>npx cstesting init</code></td><td>Scaffold <code>pages/</code> and <code>tests/</code> with sample POM files.</td></tr>
+            <tr><td><code>npx cstesting init</code></td><td>Run the project wizard: sample test, <code>package.json</code> scripts, optional TypeScript and GitHub Actions.</td></tr>
             <tr><td><code>npx cstesting run &lt;config&gt;</code></td><td>Run a config-driven flow (e.g. <code>login.conf</code>).</td></tr>
             <tr><td><code>npx cstesting &lt;file.conf&gt;</code></td><td>Same as <code>run</code> when the argument has extension <code>.conf</code> or <code>.config</code>.</td></tr>
           </tbody>

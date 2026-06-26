@@ -99,54 +99,56 @@
 
         <hr />
         <h2 id="installing-cstesting">Installing CSTesting</h2>
-        <p>Get started by installing CSTesting using one of the following methods.</p>
+        <p>Get started with a Playwright-style project wizard, or add CSTesting to an existing project.</p>
 
-        <h3 id="using-npm">Using npm</h3>
-        <p>The steps below either initialize a new project or add CSTesting to an existing one.</p>
-
-        <p><strong>1. Create a project (if needed)</strong></p>
+        <h3 id="new-project">New project (recommended)</h3>
+        <p>Create a folder, initialize npm, then run the CSTesting wizard. This is the same as <code>npm create cstesting@latest</code>.</p>
         <pre><code>mkdir my-tests
 cd my-tests
-npm init -y</code></pre>
-
-        <p><strong>2. Install CSTesting</strong></p>
-        <pre><code>npm install cstesting</code></pre>
-        <p>When the install finishes, the <strong>setup</strong> runs and prompts you to choose:</p>
+npm init -y
+npm init cstesting@latest</code></pre>
+        <p>The wizard prompts you for:</p>
         <ul>
-          <li><strong>Language:</strong> TypeScript or JavaScript (choose <code>1</code> or <code>2</code>)</li>
-          <li><strong>Page Object Model:</strong> Create pages + tests scaffold? (<code>yes</code> / <code>no</code>)</li>
+          <li><strong>Language:</strong> TypeScript or JavaScript (default: TypeScript)</li>
+          <li><strong>Tests folder:</strong> where to put end-to-end tests (default: <code>tests</code>, or <code>e2e</code> if <code>tests</code> already exists)</li>
+          <li><strong>GitHub Actions workflow:</strong> add a CI workflow (default: yes)</li>
+          <li><strong>Verify Chrome:</strong> check that Chrome/Edge is available for browser tests (default: yes)</li>
         </ul>
-        <p>Your answers determine what is created: a <strong>tests/</strong> folder only (simple sample) or <strong>pages/</strong> and <strong>tests/</strong> with a Page Object example. You can run the setup again later with <code>npx cstesting init</code>; it will prompt again and create files based on your choices.</p>
+        <p>When setup finishes, run <strong><code>npm test</code></strong> to execute the sample test.</p>
 
         <p><strong>Using yarn or pnpm</strong></p>
-        <pre><code>yarn init -y    # or pnpm init -y
-yarn add cstesting   # or pnpm add cstesting</code></pre>
-        <p>The same prompts appear after install.</p>
+        <pre><code>yarn create cstesting@latest    # or pnpm create cstesting@latest</code></pre>
+
+        <h3 id="existing-project">Existing project</h3>
+        <p>Install the package, then run the same interactive wizard:</p>
+        <pre><code>npm install cstesting
+npx cstesting init
+# or
+npx cst init</code></pre>
+        <p><code>npm install cstesting</code> alone does not scaffold files — run <code>npx cstesting init</code> (or use <code>npm init cstesting@latest</code> in a new folder) to create tests and configure the project.</p>
+
+        <h3 id="local-clone">Install from local clone</h3>
+        <p>If you are developing from the repo at <code>C:\CSTesting-Nodejs</code> (or another local path), install the package from that folder and run the wizard:</p>
+        <pre><code>npm install C:\CSTesting-Nodejs
+npx cstesting init</code></pre>
 
         <hr />
         <h2 id="whats-installed">What's Installed</h2>
-        <p>CSTesting adds the package to your project and, from your setup choices, creates a scaffold like one of these.</p>
-
-        <p><strong>If you chose Page Object Model (yes):</strong></p>
-        <pre><code>package.json
-package-lock.json       # or yarn.lock / pnpm-lock.yaml
-pages/
-  HomePage.js           # or HomePage.ts (TypeScript)
-tests/
-  home.test.js          # or home.test.ts (TypeScript)</code></pre>
-
-        <p><strong>If you chose no Page Object Model:</strong></p>
-        <pre><code>package.json
-package-lock.json
-tests/
-  sample.test.js        # or sample.test.ts (TypeScript)</code></pre>
+        <p>After the wizard completes, your project typically looks like this:</p>
+        <pre><code>package.json              # cstesting dependency + "test" script
+package-lock.json         # or yarn.lock / pnpm-lock.yaml
+tests/                    # or e2e/ (your chosen folder)
+  sample.test.ts          # or sample.test.js (JavaScript)
+tsconfig.json             # TypeScript only
+.github/workflows/
+  cstesting.yml           # if you chose GitHub Actions</code></pre>
 
         <ul>
-          <li><strong>pages/</strong> (when POM is yes) — Page objects that wrap selectors and actions.</li>
-          <li><strong>tests/</strong> — Test files (<code>*.test.js</code>, <code>*.test.ts</code>, <code>*.spec.js</code>, <code>*.spec.ts</code>).</li>
+          <li><strong>tests/</strong> (or your chosen folder) — Sample test file (<code>*.test.js</code>, <code>*.test.ts</code>, <code>*.spec.js</code>, <code>*.spec.ts</code>).</li>
+          <li><strong>package.json</strong> — Adds <code>cstesting</code>, sets <code>"test": "cstesting tests/"</code> (or your folder), and runs <code>npm install</code>.</li>
+          <li><strong>TypeScript</strong> — When you choose TypeScript, the wizard adds <code>typescript</code>, <code>ts-node</code>, and <code>@types/node</code> as dev dependencies and writes <code>tsconfig.json</code>. See <a href="typescript.html">TypeScript</a> for details.</li>
+          <li><strong>Page Object Model</strong> — Not part of the default scaffold. Create a <code>pages/</code> folder yourself when you want POM; see <a href="page-object-model.html">Page Object Model (POM)</a>.</li>
         </ul>
-        <p>For <strong>TypeScript</strong>, install dev dependencies after setup:</p>
-        <pre><code>npm install -D typescript ts-node</code></pre>
 
         <hr />
         <h2 id="running-example-test">Running the Example Test</h2>
@@ -178,11 +180,11 @@ npx cst tests/</code></pre>
 
         <hr />
         <h2 id="re-running-setup">Re-running Setup (init)</h2>
-        <p>If you skipped the install prompts (e.g. non-interactive install or CI), or want to scaffold again:</p>
+        <p>If you installed <code>cstesting</code> without running the wizard (e.g. CI or a plain <code>npm install</code>), or want to scaffold again:</p>
         <pre><code>npx cstesting init
 # or
 npx cst init</code></pre>
-        <p>You will be asked again for <strong>language</strong> and <strong>Page Object Model</strong>; files are created based on your answers. Existing files are not overwritten by the current templates; you may need to adjust or merge manually if you re-run on an existing project.</p>
+        <p>You will be asked again for <strong>language</strong>, <strong>tests folder</strong>, <strong>GitHub Actions</strong>, and <strong>Chrome verification</strong>. Existing files are not overwritten by the templates; you may need to adjust or merge manually if you re-run on an existing project.</p>
 
         <hr />
         <h2 id="updating">Updating CSTesting</h2>
@@ -208,7 +210,8 @@ npx cst --version</code></pre>
         <hr />
         <h2 id="next-steps">Next steps</h2>
         <ul>
-          <li>Add more tests under <strong>tests/</strong> or use <strong>pages/</strong> for the Page Object Model.</li>
+          <li>Add more tests under your tests folder (e.g. <strong>tests/</strong> or <strong>e2e/</strong>).</li>
+          <li>Organize selectors with the <a href="page-object-model.html">Page Object Model (POM)</a> pattern when your suite grows.</li>
           <li>Run <strong>config-driven tests</strong> from a <code>.conf</code> file: see <a href="config-driven-tests.html">Config-driven tests</a>.</li>
           <li>Use <strong>recording</strong> to generate tests: <code>npx cstesting record --output tests/flow.test.js</code>.</li>
         </ul>
